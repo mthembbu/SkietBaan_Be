@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.329
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkietbaanBE", "SkietbaanBE\SkietbaanBE.csproj", "{F07C6F90-4965-479F-ADCB-27E84AFC74A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkietbaanBETest", "SkietbaanBETest\SkietbaanBETest.csproj", "{36B4D2EE-889B-4561-AA07-C299D1D1279A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F07C6F90-4965-479F-ADCB-27E84AFC74A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F07C6F90-4965-479F-ADCB-27E84AFC74A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F07C6F90-4965-479F-ADCB-27E84AFC74A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F07C6F90-4965-479F-ADCB-27E84AFC74A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36B4D2EE-889B-4561-AA07-C299D1D1279A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36B4D2EE-889B-4561-AA07-C299D1D1279A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36B4D2EE-889B-4561-AA07-C299D1D1279A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36B4D2EE-889B-4561-AA07-C299D1D1279A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C0941F89-5725-4D9F-906D-3206D57CC402}
+	EndGlobalSection
+EndGlobal
