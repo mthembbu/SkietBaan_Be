@@ -29,6 +29,17 @@ namespace SkietbaanBE
             var connection = @"Server=dev.retrotest.co.za;Database=skietbaan;User Id=group3;Password=Y%6KG-bmr96Pe5rC;";
             services.AddDbContext<ModelsContext>
                 (options => options.UseSqlServer(connection));
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                builder => builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+            });
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,7 +50,7 @@ namespace SkietbaanBE
                 app.UseDeveloperExceptionPage();
             }
 
-
+            app.UseCors("CorsPolicy");
             app.UseMvc();
         }
     }
