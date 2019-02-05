@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SkietbaanBE.Models;
 
 namespace SkietbaanBE
 {
@@ -24,6 +26,10 @@ namespace SkietbaanBE
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            var connection = @"Server=dev.retrotest.co.za;Database=skietbaan;User Id=group3;Password=Y%6KG-bmr96Pe5rC;";
+            services.AddDbContext<ModelsContext>
+                (options => options.UseSqlServer(connection));
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
