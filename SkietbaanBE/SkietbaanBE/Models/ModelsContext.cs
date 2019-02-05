@@ -9,6 +9,8 @@ namespace SkietbaanBE.Models {
 
         //Tables
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Competition> Competition { get; set; }
+        
 
     }
 }
