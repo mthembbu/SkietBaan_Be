@@ -10,10 +10,8 @@ namespace SkietbaanBE.Models {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
         public virtual Competition Competition { get; set; }
         public virtual User User { get; set; }
-
         public int UserScore { get; set; }
         public string PictureURL { get; set; }
         public DateTime UploadDate { get; set; }

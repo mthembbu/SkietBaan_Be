@@ -17,7 +17,8 @@ namespace SkietbaanBE.Models {
         public DateTime MemberExpiry { get; set; }
         public DateTime EntryDate { get; set; }
         public bool Admin { get; set; }
-
+        public ICollection<UserGroup> UserGroups { get; set; }
+        public ICollection<Score> Scores { get; set; }
         public static implicit operator Task<object>(User v) {
             throw new NotImplementedException();
         }
