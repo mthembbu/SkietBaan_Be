@@ -25,13 +25,9 @@ namespace SkietbaanBE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
                     b.Property<string>("Name");
-
                     b.Property<bool>("Status");
-
                     b.HasKey("Id");
-
                     b.ToTable("Competitions");
                 });
 
@@ -39,11 +35,8 @@ namespace SkietbaanBE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
                     b.Property<string>("Name");
-
                     b.HasKey("Id");
-
                     b.ToTable("Groups");
                 });
 
@@ -51,23 +44,14 @@ namespace SkietbaanBE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
                     b.Property<int?>("CompetitionId");
-
                     b.Property<string>("PictureURL");
-
                     b.Property<DateTime>("UploadDate");
-
                     b.Property<int?>("UserId");
-
                     b.Property<int>("UserScore");
-
                     b.HasKey("Id");
-
                     b.HasIndex("CompetitionId");
-
                     b.HasIndex("UserId");
-
                     b.ToTable("Scores");
                 });
 
@@ -75,23 +59,14 @@ namespace SkietbaanBE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
                     b.Property<bool>("Admin");
-
                     b.Property<string>("Email");
-
                     b.Property<DateTime>("EntryDate");
-
                     b.Property<DateTime>("MemberExpiry");
-
                     b.Property<string>("MemberID");
-
                     b.Property<string>("Password");
-
                     b.Property<string>("Username");
-
                     b.HasKey("Id");
-
                     b.ToTable("Users");
                 });
 
@@ -99,23 +74,14 @@ namespace SkietbaanBE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
                     b.Property<int>("BestScore");
-
                     b.Property<int>("CompScore");
-
                     b.Property<int?>("CompetitionId");
-
                     b.Property<int?>("UserId");
-
                     b.Property<DateTime>("Year");
-
                     b.HasKey("Id");
-
                     b.HasIndex("CompetitionId");
-
                     b.HasIndex("UserId");
-
                     b.ToTable("UserCompStats");
                 });
 
@@ -123,17 +89,11 @@ namespace SkietbaanBE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
                     b.Property<int?>("GroupId");
-
                     b.Property<int?>("UserId");
-
                     b.HasKey("Id");
-
                     b.HasIndex("GroupId");
-
                     b.HasIndex("UserId");
-
                     b.ToTable("UserGroups");
                 });
 
@@ -142,7 +102,6 @@ namespace SkietbaanBE.Migrations
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
                         .WithMany()
                         .HasForeignKey("CompetitionId");
-
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
@@ -153,7 +112,6 @@ namespace SkietbaanBE.Migrations
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
                         .WithMany()
                         .HasForeignKey("CompetitionId");
-
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
@@ -164,7 +122,6 @@ namespace SkietbaanBE.Migrations
                     b.HasOne("SkietbaanBE.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId");
-
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
