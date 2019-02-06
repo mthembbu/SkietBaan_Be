@@ -12,5 +12,9 @@ namespace SkietbaanBE.Models {
         public int Id { get; set; }
         public string Name { get; set; }
         public ICollection<UserGroup> UserGroups { get; set; }
+
+        public Group() {
+            UserGroups = new HashSet<UserGroup>();
+        }
     }
 }

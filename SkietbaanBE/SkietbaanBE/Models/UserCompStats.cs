@@ -15,6 +15,5 @@ namespace SkietbaanBE.Models {
         public int BestScore { get; set; }
         public int CompScore { get; set; }
         public DateTime Year { get; set; }
-
     }
 }

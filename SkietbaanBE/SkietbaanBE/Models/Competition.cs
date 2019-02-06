@@ -13,5 +13,11 @@ namespace SkietbaanBE.Models {
         public string Name { get; set; }
         public bool Status { get; set; }
         public ICollection<Score> Scores { get; set; }
+        public ICollection<UserCompStats> UserCompStats { get; set; }
+        
+        public Competition() {
+            Scores = new HashSet<Score>();
+            UserCompStats = new HashSet<UserCompStats>();
+        }
     }
 }

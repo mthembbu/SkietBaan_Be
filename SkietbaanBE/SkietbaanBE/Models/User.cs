@@ -19,6 +19,14 @@ namespace SkietbaanBE.Models {
         public bool Admin { get; set; }
         public ICollection<UserGroup> UserGroups { get; set; }
         public ICollection<Score> Scores { get; set; }
+        public ICollection<UserCompStats> UserCompStats { get; set; }
+
+        public User() {
+            UserGroups = new HashSet<UserGroup>();
+            Scores = new HashSet<Score>();
+            UserCompStats = new HashSet<UserCompStats>();
+        }
+
         public static implicit operator Task<object>(User v) {
             throw new NotImplementedException();
         }
