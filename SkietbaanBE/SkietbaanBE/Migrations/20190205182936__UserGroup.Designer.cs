@@ -11,8 +11,8 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    [Migration("20190205132800_SecondCompetition")]
-    partial class SecondCompetition
+    [Migration("20190205182936__UserGroup")]
+    partial class _UserGroup
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,42 +21,35 @@ namespace SkietbaanBE.Migrations
                 .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("SkietbaanBE.Models.Competition", b =>
+            modelBuilder.Entity("SkietbaanBE.Models.UserGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Name");
+                    b.Property<int>("GId");
 
-                    b.Property<bool>("Status");
+                    b.Property<int>("UId");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Competition");
+                    b.HasIndex("GId");
+
+                    b.HasIndex("UId");
+
+                    b.ToTable("UserGroups");
                 });
 
-            modelBuilder.Entity("SkietbaanBE.Models.User", b =>
+            modelBuilder.Entity("SkietbaanBE.Models.UserGroup", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.HasOne("SkietbaanBE.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Property<bool>("Admin");
-
-                    b.Property<string>("Email");
-
-                    b.Property<DateTime>("EntryDate");
-
-                    b.Property<DateTime>("MemberExpiry");
-
-                    b.Property<string>("MemberID");
-
-                    b.Property<string>("Password");
-
-                    b.Property<string>("Username");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

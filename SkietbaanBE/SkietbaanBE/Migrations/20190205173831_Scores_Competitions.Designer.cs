@@ -11,8 +11,8 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    [Migration("20190205131907_CompetitionMigrations")]
-    partial class CompetitionMigrations
+    [Migration("20190205173831_Scores_Competitions")]
+    partial class Scores_Competitions
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,7 +32,31 @@ namespace SkietbaanBE.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Competition");
+                    b.ToTable("Competitions");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CompetitionID");
+
+                    b.Property<string>("PictureURL");
+
+                    b.Property<DateTime>("UploadDate");
+
+                    b.Property<int>("UserID");
+
+                    b.Property<int>("_Score");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetitionID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Scores");
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.User", b =>
@@ -56,7 +80,20 @@ namespace SkietbaanBE.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.Competition", "Competition")
+                        .WithMany()
+                        .HasForeignKey("CompetitionID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
