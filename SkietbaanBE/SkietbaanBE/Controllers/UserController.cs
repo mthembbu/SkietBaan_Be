@@ -78,13 +78,5 @@ namespace SkietbaanBE.Controllers
             _context.SaveChanges();
             return new OkObjectResult("User update successful");
         }
-
-        // DELETE: api/ApiWithActions/5
-        //[HttpDelete]
-       /// public void Delete(User user)
-       // {
-            //_context.Users.Remove(user);
-            // _context.SaveChanges();
-        //}
     }
 }
