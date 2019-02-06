@@ -11,8 +11,8 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    [Migration("20190206062231_UserCompStats")]
-    partial class UserCompStats
+    [Migration("20190206075919_MagicMigration")]
+    partial class MagicMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -52,21 +52,21 @@ namespace SkietbaanBE.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CompetitionID");
+                    b.Property<int?>("CompetitionId");
 
                     b.Property<string>("PictureURL");
 
                     b.Property<DateTime>("UploadDate");
 
-                    b.Property<int>("UserID");
+                    b.Property<int?>("UserId");
 
-                    b.Property<int>("_Score");
+                    b.Property<int>("UserScore");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompetitionID");
+                    b.HasIndex("CompetitionId");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Scores");
                 });
@@ -104,17 +104,17 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<int>("CompScore");
 
+                    b.Property<int?>("CompetitionId");
+
+                    b.Property<int?>("UserId");
+
                     b.Property<DateTime>("Year");
-
-                    b.Property<int>("_CompID");
-
-                    b.Property<int>("_UserID");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("_CompID");
+                    b.HasIndex("CompetitionId");
 
-                    b.HasIndex("_UserID");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserCompStats");
                 });
@@ -124,15 +124,15 @@ namespace SkietbaanBE.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("GId");
+                    b.Property<int?>("GroupId");
 
-                    b.Property<int>("UId");
+                    b.Property<int?>("UserId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GId");
+                    b.HasIndex("GroupId");
 
-                    b.HasIndex("UId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserGroups");
                 });
@@ -141,39 +141,33 @@ namespace SkietbaanBE.Migrations
                 {
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
                         .WithMany()
-                        .HasForeignKey("CompetitionID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CompetitionId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.UserCompStats", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
                         .WithMany()
-                        .HasForeignKey("_CompID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CompetitionId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("_UserID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.UserGroup", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Group", "Group")
                         .WithMany()
-                        .HasForeignKey("GId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("GroupId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

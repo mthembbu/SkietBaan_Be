@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SkietbaanBE.Models {
     public class UserCompStats {
-
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public int _UserID { get; set; }
-        [ForeignKey("_UserID")]
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
-        public int _CompID { get; set; }
-        [ForeignKey("_CompID")]
-        public Competition Competition { get; set; }
+        public virtual Competition Competition { get; set; }
 
         public int BestScore { get; set; }
         public int CompScore { get; set; }
