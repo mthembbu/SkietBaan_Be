@@ -5,7 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace SkietbaanBE.Models {
-    public class User {
+    public class User
+    {
 
         public int Id { get; set; }
         public string Username { get; set; }
@@ -15,9 +16,5 @@ namespace SkietbaanBE.Models {
         public DateTime MemberExpiry { get; set; }
         public DateTime EntryDate { get; set; }
         public bool Admin { get; set; }
-
-        public static implicit operator Task<object>(User v) {
-            throw new NotImplementedException();
-        }
     }
 }
