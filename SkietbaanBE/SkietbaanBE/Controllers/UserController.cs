@@ -18,9 +18,6 @@ namespace SkietbaanBE.Controllers
         {
             _context = db;
         }
-
-        //public UserController() { }
-
         // GET: api/User
         [HttpGet]
         public IEnumerable<User> Get()
@@ -28,7 +25,6 @@ namespace SkietbaanBE.Controllers
             var users = _context.Users.ToArray<User>();
             return users;
         }
-
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
         public async Task<User> Get(int id)
@@ -36,23 +32,23 @@ namespace SkietbaanBE.Controllers
             User user = await _context.Users.FindAsync(id);
             return user;
         }
-
         // POST: api/User
-        [HttpPost]
-        public async Task<HttpResponseMessage> Post([FromBody] User user)
+        [HttpPost("{id}")]
+        public async Task<HttpResponseMessage> Post(int id,[FromBody] User user)
         {
-            
             if (ModelState.IsValid)
             {
+                User dbUser = await _context.Users.FindAsync(id);
+                //user not found
+                if(user == null)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                }
                 //get today's date and save it under user entry date
-                DateTime currentDate = new DateTime();
-                user.EntryDate = currentDate;
-
+                user.EntryDate = DateTime.Now;
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
-
-
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             else
@@ -60,8 +56,7 @@ namespace SkietbaanBE.Controllers
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
         }
-
-        // PUT: api/User/5
+        // PUT: api/User/
         [HttpPut]
         public async Task<ActionResult> Put([FromBody] User user)
         {
@@ -74,7 +69,6 @@ namespace SkietbaanBE.Controllers
             {
                 return new OkObjectResult("user does not exist");
             }
-
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return new OkObjectResult("User update successful");
