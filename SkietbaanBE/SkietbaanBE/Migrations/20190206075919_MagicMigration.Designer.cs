@@ -11,9 +11,10 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    partial class ModelsContextModelSnapshot : ModelSnapshot
+    [Migration("20190206075919_MagicMigration")]
+    partial class MagicMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,11 +140,11 @@ namespace SkietbaanBE.Migrations
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
-                        .WithMany("Scores")
+                        .WithMany()
                         .HasForeignKey("CompetitionId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany("Scores")
+                        .WithMany()
                         .HasForeignKey("UserId");
                 });
 
@@ -161,11 +162,11 @@ namespace SkietbaanBE.Migrations
             modelBuilder.Entity("SkietbaanBE.Models.UserGroup", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Group", "Group")
-                        .WithMany("UserGroups")
+                        .WithMany()
                         .HasForeignKey("GroupId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany("UserGroups")
+                        .WithMany()
                         .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
