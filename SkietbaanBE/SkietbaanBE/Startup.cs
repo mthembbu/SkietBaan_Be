@@ -26,7 +26,7 @@ namespace SkietbaanBE
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();services.AddDbContext<ModelsContext>
-                (options => options.UseSqlServer(Configuration.GetConnectionString("BloggingDatabase")));
+                (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanDatabase")));
 
             services.AddCors(options =>
             {
