@@ -30,8 +30,8 @@ namespace SkietbaanBE.Controllers
         {
             return await _context.Users.FindAsync(id);
         }
-        // POST: api/User
-        [HttpPost("{id}")]
+        // POST: api/User/id
+        [HttpPut("{id}")]
         public async Task<HttpResponseMessage> Post(int id,[FromBody] User user)
         {
             if (ModelState.IsValid)
@@ -56,9 +56,10 @@ namespace SkietbaanBE.Controllers
             }
         }
         // PUT: api/User/
-        [HttpPut]
-        public async Task<ActionResult> Put([FromBody] User user)
+        [HttpPost]
+        public async Task<ActionResult> Post([FromBody] User user)
         {
+
             //error handling, check if client provided valid data
             if (user == null)
             {
@@ -72,5 +73,29 @@ namespace SkietbaanBE.Controllers
             await _context.SaveChangesAsync();
             return new OkObjectResult("User update successful");
         }
+
+        // POST: api/user/login
+        [HttpPost("login")]
+        public async Task<ActionResult> LoginPost([FromBody]User user)
+        {
+            if (user.Username == null || user.Password == null || user.Email == null)
+            {
+                return new BadRequestObjectResult("No empty fields allowed");
+            }
+            
+            foreach (User dbUser in Get())
+            {
+                if (dbUser.Username.Equals(user.Username))
+                {
+                    if (dbUser.Password.Equals(user.Password))
+                        return new OkObjectResult("Successful login");
+                    else
+                        return new BadRequestObjectResult("Incorrect Password or Username");
+                }
+
+            }
+            return new BadRequestObjectResult("User not found");
+        }
+
     }
 }
