@@ -55,25 +55,6 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("user cannot be null");
             }
         }
-        // POST: api/login
-        [HttpPost]
-        public async Task<ActionResult> LoginPost([FromBody]string username, string password, string email)
-        {
-            foreach (User user in Get().Result) {
-
-                if (username == null || password == null || email == null)
-                {
-                    return new BadRequestObjectResult("No empty fields allowed");
-                }else if (user.Username.Equals(username) && user.Password.Equals(password) && user.Email.Equals(email)){
-                    return new OkObjectResult("Successful login");
-                }
-                else
-                {
-                    return new BadRequestObjectResult("Unsuccessful login");
-                }
-            }
-            return null;
-        }
         // PUT: api/User/
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id,[FromBody] User user)
