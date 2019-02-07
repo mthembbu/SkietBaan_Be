@@ -32,16 +32,16 @@ namespace SkietbaanBE.Controllers
         }
         // POST: api/User
         [HttpPost]
-        public async Task<IActionResult> AddUser(int id,[FromBody] User user)
+        public async Task<IActionResult> AddUser([FromBody] User user)
         {
             if (ModelState.IsValid)
             {
                 //get user with the specified ID from database
-                User dbUser = await _context.Users.FindAsync(id);
+                User dbUser = await _context.Users.FindAsync(user.Id);
                 //user not found
-                if(dbUser == null)
+                if(dbUser != null)
                 {
-                    return NotFound("User does not exist");
+                    return NotFound("User already exist");
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
@@ -59,13 +59,14 @@ namespace SkietbaanBE.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id,[FromBody] User user)
         {
-
+            //get user with the specified ID from database
+            User dbUser = await _context.Users.FindAsync(id);
             //error handling, check if client provided valid data
             if (user == null)
             {
                 return new BadRequestObjectResult("user cannot be null");
             }
-            else if (GetUser(user.Id) == null)
+            else if (dbUser == null)
             {
                 return NotFound("user does not exist");
             }
@@ -84,7 +85,7 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("No empty fields allowed");
             }
 
-            foreach (User dbUser in Get())
+            foreach (User dbUser in GetUsers())
             {
                 if (dbUser.Username.Equals(user.Username))
                 {
