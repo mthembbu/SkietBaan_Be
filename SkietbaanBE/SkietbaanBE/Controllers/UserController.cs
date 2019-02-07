@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,61 +21,58 @@ namespace SkietbaanBE.Controllers
         }
         // GET: api/User
         [HttpGet]
-        public IEnumerable<User> Get()
+        public IEnumerable<User> GetUsers()
         {
-           return _context.Users.ToArray<User>();
+            return _context.Users.ToArray<User>();
         }
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
-        public async Task<User> Get(int id)
+        public async Task<User> GetUser(int id)
         {
             return await _context.Users.FindAsync(id);
         }
-        // POST: api/User/id
-        [HttpPut("{id}")]
-        public async Task<HttpResponseMessage> Post(int id,[FromBody] User user)
+        // POST: api/User
+        [HttpPost]
+        public async Task<IActionResult> AddUser(int id, [FromBody] User user)
         {
             if (ModelState.IsValid)
             {
                 //get user with the specified ID from database
                 User dbUser = await _context.Users.FindAsync(id);
                 //user not found
-                if(dbUser == null)
+                if (dbUser == null)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                    return NotFound("User does not exist");
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
-                return new HttpResponseMessage(HttpStatusCode.OK);
+                return Ok("User saved successfully");
             }
             else
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                return new BadRequestObjectResult("user cannot be null");
             }
         }
         // PUT: api/User/
-        [HttpPost]
-        public async Task<ActionResult> Post([FromBody] User user)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
-
             //error handling, check if client provided valid data
             if (user == null)
             {
                 return new BadRequestObjectResult("user cannot be null");
             }
-            else if (Get(user.Id) == null)
+            else if (GetUser(user.Id) == null)
             {
-                return new OkObjectResult("user does not exist");
+                return NotFound("user does not exist");
             }
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
-            return new OkObjectResult("User update successful");
+            return Ok("User update successful");
         }
-
-
         // POST: api/user/login
         [HttpPost("login")]
         public async Task<ActionResult> LoginPost([FromBody]User user)
@@ -84,7 +82,7 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("No empty fields allowed");
             }
 
-            foreach (User dbUser in Get())
+            foreach (User dbUser in GetUsers())
             {
                 if (dbUser.Username.Equals(user.Username))
                 {
@@ -97,6 +95,6 @@ namespace SkietbaanBE.Controllers
             }
             return new BadRequestObjectResult("User not found");
         }
-
     }
 }
+
