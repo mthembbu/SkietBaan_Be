@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace SkietbaanBE.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Test")]
+    [Route("api/[controller]")]
     public class TestController : Controller
     {
         // GET: api/Test
@@ -19,3 +19,4 @@ namespace SkietbaanBE.Controllers
         }
     }
 }
+
