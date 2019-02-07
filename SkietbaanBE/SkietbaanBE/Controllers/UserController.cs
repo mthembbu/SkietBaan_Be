@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -22,7 +23,7 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<User> GetUsers()
         {
-           return _context.Users.ToArray<User>();
+            return _context.Users.ToArray<User>();
         }
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
@@ -57,7 +58,7 @@ namespace SkietbaanBE.Controllers
         }
         // PUT: api/User/
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id,[FromBody] User user)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
             //get user with the specified ID from database
             User dbUser = await _context.Users.FindAsync(id);
@@ -74,8 +75,6 @@ namespace SkietbaanBE.Controllers
             await _context.SaveChangesAsync();
             return Ok("User update successful");
         }
-
-
         // POST: api/user/login
         [HttpPost("login")]
         public async Task<ActionResult> LoginPost([FromBody]User user)
@@ -84,7 +83,6 @@ namespace SkietbaanBE.Controllers
             {
                 return new BadRequestObjectResult("No empty fields allowed");
             }
-
             foreach (User dbUser in GetUsers())
             {
                 if (dbUser.Username.Equals(user.Username))
@@ -94,10 +92,9 @@ namespace SkietbaanBE.Controllers
                     else
                         return new BadRequestObjectResult("Incorrect Password or Username");
                 }
-
             }
             return new BadRequestObjectResult("User not found");
         }
-
     }
 }
+
