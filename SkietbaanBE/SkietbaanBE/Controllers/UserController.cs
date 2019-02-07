@@ -59,6 +59,7 @@ namespace SkietbaanBE.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id,[FromBody] User user)
         {
+
             //error handling, check if client provided valid data
             if (user == null)
             {
@@ -72,5 +73,30 @@ namespace SkietbaanBE.Controllers
             await _context.SaveChangesAsync();
             return Ok("User update successful");
         }
+
+
+        // POST: api/user/login
+        [HttpPost("login")]
+        public async Task<ActionResult> LoginPost([FromBody]User user)
+        {
+            if (user.Username == null || user.Password == null || user.Email == null)
+            {
+                return new BadRequestObjectResult("No empty fields allowed");
+            }
+
+            foreach (User dbUser in Get())
+            {
+                if (dbUser.Username.Equals(user.Username))
+                {
+                    if (dbUser.Password.Equals(user.Password))
+                        return new OkObjectResult("Successful login");
+                    else
+                        return new BadRequestObjectResult("Incorrect Password or Username");
+                }
+
+            }
+            return new BadRequestObjectResult("User not found");
+        }
+
     }
 }
