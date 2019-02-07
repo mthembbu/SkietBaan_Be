@@ -11,7 +11,7 @@ using SkietbaanBE.Models;
 namespace SkietbaanBE.Controllers
 {
     [Produces("application/json")]
-    [Route("api/User")]
+    [Route("api/[controller]")]
     public class UserController : Controller
     {
         private ModelsContext _context;
@@ -31,6 +31,7 @@ namespace SkietbaanBE.Controllers
         {
             return await _context.Users.FindAsync(id);
         }
+        
         // POST: api/User
         [HttpPost]
         public async Task<IActionResult> AddUser([FromBody] User user)
