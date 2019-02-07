@@ -39,7 +39,7 @@ namespace SkietbaanBE.Controllers
                 //get user with the specified ID from database
                 User dbUser = await _context.Users.FindAsync(id);
                 //user not found
-                if(user == null)
+                if(dbUser == null)
                 {
                     return new HttpResponseMessage(HttpStatusCode.NotFound);
                 }
