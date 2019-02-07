@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -22,7 +23,7 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<User> GetUsers()
         {
-           return _context.Users.ToArray<User>();
+            return _context.Users.ToArray<User>();
         }
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
@@ -32,16 +33,16 @@ namespace SkietbaanBE.Controllers
         }
         // POST: api/User
         [HttpPost]
-        public async Task<IActionResult> AddUser(int id,[FromBody] User user)
+        public async Task<IActionResult> AddUser([FromBody] User user)
         {
             if (ModelState.IsValid)
             {
                 //get user with the specified ID from database
-                User dbUser = await _context.Users.FindAsync(id);
+                User dbUser = await _context.Users.FindAsync(user.Id);
                 //user not found
-                if(dbUser == null)
+                if(dbUser != null)
                 {
-                    return NotFound("User does not exist");
+                    return NotFound("User already exist");
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
@@ -57,14 +58,16 @@ namespace SkietbaanBE.Controllers
         }
         // PUT: api/User/
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id,[FromBody] User user)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
+            //get user with the specified ID from database
+            User dbUser = await _context.Users.FindAsync(id);
             //error handling, check if client provided valid data
             if (user == null)
             {
                 return new BadRequestObjectResult("user cannot be null");
             }
-            else if (GetUser(user.Id) == null)
+            else if (dbUser == null)
             {
                 return NotFound("user does not exist");
             }
@@ -72,5 +75,26 @@ namespace SkietbaanBE.Controllers
             await _context.SaveChangesAsync();
             return Ok("User update successful");
         }
+        // POST: api/user/login
+        [HttpPost("login")]
+        public async Task<ActionResult> LoginPost([FromBody]User user)
+        {
+            if (user.Username == null || user.Password == null || user.Email == null)
+            {
+                return new BadRequestObjectResult("No empty fields allowed");
+            }
+            foreach (User dbUser in GetUsers())
+            {
+                if (dbUser.Username.Equals(user.Username))
+                {
+                    if (dbUser.Password.Equals(user.Password))
+                        return new OkObjectResult("Successful login");
+                    else
+                        return new BadRequestObjectResult("Incorrect Password or Username");
+                }
+            }
+            return new BadRequestObjectResult("User not found");
+        }
     }
 }
+
