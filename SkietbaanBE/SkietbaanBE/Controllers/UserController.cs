@@ -22,15 +22,13 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<User> GetUsers()
         {
-            var users = _context.Users.ToArray<User>();
-            return users;
+           return _context.Users.ToArray<User>();
         }
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
         public async Task<User> GetUser(int id)
         {
-            User user = await _context.Users.FindAsync(id);
-            return user;
+            return await _context.Users.FindAsync(id);
         }
         // POST: api/User
         [HttpPost]
@@ -38,9 +36,10 @@ namespace SkietbaanBE.Controllers
         {
             if (ModelState.IsValid)
             {
+                //get user with the specified ID from database
                 User dbUser = await _context.Users.FindAsync(id);
                 //user not found
-                if(user == null)
+                if(dbUser == null)
                 {
                     return NotFound("User does not exist");
                 }
