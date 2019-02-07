@@ -20,21 +20,21 @@ namespace SkietbaanBE.Controllers
         }
         // GET: api/User
         [HttpGet]
-        public IEnumerable<User> Get()
+        public IEnumerable<User> GetUsers()
         {
             var users = _context.Users.ToArray<User>();
             return users;
         }
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
-        public async Task<User> Get(int id)
+        public async Task<User> GetUser(int id)
         {
             User user = await _context.Users.FindAsync(id);
             return user;
         }
         // POST: api/User
-        [HttpPost("{id}")]
-        public async Task<HttpResponseMessage> Post(int id,[FromBody] User user)
+        [HttpPost]
+        public async Task<IActionResult> AddUser(int id,[FromBody] User user)
         {
             if (ModelState.IsValid)
             {
@@ -42,36 +42,36 @@ namespace SkietbaanBE.Controllers
                 //user not found
                 if(user == null)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                    return NotFound("User does not exist");
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
-                return new HttpResponseMessage(HttpStatusCode.OK);
+                return Ok("User saved successfully");
             }
             else
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                return new BadRequestObjectResult("user cannot be null");
             }
         }
         // PUT: api/User/
-        [HttpPut]
-        public async Task<ActionResult> Put([FromBody] User user)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id,[FromBody] User user)
         {
             //error handling, check if client provided valid data
             if (user == null)
             {
                 return new BadRequestObjectResult("user cannot be null");
             }
-            else if (Get(user.Id) == null)
+            else if (GetUser(user.Id) == null)
             {
-                return new OkObjectResult("user does not exist");
+                return NotFound("user does not exist");
             }
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
-            return new OkObjectResult("User update successful");
+            return Ok("User update successful");
         }
     }
 }

@@ -10,3 +10,4 @@ namespace SkietbaanBE.Models {
         public bool Status { get; set; }
     }
 }
+

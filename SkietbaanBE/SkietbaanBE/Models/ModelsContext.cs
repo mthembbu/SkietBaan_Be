@@ -12,3 +12,4 @@ namespace SkietbaanBE.Models {
         public virtual DbSet<Competition> Competition { get; set; }
     }
 }
+

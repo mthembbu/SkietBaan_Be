@@ -17,3 +17,4 @@ namespace SkietbaanBE.Models {
         public bool Admin { get; set; }
     }
 }
+
