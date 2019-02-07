@@ -74,6 +74,7 @@ namespace SkietbaanBE.Controllers
             return new OkObjectResult("User update successful");
         }
 
+
         // POST: api/user/login
         [HttpPost("login")]
         public async Task<ActionResult> LoginPost([FromBody]User user)
@@ -82,7 +83,7 @@ namespace SkietbaanBE.Controllers
             {
                 return new BadRequestObjectResult("No empty fields allowed");
             }
-            
+
             foreach (User dbUser in Get())
             {
                 if (dbUser.Username.Equals(user.Username))
