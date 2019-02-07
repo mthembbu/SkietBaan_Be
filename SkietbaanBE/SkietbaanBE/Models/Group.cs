@@ -6,17 +6,15 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace SkietbaanBE.Models {
-    public class Competition {
+    public class Group {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool Status { get; set; }
-        public ICollection<Score> Scores { get; set; }
-        public ICollection<UserCompStats> UserCompStats { get; set; }
-        public Competition() {
-            Scores = new HashSet<Score>();
-            UserCompStats = new HashSet<UserCompStats>();
+        public ICollection<UserGroup> UserGroups { get; set; }
+
+        public Group() {
+            UserGroups = new HashSet<UserGroup>();
         }
     }
 }
