@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
 
 namespace SkietbaanBE.Models {
     public class ModelsContext : DbContext {
@@ -12,4 +14,3 @@ namespace SkietbaanBE.Models {
         public virtual DbSet<UserCompStats> UserCompStats { get; set; }
     }
 }
-
