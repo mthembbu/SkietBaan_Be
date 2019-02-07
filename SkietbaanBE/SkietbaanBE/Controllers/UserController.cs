@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SkietbaanBE.Models;
 
@@ -10,50 +14,82 @@ namespace SkietbaanBE.Controllers
     public class UserController : Controller
     {
         private ModelsContext _context;
-        public UserController(ModelsContext db) {
+        public UserController(ModelsContext db)
+        {
             _context = db;
         }
-
-        //public UserController() { }
-
         // GET: api/User
         [HttpGet]
-        public IEnumerable<User> Get() {
-            var users = _context.Users.ToArray<User>();
-            return users;
+        public IEnumerable<User> GetUsers()
+        {
+           return _context.Users.ToArray<User>();
         }
-
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
-        public User Get(int id) {
-            User user = _context.Users.Find(id);
-            return user;
+        public async Task<User> GetUser(int id)
+        {
+            return await _context.Users.FindAsync(id);
         }
-
-        [HttpGet("test/{ret}", Name = "Test")]
-        public string Test(string ret) {
-            return $"Returned : {ret}";
-        }
-
         // POST: api/User
         [HttpPost]
-        public virtual void Post([FromBody] User user) {
-            _context.Add(user);
-            _context.SaveChanges();
+        public async Task<IActionResult> AddUser(int id,[FromBody] User user)
+        {
+            if (ModelState.IsValid)
+            {
+                //get user with the specified ID from database
+                User dbUser = await _context.Users.FindAsync(id);
+                //user not found
+                if(dbUser == null)
+                {
+                    return NotFound("User does not exist");
+                }
+                //get today's date and save it under user entry date
+                user.EntryDate = DateTime.Now;
+                //Save User
+                await _context.AddAsync(user);
+                await _context.SaveChangesAsync();
+                return Ok("User saved successfully");
+            }
+            else
+            {
+                return new BadRequestObjectResult("user cannot be null");
+            }
         }
+        // POST: api/login
+        [HttpPost]
+        public async Task<ActionResult> LoginPost([FromBody]string username, string password, string email)
+        {
+            foreach (User user in Get().Result) {
 
-        // PUT: api/User/5
-        [HttpPut]
-        public void Put([FromBody] User user) {
+                if (username == null || password == null || email == null)
+                {
+                    return new BadRequestObjectResult("No empty fields allowed");
+                }else if (user.Username.Equals(username) && user.Password.Equals(password) && user.Email.Equals(email)){
+                    return new OkObjectResult("Successful login");
+                }
+                else
+                {
+                    return new BadRequestObjectResult("Unsuccessful login");
+                }
+            }
+            return null;
+        }
+        // PUT: api/User/
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id,[FromBody] User user)
+        {
+            //error handling, check if client provided valid data
+            if (user == null)
+            {
+                return new BadRequestObjectResult("user cannot be null");
+            }
+            else if (GetUser(user.Id) == null)
+            {
+                return NotFound("user does not exist");
+            }
             _context.Users.Update(user);
-            _context.SaveChanges();
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete]
-        public void Delete(User user) {
-            _context.Users.Remove(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            return Ok("User update successful");
         }
     }
 }
