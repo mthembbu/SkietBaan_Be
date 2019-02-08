@@ -39,24 +39,23 @@ namespace SkietbaanBE.Controllers
             if (ModelState.IsValid)
             {
                 //get user with the specified ID from database
-                User dbUser = await _context.Users.FindAsync(user.Id);
-                //user not found
-                if(dbUser != null)
+                List<User> dbUsers =  _context.Users.ToList<User>();
+                for(int i = 0; i < dbUsers.Count; i++)
                 {
-                    return NotFound("User already exist");
+                    if (dbUsers.ElementAt(i).Username.ToUpper().Equals(user.Username.ToUpper()))
+                    {
+                        return Ok("User already exists");
+                    }
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
-
                 //encrypt password
                 user.Password = Security.HashSensitiveData(user.Password);
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
                 return Ok("User saved successfully");
-            }
-            else
-            {
+            }else{
                 return new BadRequestObjectResult("user cannot be null");
             }
         }
