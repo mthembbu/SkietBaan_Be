@@ -6,6 +6,7 @@ namespace SkietbaanBE.Models {
     public class ModelsContext : DbContext {
         public ModelsContext(DbContextOptions<ModelsContext> options)
            : base(options) { }
+        public ModelsContext() { }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Competition> Competitions { get; set; }
         public virtual DbSet<Score> Scores { get; set; }
