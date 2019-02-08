@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SkietbaanBE.Models;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace SkietbaanBE
 {
@@ -33,6 +34,9 @@ namespace SkietbaanBE
                 .AllowAnyHeader()
                 .AllowCredentials());
             });
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("Skietbaan", new Info { Title = "Skietbaan API", Version = "v1" });
+            });
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -43,6 +47,11 @@ namespace SkietbaanBE
                 app.UseDeveloperExceptionPage();
             }
             app.UseMvc();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/Skietbaan/swagger.json", "SkietbaanBE");
+            });
+            app.UseSwagger();
         }
     }
 }
