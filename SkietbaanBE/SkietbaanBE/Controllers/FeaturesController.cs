@@ -32,7 +32,5 @@ namespace SkietbaanBE.Controllers
             }
             return null;
         }
-
-
     }
 }

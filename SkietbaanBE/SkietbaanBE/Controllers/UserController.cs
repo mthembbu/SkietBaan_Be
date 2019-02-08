@@ -47,6 +47,9 @@ namespace SkietbaanBE.Controllers
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
+
+                //encrypt password
+                user.Password = Security.HashSensitiveData(user.Password);
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
@@ -72,6 +75,10 @@ namespace SkietbaanBE.Controllers
             {
                 return NotFound("user does not exist");
             }
+            //prevent this method from updating the current hashed password
+            user.Password = dbUser.Password;
+
+            //saving updated user details (except password)
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return Ok("User update successful");
@@ -88,7 +95,7 @@ namespace SkietbaanBE.Controllers
             {
                 if (dbUser.Username.Equals(user.Username))
                 {
-                    if (dbUser.Password.Equals(user.Password))
+                    if (Security.CompareHashedData(dbUser.Password,user.Password))
                         return new OkObjectResult("Successful login");
                     else
                         return new BadRequestObjectResult("Incorrect Password or Username");
