@@ -26,9 +26,6 @@ namespace SkietbaanBE.Models {
             Scores = new HashSet<Score>();
             UserCompStats = new HashSet<UserCompStats>();
         }
-        public static implicit operator Task<object>(User v) {
-            throw new NotImplementedException();
-        }
     }
 }
 
