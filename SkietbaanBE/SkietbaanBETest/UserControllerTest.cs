@@ -29,7 +29,7 @@ namespace SkietbaanBETest {
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(mockData.GetEnumerator());
             var mockContext = new Mock<ModelsContext>();
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
-            var controller = new UserController(mockContext.Object);
+            var controller = new UserController(mockContext.Object, null);
             var users = controller.GetUsers();
 
             Assert.IsNotEmpty(users);
