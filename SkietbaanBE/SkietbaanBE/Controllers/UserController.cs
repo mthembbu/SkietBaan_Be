@@ -53,6 +53,11 @@ namespace SkietbaanBE.Controllers
                                     .Where(u => u.Username == user.Username)
                                     .FirstOrDefault<User>();
                 if (dbUser != null)
+
+                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+
+                //if user aready exist return
+                if(dbUser != null)
                 {
                     return Ok("User already exists");
                 }
@@ -63,6 +68,7 @@ namespace SkietbaanBE.Controllers
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
+
                 return Ok("User saved successfully");
             }
             else
