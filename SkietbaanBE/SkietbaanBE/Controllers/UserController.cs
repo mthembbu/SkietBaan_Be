@@ -39,12 +39,9 @@ namespace SkietbaanBE.Controllers
             if (ModelState.IsValid)
             {
                 User dbUser = null; //assume user does not exist
-                using (_context)
-                {
-                    dbUser = _context.Users
-                                     .Where(u => u.Username == user.Username)
-                                     .FirstOrDefault<User>();
-                }
+
+                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+
                 //if user aready exist return
                 if(dbUser != null)
                 {
@@ -57,6 +54,7 @@ namespace SkietbaanBE.Controllers
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
+
                 return Ok("User saved successfully");
             }else{
                 return new BadRequestObjectResult("user cannot be null");
