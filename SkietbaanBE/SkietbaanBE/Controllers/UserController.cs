@@ -45,7 +45,7 @@ namespace SkietbaanBE.Controllers
                 }
                 else
                 {
-                    User dbUser = null; //assume user does not exist
+                    var dbUser = null; //assume user does not exist
                     using (_context)
                     {
                         dbUser = _context.Users
