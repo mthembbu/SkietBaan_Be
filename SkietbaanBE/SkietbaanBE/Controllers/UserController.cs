@@ -124,7 +124,7 @@ namespace SkietbaanBE.Controllers
         [HttpPost("login")]
         public IActionResult CreateToken([FromBody]User user)
         {
-            IActionResult response = Unauthorized();
+            var response = Unauthorized();
             var _user = Authenticate(user);
             
             if (_user != null)
