@@ -16,13 +16,11 @@ namespace SkietbaanBETest {
         private IQueryable<User> mockData = new List<User> {
             new User{
                 Id=1, Username="Superman", Password="Clark Kent", Email="DC@comics.com", MemberID=null,
-                Admin=false, EntryDate=DateTime.Now.Date, MemberExpiry=DateTime.MinValue, Scores=null,
-                UserCompStats=null, UserGroups=null
+                Admin=false, EntryDate=DateTime.Now.Date, MemberExpiry=DateTime.MinValue
             },
             new User {
                 Id=2, Username="Thanos", Password="Infinity Stone", Email="mavel@comics.com", MemberID="YES",
-                Admin=false, EntryDate=DateTime.Now.Date, MemberExpiry=DateTime.MaxValue, Scores=null,
-                UserCompStats=null, UserGroups=null
+                Admin=false, EntryDate=DateTime.Now.Date, MemberExpiry=DateTime.MaxValue
             }
         }.AsQueryable();
 
