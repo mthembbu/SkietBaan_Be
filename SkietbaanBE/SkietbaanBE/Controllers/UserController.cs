@@ -43,8 +43,6 @@ namespace SkietbaanBE.Controllers
                 {
                     return new BadRequestObjectResult("user cannot be null");
                 }
-                else
-                {
                     using (_context)
                     {
                         var dbUser = _context.Users
@@ -64,8 +62,6 @@ namespace SkietbaanBE.Controllers
                         await _context.SaveChangesAsync();
                         return Ok("User update successful");
                     }
-
-                }
             }
             else
             {
