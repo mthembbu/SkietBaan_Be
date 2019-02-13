@@ -42,8 +42,6 @@ namespace SkietbaanBE.Controllers
             {
                 return new BadRequestObjectResult("No empty fields allowed");
             }
-            else
-            {
                 User dbUser = _context.Users.Where(u => u.Username == user.Username)
                     .FirstOrDefault<User>();
 
@@ -59,7 +57,6 @@ namespace SkietbaanBE.Controllers
                 _context.Users.Update(dbUser);
                 await _context.SaveChangesAsync();
                 return Ok("User update successful");
-            }
         }
     }
 }
