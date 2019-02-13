@@ -71,8 +71,7 @@ namespace SkietbaanBE.Controllers
                 }
                 else
                 {
-                    User dbUser = null; //assume user does not exist
-                    dbUser = _context.Users.Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
+                    User dbUser = _context.Users.Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
                         .FirstOrDefault<User>();
                     if (dbUser != null)
                     {
