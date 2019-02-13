@@ -55,7 +55,7 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<string>("PictureURL");
 
-                    b.Property<DateTime>("UploadDate");
+                    b.Property<DateTime?>("UploadDate");
 
                     b.Property<int?>("UserId");
 
@@ -139,11 +139,11 @@ namespace SkietbaanBE.Migrations
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
-                        .WithMany("Scores")
+                        .WithMany()
                         .HasForeignKey("CompetitionId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany("Scores")
+                        .WithMany()
                         .HasForeignKey("UserId");
                 });
 
@@ -161,11 +161,11 @@ namespace SkietbaanBE.Migrations
             modelBuilder.Entity("SkietbaanBE.Models.UserGroup", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Group", "Group")
-                        .WithMany("UserGroups")
+                        .WithMany()
                         .HasForeignKey("GroupId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany("UserGroups")
+                        .WithMany()
                         .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618

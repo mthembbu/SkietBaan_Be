@@ -14,6 +14,6 @@ namespace SkietbaanBE.Models {
         public virtual User User { get; set; }
         public int UserScore { get; set; }
         public string PictureURL { get; set; }
-        public DateTime UploadDate { get; set; }
+        public DateTime? UploadDate { get; set; }
     }
 }
