@@ -32,5 +32,23 @@ namespace SkietbaanBE.Controllers
             }
             return null;
         }
+
+        //// PUT: api/User/Update
+        [HttpPut]
+        [ActionName("Update")]
+        public async Task<IActionResult> PutUserMember(String username, [FromBody] User user)
+        {
+            User dbUser = null; //assume user does not exist
+            dbUser = _context.Users.Where(u => u.Username == user.Username)
+                .FirstOrDefault<User>();
+
+            //now updating user details
+            dbUser.MemberID = user.MemberID;
+            dbUser.EntryDate = user.EntryDate;
+            dbUser.MemberExpiry = user.MemberExpiry;
+            _context.Users.Update(dbUser);
+            await _context.SaveChangesAsync();
+            return Ok("User update successful");
+        }
     }
 }
