@@ -1,0 +1,123 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using SkietbaanBE.Models;
+
+namespace SkietbaanBE.Controllers
+{
+    [Produces("application/json")]
+    [Route("api/Competition")]
+
+    public class CompetitionController : Controller
+    {
+        private ModelsContext _context;
+        public CompetitionController(ModelsContext db)
+        {
+            _context = db;
+        }
+ //----------------------------------------------------------------------------------------------------------------------------------------
+        /** The method to return an array of competition objects*/
+        // GET: api/Competition
+        [HttpGet]
+        public IEnumerable<Competition> Get()
+        {
+            return _context.Competition.ToArray<Competition>();
+        }
+//----------------------------------------------------------------------------------------------------------------------------------------
+        //Getting the competition by ID
+        // GET: api/Competition/5
+        [HttpGet("{id}", Name = "Get")]
+        public async Task<Competition> CompetitionGet(int id)
+        {
+            return await _context.Competition.FindAsync(id);
+        }
+ //----------------------------------------------------------------------------------------------------------------------------------------
+        //Getting the competition by ID
+        // GET: api/Competition/5
+        [HttpGet("{compTitle}", Name = "Get")]
+        public async Task<Competition> CompetitionGet(string compTitle)
+        {
+            return await _context.Competition.FindAsync(compTitle);
+        }
+//----------------------------------------------------------------------------------------------------------------------------------------
+        //posting the competition to the competition table
+        // POST: api/Competition
+        [HttpPost]
+        public async Task<IActionResult> addCompetition([FromBody]Competition comp)
+        {
+            if (ModelState.IsValid)
+            {
+                Competition dbComp = null; //assume the competition does not exist
+
+                dbComp = _context.Competitions.FirstOrDefault(x => x.compTitle == comp.compTitle);
+                //if competition aready exist return
+                if (dbComp != null)
+                {
+                    return Ok("User already exists");
+                }
+                //Save the competition basic details
+                await _context.AddAsync(comp);
+                await _context.SaveChangesAsync();
+
+                return Ok("Competition saved successfully");
+            }
+            else
+            {
+                return new BadRequestObjectResult("competition cannot be null");
+            }
+        }
+//----------------------------------------------------------------------------------------------------------------------------------------
+        //A method that updates the status of the competition
+        // PUT: api/Competition/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCompetition(int id, [FromBody]Competition comp)
+        {
+            if (ModelState.IsValid)
+            {
+                //error handling, check if client provided valid data
+                if (comp == null)
+                {
+                    return new BadRequestObjectResult("competiton cannot be null");
+                }
+                else
+                {
+                    Competition dbComp = null; //assume competition does not exist
+                    using (_context)
+                    {
+                        dbComp = _context.Competitions
+                                         .Where(u => u.compTitle == comp.compTitle && u.Id != comp.Id) //check if a different user with the new username already exists
+                                         .FirstOrDefault<Competition>();
+                        if (dbComp != null)
+                        {
+                            return BadRequest("Cannot update user, Username already exists");
+                        }
+                        dbComp = _context.Competitions
+                                         .Where(u => u.Id == comp.Id)
+                                         .FirstOrDefault<Competition>();
+
+                        //now updating user details
+                        dbComp.compTitle = comp.compTitle;
+                        _context.Competitions.Update(dbComp);
+                        await _context.SaveChangesAsync();
+                        return Ok("Status update successful");
+                    }
+
+                }
+            }
+            else
+            {
+                return new BadRequestObjectResult("competition cannot be null");
+            }
+        }
+//----------------------------------------------------------------------------------------------------------------------------------------
+        // DELETE: api/ApiWithActions/5
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
+        }
+    }
+
+}

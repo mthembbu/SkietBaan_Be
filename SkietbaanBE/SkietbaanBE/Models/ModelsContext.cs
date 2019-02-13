@@ -17,9 +17,6 @@ namespace SkietbaanBE.Models {
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<UserGroup> UserGroups { get; set; }
         public virtual DbSet<UserCompStats> UserCompStats { get; set; }
-
-        /*protected override void OnModelCreating(ModelBuilder modelBuilder) {
-
-        }*/
+        public virtual DbSet<Competition> Competition { get; set; }
     }
 }

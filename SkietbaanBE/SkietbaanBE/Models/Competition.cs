@@ -10,7 +10,7 @@ namespace SkietbaanBE.Models {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string compTitle { get; set; }
         public bool Status { get; set; }
     }
 }
