@@ -5,11 +5,56 @@ using System.Collections.Generic;
 
 namespace SkietbaanBE.Migrations
 {
-    public partial class MagicMigration : Migration
+    public partial class xx : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-        
+            migrationBuilder.CreateTable(
+                name: "Competitions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true),
+                    Status = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Competitions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Admin = table.Column<bool>(nullable: false),
+                    Email = table.Column<string>(nullable: true),
+                    EntryDate = table.Column<DateTime>(nullable: false),
+                    MemberExpiry = table.Column<DateTime>(nullable: false),
+                    MemberID = table.Column<string>(nullable: true),
+                    Password = table.Column<string>(nullable: true),
+                    Username = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Scores",
                 columns: table => new
@@ -18,7 +63,7 @@ namespace SkietbaanBE.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CompetitionId = table.Column<int>(nullable: true),
                     PictureURL = table.Column<string>(nullable: true),
-                    UploadDate = table.Column<DateTime>(nullable: false),
+                    UploadDate = table.Column<DateTime>(nullable: true),
                     UserId = table.Column<int>(nullable: true),
                     UserScore = table.Column<int>(nullable: false)
                 },
@@ -135,6 +180,15 @@ namespace SkietbaanBE.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserGroups");
+
+            migrationBuilder.DropTable(
+                name: "Competitions");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
