@@ -50,12 +50,13 @@ namespace SkietbaanBE.Controllers
                 User dbUser = null; //assume user does not exist
              
                 dbUser = _context.Users
-                                    .Where(u => u.Username == user.Username)
-                                    .FirstOrDefault<User>();
+                                      .Where(u => u.Username == user.Username)
+                                      .FirstOrDefault<User>();
                 if (dbUser != null)
-
-                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
-
+                {
+                    dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+                }
+                
                 //if user aready exist return
                 if(dbUser != null)
                 {
@@ -126,7 +127,6 @@ namespace SkietbaanBE.Controllers
             IActionResult response = Unauthorized();
             var _user = Authenticate(user);
             
-
             if (_user != null)
             {
                 var tokenString = BuildToken(_user);
@@ -141,6 +141,7 @@ namespace SkietbaanBE.Controllers
             {
                 new BadRequestObjectResult("No empty fields allowed");
             }
+            
             foreach (User dbUser in GetUsers())
             {
                 if (dbUser.Username.Equals(user.Username))
@@ -169,13 +170,12 @@ namespace SkietbaanBE.Controllers
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-              _config["Jwt:Issuer"],
-              expires: DateTime.Now.AddDays(365),
-              signingCredentials: creds);
+             _config["Jwt:Issuer"],
+             expires: DateTime.Now.AddDays(365),
+             signingCredentials: creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
 
         private string GetCorrelationId()
         {
