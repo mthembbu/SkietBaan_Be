@@ -31,35 +31,49 @@ namespace SkietbaanBE.Controllers
         {
             return await _context.Users.FindAsync(id);
         }
-        
+
         // POST: api/User
-        [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] User user)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
             if (ModelState.IsValid)
             {
-                User dbUser = null; //assume user does not exist
-
-                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
-
-                //if user aready exist return
-                if(dbUser != null)
+                //error handling, check if client provided valid data
+                if (user == null)
                 {
-                    return Ok("User already exists");
+                    return new BadRequestObjectResult("user cannot be null");
                 }
-                //get today's date and save it under user entry date
-                user.EntryDate = DateTime.Now;
-                //encrypt password
-                user.Password = Security.HashSensitiveData(user.Password);
-                //Save User
-                await _context.AddAsync(user);
-                await _context.SaveChangesAsync();
+                else
+                {
+                    User dbUser = null; //assume user does not exist
+                    using (_context)
+                    {
+                        dbUser = _context.Users
+                        .Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
+                        .FirstOrDefault<User>();
+                        if (dbUser != null)
+                        {
+                            return BadRequest("Cannot update user, Username already exists");
+                        }
+                        dbUser = _context.Users
+                        .Where(u => u.Id == user.Id)
+                        .FirstOrDefault<User>();
 
-                return Ok("User saved successfully");
-            }else{
+                        //now updating user details
+                        dbUser.Username = user.Username;
+                        _context.Users.Update(dbUser);
+                        await _context.SaveChangesAsync();
+                        return Ok("User update successful");
+                    }
+
+                }
+            }
+            else
+            {
                 return new BadRequestObjectResult("user cannot be null");
             }
         }
+    }
         // PUT: api/User
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
