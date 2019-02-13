@@ -42,7 +42,7 @@ namespace SkietbaanBE.Controllers
             {
                 return new BadRequestObjectResult("No empty fields allowed");
             }
-                User dbUser = _context.Users.Where(u => u.Username == user.Username)
+                var dbUser = _context.Users.Where(u => u.Username == user.Username)
                     .FirstOrDefault<User>();
 
                 if (dbUser != null)
