@@ -36,7 +36,7 @@ namespace SkietbaanBE.Controllers
         //// PUT: api/User/Update
         [HttpPut]
         [ActionName("Update")]
-        public async Task<IActionResult> PutUserMember(String username, [FromBody] User user)
+        public async Task<IActionResult> PutUserMember([FromBody] User user)
         {
             User dbUser = null; //assume user does not exist
             dbUser = _context.Users.Where(u => u.Username == user.Username)
