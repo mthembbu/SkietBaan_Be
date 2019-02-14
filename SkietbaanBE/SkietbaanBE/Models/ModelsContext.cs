@@ -17,6 +17,6 @@ namespace SkietbaanBE.Models {
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<UserGroup> UserGroups { get; set; }
         public virtual DbSet<UserCompStats> UserCompStats { get; set; }
-        public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<Notifications> Notifications { get; set; }
     }
 }
