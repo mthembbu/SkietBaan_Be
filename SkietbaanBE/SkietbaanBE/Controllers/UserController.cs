@@ -44,7 +44,7 @@ namespace SkietbaanBE.Controllers
                 //if user aready exist return
                 if (dbUser != null)
                 {
-                    return Ok("User already exists");
+                    return BadRequest("User already exists");
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
