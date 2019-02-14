@@ -5,38 +5,23 @@ using System.Collections.Generic;
 
 namespace SkietbaanBE.Migrations
 {
-    public partial class MagicMigration : Migration
+    public partial class Mig : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-        
             migrationBuilder.CreateTable(
-                name: "Scores",
+                name: "Notifications",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CompetitionId = table.Column<int>(nullable: true),
-                    PictureURL = table.Column<string>(nullable: true),
-                    UploadDate = table.Column<DateTime>(nullable: false),
-                    UserId = table.Column<int>(nullable: true),
-                    UserScore = table.Column<int>(nullable: false)
+                    NotificationMessage = table.Column<string>(nullable: true),
+                    NotitficationContent = table.Column<string>(nullable: true),
+                    isRead = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Scores", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Scores_Competitions_CompetitionId",
-                        column: x => x.CompetitionId,
-                        principalTable: "Competitions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Scores_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,7 +34,7 @@ namespace SkietbaanBE.Migrations
                     CompScore = table.Column<int>(nullable: false),
                     CompetitionId = table.Column<int>(nullable: true),
                     UserId = table.Column<int>(nullable: true),
-                    Year = table.Column<DateTime>(nullable: false)
+                    Year = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -69,25 +54,25 @@ namespace SkietbaanBE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserGroups",
+                name: "UserNotifications",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    GroupId = table.Column<int>(nullable: true),
+                    NotificationId = table.Column<int>(nullable: true),
                     UserId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserGroups", x => x.Id);
+                    table.PrimaryKey("PK_UserNotifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserGroups_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
+                        name: "FK_UserNotifications_Notifications_NotificationId",
+                        column: x => x.NotificationId,
+                        principalTable: "Notifications",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserGroups_Users_UserId",
+                        name: "FK_UserNotifications_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -95,46 +80,32 @@ namespace SkietbaanBE.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Scores_CompetitionId",
-                table: "Scores",
-                column: "CompetitionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Scores_UserId",
-                table: "Scores",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserCompStats_CompetitionId",
-                table: "UserCompStats",
-                column: "CompetitionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserCompStats_UserId",
                 table: "UserCompStats",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserGroups_GroupId",
-                table: "UserGroups",
-                column: "GroupId");
+                name: "IX_UserNotifications_NotificationId",
+                table: "UserNotifications",
+                column: "NotificationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserGroups_UserId",
-                table: "UserGroups",
+                name: "IX_UserNotifications_UserId",
+                table: "UserNotifications",
                 column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Scores");
 
             migrationBuilder.DropTable(
                 name: "UserCompStats");
 
             migrationBuilder.DropTable(
-                name: "UserGroups");
+                name: "UserNotifications");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
         }
     }
 }

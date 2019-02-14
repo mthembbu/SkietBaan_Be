@@ -11,8 +11,8 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    [Migration("20190206125741_NewMigration")]
-    partial class NewMigration
+    [Migration("20190214073727_TokenUpdate")]
+    partial class TokenUpdate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,6 +47,22 @@ namespace SkietbaanBE.Migrations
                     b.ToTable("Groups");
                 });
 
+            modelBuilder.Entity("SkietbaanBE.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("NotificationMessage");
+
+                    b.Property<string>("NotitficationContent");
+
+                    b.Property<bool>("isRead");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
                 {
                     b.Property<int>("Id")
@@ -56,7 +72,7 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<string>("PictureURL");
 
-                    b.Property<DateTime>("UploadDate");
+                    b.Property<DateTime?>("UploadDate");
 
                     b.Property<int?>("UserId");
 
@@ -88,6 +104,8 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<string>("Password");
 
+                    b.Property<string>("Token");
+
                     b.Property<string>("Username");
 
                     b.HasKey("Id");
@@ -108,7 +126,7 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<int?>("UserId");
 
-                    b.Property<DateTime>("Year");
+                    b.Property<int>("Year");
 
                     b.HasKey("Id");
 
@@ -137,14 +155,32 @@ namespace SkietbaanBE.Migrations
                     b.ToTable("UserGroups");
                 });
 
+            modelBuilder.Entity("SkietbaanBE.Models.UserNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("NotificationId");
+
+                    b.Property<int?>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NotificationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserNotifications");
+                });
+
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
-                        .WithMany("Scores")
+                        .WithMany()
                         .HasForeignKey("CompetitionId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany("Scores")
+                        .WithMany()
                         .HasForeignKey("UserId");
                 });
 
@@ -162,11 +198,22 @@ namespace SkietbaanBE.Migrations
             modelBuilder.Entity("SkietbaanBE.Models.UserGroup", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Group", "Group")
-                        .WithMany("UserGroups")
+                        .WithMany()
                         .HasForeignKey("GroupId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany("UserGroups")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.UserNotification", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.Notification", "Notification")
+                        .WithMany()
+                        .HasForeignKey("NotificationId");
+
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
                         .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
