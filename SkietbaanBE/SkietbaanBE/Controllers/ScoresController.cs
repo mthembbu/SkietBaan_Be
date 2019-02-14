@@ -18,15 +18,21 @@ namespace SkietbaanBE.Controllers
         {
             _context = context;
         }
-        [HttpGet]
         [HttpPost]
         public IActionResult ScoreCapture([FromBody]ScoreCapture scoreCapture)
         {
             if (ModelState.IsValid)
             {
-                Competition competition = _context.Competitions.Where(x => x.Name == scoreCapture.CompetitionName).FirstOrDefault<Competition>();
-                User user = _context.Users.Where(x => x.Username == scoreCapture.Username).FirstOrDefault<User>();
-
+                var competition = _context.Competitions.Where(x => x.Name == scoreCapture.CompetitionName).FirstOrDefault<Competition>();
+                if(competition == null)
+                {
+                    return new NotFoundObjectResult("Competition not found");
+                }
+                var user = _context.Users.Where(x => x.Username == scoreCapture.Username).FirstOrDefault<User>();
+                if (user == null)
+                {
+                    return new NotFoundObjectResult("User not found");
+                }
                 var score = new Score()
                 {
                     UserScore = scoreCapture.UserScore,
@@ -41,7 +47,7 @@ namespace SkietbaanBE.Controllers
             }
             else
             {
-                return new BadRequestObjectResult("score cannout be null");
+                return new BadRequestObjectResult("score cannot be null");
             }
             
         }
