@@ -18,7 +18,6 @@ namespace SkietbaanBE.Controllers
         {
             _context = db;
         }
- //----------------------------------------------------------------------------------------------------------------------------------------
         /** The method to return an array of competition objects that hold the true Status*/
         // GET: api/Competition
         [HttpGet]
@@ -28,11 +27,10 @@ namespace SkietbaanBE.Controllers
             var competitionIDsQuery = from Comp in _context.Competitions
                                       where Comp.Status == true
                                       select Comp;
-            List<Competition> competitionsIDs = competitionIDsQuery.ToList<Competition>();
+            List<Competition> competitionsList = competitionIDsQuery.ToList<Competition>();
             // return _context.Competitions.ToArray<Competition>();
-            return competitionsIDs;
+            return competitionsList;
         }
-//----------------------------------------------------------------------------------------------------------------------------------------
         //Getting the competition by ID
         // GET: api/Competition/5
         [HttpGet("{id}")]
@@ -40,7 +38,6 @@ namespace SkietbaanBE.Controllers
         {
             return await _context.Competitions.FindAsync(id);
         }
- //----------------------------------------------------------------------------------------------------------------------------------------
         //Getting the competition by ID
         // GET: api/Competition/5
         [HttpGet("{Name}")]
@@ -48,34 +45,21 @@ namespace SkietbaanBE.Controllers
         {
             return await _context.Competitions.FindAsync(Name);
         }
-//----------------------------------------------------------------------------------------------------------------------------------------
         //posting the competition to the competition table
         // POST: api/Competition
         [HttpPost]
         public async Task<IActionResult> addCompetition([FromBody]Competition comp)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                Competition dbComp = null; //assume the competition does not exist
-
-                dbComp = _context.Competitions.FirstOrDefault(x => x.Name == comp.Name);
-                //if competition aready exist return
-                if (dbComp != null)
-                {
-                    return Ok("User already exists");
-                }
-                //Save the competition basic details
-                await _context.AddAsync(comp);
-                await _context.SaveChangesAsync();
-
-                return Ok("Competition saved successfully");
+                return BadRequest(ModelState);
             }
-            else
-            {
-                return new BadRequestObjectResult("competition cannot be null");
-            }
+ 
+            await _context.AddAsync(comp);
+            await _context.SaveChangesAsync();
+
+            return Ok("Competition Added!!!!!!!");
         }
-//----------------------------------------------------------------------------------------------------------------------------------------
         //A method that updates the status of the competition
         // PUT: api/Competition/5
         [HttpPut("{id}")]
@@ -98,7 +82,7 @@ namespace SkietbaanBE.Controllers
                                          .FirstOrDefault<Competition>();
                         if (dbComp != null)
                         {
-                            return BadRequest("Cannot update user, Username already exists");
+                            return BadRequest("Cannot update competition, already exists");
                         }
                         dbComp = _context.Competitions
                                          .Where(u => u.Id == comp.Id)
@@ -118,7 +102,6 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("competition cannot be null");
             }
         }
-//----------------------------------------------------------------------------------------------------------------------------------------
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public void Delete(int id)
