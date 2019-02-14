@@ -42,7 +42,7 @@ namespace SkietbaanBE.Controllers
         }
 
         
-        // POST: api/User
+        //POST: api/User
         [HttpPost]
         public async Task<ActionResult> AddUser([FromBody] User user)
         {
@@ -53,7 +53,7 @@ namespace SkietbaanBE.Controllers
                 dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
 
                 //if user aready exist return
-                if(dbUser != null)
+                if (dbUser != null)
                 {
                     return new BadRequestObjectResult("User already exists");
                 }
@@ -69,7 +69,8 @@ namespace SkietbaanBE.Controllers
                 await  _context.SaveChangesAsync();
 
                 new OkObjectResult("User saved successfully");
-            }else
+            }
+            else
             {
                  return new BadRequestObjectResult("user cannot be null");
             }
@@ -100,15 +101,15 @@ namespace SkietbaanBE.Controllers
                     using (_context)
                     {
                         dbUser = _context.Users
-                                         .Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
-                                         .FirstOrDefault<User>();
-                        if(dbUser != null)
+                        .Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
+                        .FirstOrDefault<User>();
+                        if (dbUser != null)
                         {
                             return BadRequest("Cannot update user, Username already exists");
                         }
                         dbUser = _context.Users
-                                         .Where(u => u.Id == user.Id)
-                                         .FirstOrDefault<User>();
+                        .Where(u => u.Id == user.Id)
+                        .FirstOrDefault<User>();
 
                         //now updating user details
                         dbUser.Username = user.Username;
@@ -126,4 +127,6 @@ namespace SkietbaanBE.Controllers
         }
     }
 }
+
+
 
