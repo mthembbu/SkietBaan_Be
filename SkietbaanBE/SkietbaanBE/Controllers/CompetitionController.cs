@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Controllers
@@ -57,7 +58,7 @@ namespace SkietbaanBE.Controllers
  
             await _context.AddAsync(comp);
             await _context.SaveChangesAsync();
-
+            new HelperClass().Notification(_context, comp);
             return Ok("Competition Added!!!!!!!");
         }
         //A method that updates the status of the competition
@@ -94,7 +95,6 @@ namespace SkietbaanBE.Controllers
                         await _context.SaveChangesAsync();
                         return Ok("Status update successful");
                     }
-
                 }
             }
             else
