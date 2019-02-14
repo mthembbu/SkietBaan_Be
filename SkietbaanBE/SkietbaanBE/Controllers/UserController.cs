@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Controllers
@@ -53,6 +54,7 @@ namespace SkietbaanBE.Controllers
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
+                new HelperClass().Notification(_context, user);
 
                 return Ok("User saved successfully");
             }
