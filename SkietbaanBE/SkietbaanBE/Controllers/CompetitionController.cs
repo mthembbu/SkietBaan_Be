@@ -19,28 +19,34 @@ namespace SkietbaanBE.Controllers
             _context = db;
         }
  //----------------------------------------------------------------------------------------------------------------------------------------
-        /** The method to return an array of competition objects*/
+        /** The method to return an array of competition objects that hold the true Status*/
         // GET: api/Competition
         [HttpGet]
         public IEnumerable<Competition> Get()
         {
-            return _context.Competition.ToArray<Competition>();
+            //get the competitions where(Status == true)
+            var competitionIDsQuery = from Comp in _context.Competitions
+                                      where Comp.Status == true
+                                      select Comp;
+            List<Competition> competitionsIDs = competitionIDsQuery.ToList<Competition>();
+            // return _context.Competitions.ToArray<Competition>();
+            return competitionsIDs;
         }
 //----------------------------------------------------------------------------------------------------------------------------------------
         //Getting the competition by ID
         // GET: api/Competition/5
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}")]
         public async Task<Competition> CompetitionGet(int id)
         {
-            return await _context.Competition.FindAsync(id);
+            return await _context.Competitions.FindAsync(id);
         }
  //----------------------------------------------------------------------------------------------------------------------------------------
         //Getting the competition by ID
         // GET: api/Competition/5
-        [HttpGet("{compTitle}", Name = "Get")]
-        public async Task<Competition> CompetitionGet(string compTitle)
+        [HttpGet("{Name}")]
+        public async Task<Competition> CompetitionGet(string Name)
         {
-            return await _context.Competition.FindAsync(compTitle);
+            return await _context.Competitions.FindAsync(Name);
         }
 //----------------------------------------------------------------------------------------------------------------------------------------
         //posting the competition to the competition table
@@ -52,7 +58,7 @@ namespace SkietbaanBE.Controllers
             {
                 Competition dbComp = null; //assume the competition does not exist
 
-                dbComp = _context.Competitions.FirstOrDefault(x => x.compTitle == comp.compTitle);
+                dbComp = _context.Competitions.FirstOrDefault(x => x.Name == comp.Name);
                 //if competition aready exist return
                 if (dbComp != null)
                 {
@@ -88,7 +94,7 @@ namespace SkietbaanBE.Controllers
                     using (_context)
                     {
                         dbComp = _context.Competitions
-                                         .Where(u => u.compTitle == comp.compTitle && u.Id != comp.Id) //check if a different user with the new username already exists
+                                         .Where(u => u.Name == comp.Name && u.Id != comp.Id) //check if a different user with the new username already exists
                                          .FirstOrDefault<Competition>();
                         if (dbComp != null)
                         {
@@ -99,7 +105,7 @@ namespace SkietbaanBE.Controllers
                                          .FirstOrDefault<Competition>();
 
                         //now updating user details
-                        dbComp.compTitle = comp.compTitle;
+                        dbComp.Name = comp.Name;
                         _context.Competitions.Update(dbComp);
                         await _context.SaveChangesAsync();
                         return Ok("Status update successful");
