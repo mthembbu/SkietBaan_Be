@@ -52,10 +52,6 @@ namespace SkietbaanBE.Controllers
                 dbUser = _context.Users
                                       .Where(u => u.Username == user.Username)
                                       .FirstOrDefault<User>();
-                if (dbUser != null)
-                {
-                    dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
-                }
                 
                 //if user aready exist return
                 if(dbUser != null)
