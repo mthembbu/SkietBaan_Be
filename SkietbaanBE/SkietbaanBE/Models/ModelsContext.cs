@@ -7,9 +7,9 @@ namespace SkietbaanBE.Models {
 
         public ModelsContext(DbContextOptions<ModelsContext> options)
            : base(options) {
-            //Database.EnsureDeleted();
-            //Database.Migrate();
         }
+
+        public ModelsContext() { }
 
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Competition> Competitions { get; set; }
@@ -17,5 +17,6 @@ namespace SkietbaanBE.Models {
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<UserGroup> UserGroups { get; set; }
         public virtual DbSet<UserCompStats> UserCompStats { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
     }
 }
