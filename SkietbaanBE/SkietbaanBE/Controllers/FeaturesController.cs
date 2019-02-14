@@ -17,6 +17,15 @@ namespace SkietbaanBE.Controllers
         {
             _context = db;
         }
+        //api/features/getuserbytoken/{token}
+        [HttpGet("{token}")]
+        public User GetUserByToken(string token)
+        {
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
+                if(user != null)
+                    return user;
+            else return null;
+        }
         //// GET: api/User/Search?Username=myusername
         [HttpGet]
         [ActionName("Search")]
