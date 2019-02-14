@@ -1,4 +1,5 @@
-﻿using SkietbaanBE.Models;
+﻿using SkietbaanBE.Controllers;
+using SkietbaanBE.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,7 @@ namespace SkietbaanBE.Lib
         public User user { get; set; }
         public List<Group> groups { get; set; }
         public List<Competition> competitions { get; set; }
+        public List<Group1> groups1 { get; set; }
+        public List<Competition1> competitions1 { get; set; }
     }
 }

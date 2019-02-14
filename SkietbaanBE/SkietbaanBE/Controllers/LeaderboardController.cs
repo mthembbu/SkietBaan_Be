@@ -41,8 +41,27 @@ namespace SkietbaanBE.Controllers
             List<Group> groups = _context.Groups.ToList<Group>();
             User user = _context.Users.Find(userID);
 
+            List<Competition1> competitions1s = new List<Competition1>();
+            List<Group1> groups1s = new List<Group1>();
+
             leaderboardFilterData.competitions = competitions;
+            for(int i = 0; i < competitions.Count; i++)
+            {
+                Competition1 competition1 = new Competition1();
+                competition1.label = competitions.ElementAt(i).Name;
+                competition1.value = competitions.ElementAt(i).Id;
+                competitions1s.Add(competition1);
+            }
             leaderboardFilterData.groups = groups;
+            for (int i = 0; i < groups.Count; i++)
+            {
+                Group1 group1 = new Group1();
+                group1.label = groups.ElementAt(i).Name;
+                group1.value = groups.ElementAt(i).Id;
+                groups1s.Add(group1);
+            }
+            leaderboardFilterData.competitions1 = competitions1s;
+            leaderboardFilterData.groups1 = groups1s;
             leaderboardFilterData.user = user;
 
             return leaderboardFilterData;
