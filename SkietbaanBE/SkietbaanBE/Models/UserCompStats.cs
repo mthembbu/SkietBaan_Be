@@ -14,6 +14,7 @@ namespace SkietbaanBE.Models {
         public virtual Competition Competition { get; set; }
         public int BestScore { get; set; }
         public int CompScore { get; set; }
-        public DateTime Year { get; set; }
+        public int Total { get; set; }
+        public int Year { get; set; }
     }
 }
