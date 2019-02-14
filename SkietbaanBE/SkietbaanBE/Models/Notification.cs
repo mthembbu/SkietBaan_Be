@@ -2,11 +2,12 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SkietbaanBE.Models {
-    public class UserGroup {
+    public class Notification {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public virtual User User { get; set; }
-        public virtual Group Group { get; set; }
+        public bool isRead { get; set; }
+        public string NotificationMessage { get; set; }
+        public string NotitficationContent { get; set; }
     }
 }

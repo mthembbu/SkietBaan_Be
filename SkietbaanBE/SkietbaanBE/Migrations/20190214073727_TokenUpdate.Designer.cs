@@ -11,8 +11,8 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    [Migration("20190212120203_xx")]
-    partial class xx
+    [Migration("20190214073727_TokenUpdate")]
+    partial class TokenUpdate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -45,6 +45,22 @@ namespace SkietbaanBE.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("NotificationMessage");
+
+                    b.Property<string>("NotitficationContent");
+
+                    b.Property<bool>("isRead");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
@@ -88,6 +104,8 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<string>("Password");
 
+                    b.Property<string>("Token");
+
                     b.Property<string>("Username");
 
                     b.HasKey("Id");
@@ -108,7 +126,7 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<int?>("UserId");
 
-                    b.Property<DateTime>("Year");
+                    b.Property<int>("Year");
 
                     b.HasKey("Id");
 
@@ -135,6 +153,24 @@ namespace SkietbaanBE.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserGroups");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.UserNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("NotificationId");
+
+                    b.Property<int?>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NotificationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserNotifications");
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
@@ -164,6 +200,17 @@ namespace SkietbaanBE.Migrations
                     b.HasOne("SkietbaanBE.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId");
+
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.UserNotification", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.Notification", "Notification")
+                        .WithMany()
+                        .HasForeignKey("NotificationId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
