@@ -13,7 +13,7 @@ namespace SkietbaanBE.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public bool IsRead { get; set; }
-        public string NotificationHeading { get; set; }
+        public string NotificationsHeading { get; set; }
         public string NotificationContent { get; set; }
         public virtual User User { get; set; }
     }

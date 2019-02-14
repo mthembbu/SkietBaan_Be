@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Controllers
@@ -66,7 +67,8 @@ namespace SkietbaanBE.Controllers
                 user.Token = tokenString;
                 //Save User
                 await _context.AddAsync(user);
-                await  _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+                new HelperClass().Notification(_context, user);
 
                 new OkObjectResult("User saved successfully");
             }
