@@ -1,11 +1,18 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Controllers
@@ -15,9 +22,11 @@ namespace SkietbaanBE.Controllers
     public class UserController : Controller
     {
         private ModelsContext _context;
-        public UserController(ModelsContext db)
+        private IConfiguration _config;
+        public UserController(ModelsContext db, IConfiguration config)
         {
             _context = db;
+            _config = config;
         }
         // GET: api/User
         [HttpGet]
@@ -25,16 +34,18 @@ namespace SkietbaanBE.Controllers
         {
             return _context.Users.ToArray<User>();
         }
+
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
         public async Task<User> GetUser(int id)
         {
             return await _context.Users.FindAsync(id);
         }
+
         
-        // POST: api/User
+        //POST: api/User
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] User user)
+        public async Task<ActionResult> AddUser([FromBody] User user)
         {
             if (ModelState.IsValid)
             {
@@ -43,23 +54,38 @@ namespace SkietbaanBE.Controllers
                 dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
 
                 //if user aready exist return
-                if(dbUser != null)
+                if (dbUser != null)
                 {
-                    return Ok("User already exists");
+                    return new BadRequestObjectResult("User already exists");
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
                 //encrypt password
                 user.Password = Security.HashSensitiveData(user.Password);
+                //generate token
+                string tokenString = BuildToken();
+                user.Token = tokenString;
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
+                new HelperClass().Notification(_context, user);
 
-                return Ok("User saved successfully");
-            }else{
-                return new BadRequestObjectResult("user cannot be null");
+                new OkObjectResult("User saved successfully");
             }
+            else
+            {
+                 return new BadRequestObjectResult("user cannot be null");
+            }
+            return Ok(user);
         }
+
+        private string BuildToken()
+        {
+            string guid = Guid.NewGuid().ToString();
+            int index = guid.LastIndexOf("-");
+            return guid.Substring(index + 1);
+        }
+
         // PUT: api/User/
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
@@ -77,15 +103,15 @@ namespace SkietbaanBE.Controllers
                     using (_context)
                     {
                         dbUser = _context.Users
-                                         .Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
-                                         .FirstOrDefault<User>();
-                        if(dbUser != null)
+                        .Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
+                        .FirstOrDefault<User>();
+                        if (dbUser != null)
                         {
                             return BadRequest("Cannot update user, Username already exists");
                         }
                         dbUser = _context.Users
-                                         .Where(u => u.Id == user.Id)
-                                         .FirstOrDefault<User>();
+                        .Where(u => u.Id == user.Id)
+                        .FirstOrDefault<User>();
 
                         //now updating user details
                         dbUser.Username = user.Username;
@@ -101,26 +127,8 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("user cannot be null");
             }
         }
-        // POST: api/user/login
-        [HttpPost("login")]
-        public async Task<ActionResult> LoginPost([FromBody]User user)
-        {
-            if (user.Username == null || user.Password == null || user.Email == null)
-            {
-                return new BadRequestObjectResult("No empty fields allowed");
-            }
-            foreach (User dbUser in GetUsers())
-            {
-                if (dbUser.Username.Equals(user.Username))
-                {
-                    if (Security.CompareHashedData(dbUser.Password,user.Password))
-                        return new OkObjectResult("Successful login");
-                    else
-                        return new BadRequestObjectResult("Incorrect Password or Username");
-                }
-            }
-            return new BadRequestObjectResult("User not found");
-        }
     }
 }
+
+
 
