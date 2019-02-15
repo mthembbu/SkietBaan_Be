@@ -45,7 +45,7 @@ namespace SkietbaanBE.Controllers
             List<Group1> groups1s = new List<Group1>();
 
             leaderboardFilterData.competitions = competitions;
-            for(int i = 0; i < competitions.Count; i++)
+            for (int i = 0; i < competitions.Count; i++)
             {
                 Competition1 competition1 = new Competition1();
                 competition1.label = competitions.ElementAt(i).Name;
@@ -71,81 +71,41 @@ namespace SkietbaanBE.Controllers
         {
             List<RankResults> rankResults = new List<RankResults>();
             //
-            if (groupID == 1) //global ranking => id = 1 by default
+            var query = from Group in _context.Groups
+                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                        join User in _context.Users on UserGroup.User.Id equals User.Id
+                        join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
+                        where (UserCompStats.Competition.Id == competitionID && Group.Id == (groupID))
+                        orderby UserCompStats.CompScore
+                        select new
+                        {
+                            User.Username,
+                            UserCompStats.Total,
+                            UserCompStats.CompScore,
+                            UserCompStats.BestScore
+                        };
+            int rank = 1;
+            foreach (var item in query)
             {
-                var query = from User in _context.Users
-                            join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
-                            where (UserCompStats.Competition.Id == competitionID)
-                            orderby UserCompStats.CompScore
-                            select new
-                            {
-                                User.Username,
-                                UserCompStats.Total,
-                                UserCompStats.CompScore,
-                                UserCompStats.BestScore
-                            };
-                
-                foreach (var item in query)
-                {
-                    RankResults rankResult = new RankResults();
+                RankResults rankResult = new RankResults();
 
-                    
-                    rankResult.Username = item.Username;
-                    switch (ScoreType.ToUpper())
-                    {
-                        case "BEST":
-                            rankResult.Value = item.BestScore;
-                            break;
-                        case "AVERAGE":
-                            rankResult.Value = item.CompScore;
-                            break;
-                        case "TOTAL":
-                            rankResult.Value = item.Total;
-                            break;
-                        default:
-                            break;
-                    }
-                    rankResults.Add(rankResult);
-                }
-            }
-            else  //rest for the database groups IDs > 1 from front-end, so must be modified by subtracting 1 in order to match database ID
-            {
-                var query = from Group in _context.Groups
-                            join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
-                            join User in _context.Users on UserGroup.User.Id equals User.Id
-                            join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
-                            where (UserCompStats.Competition.Id == competitionID && Group.Id == (groupID - 1))
-                            orderby UserCompStats.CompScore
-                            select new
-                            {
-                                User.Username,
-                                UserCompStats.Total,
-                                UserCompStats.CompScore,
-                                UserCompStats.BestScore
-                            };
-                int rank = 1;
-                foreach (var item in query)
-                {
-                    RankResults rankResult = new RankResults();
 
-                   
-                    rankResult.Username = item.Username;
-                    switch (ScoreType.ToUpper())
-                    {
-                        case "BEST":
-                            rankResult.Value = item.BestScore;
-                            break;
-                        case "AVERAGE":
-                            rankResult.Value = item.CompScore;
-                            break;
-                        case "TOTAL":
-                            rankResult.Value = item.Total;
-                            break;
-                        default:
-                            break;
-                    }
-                    rankResults.Add(rankResult);
+                rankResult.Username = item.Username;
+                switch (ScoreType.ToUpper())
+                {
+                    case "1":  //AVERAGE
+                        rankResult.Value = item.CompScore;
+                        break;
+                    case "2": //TOTAL
+                        rankResult.Value = item.Total;
+                        break;
+                    case "3": //BEST
+                        rankResult.Value = item.BestScore;
+                        break;
+                    default:
+                        break;
                 }
+                rankResults.Add(rankResult);
             }
 
             return sortAndRank(rankResults);
@@ -154,7 +114,7 @@ namespace SkietbaanBE.Controllers
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
             rankResults = rankResults.OrderByDescending(x => x.Value).ToList();
-            for (int i= 0;i< rankResults.Count; i++)
+            for (int i = 0; i < rankResults.Count; i++)
             {
                 rankResults.ElementAt(i).Rank = i + 1;
             }
