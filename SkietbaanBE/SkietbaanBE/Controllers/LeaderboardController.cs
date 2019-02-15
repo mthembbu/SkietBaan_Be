@@ -93,14 +93,14 @@ namespace SkietbaanBE.Controllers
                 rankResult.Username = item.Username;
                 switch (ScoreType.ToUpper())
                 {
-                    case "BEST":
-                        rankResult.Value = item.BestScore;
-                        break;
-                    case "AVERAGE":
+                    case "1":  //AVERAGE
                         rankResult.Value = item.CompScore;
                         break;
-                    case "TOTAL":
+                    case "2": //TOTAL
                         rankResult.Value = item.Total;
+                        break;
+                    case "3": //BEST
+                        rankResult.Value = item.BestScore;
                         break;
                     default:
                         break;
