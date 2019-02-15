@@ -17,6 +17,15 @@ namespace SkietbaanBE.Controllers
         {
             _context = db;
         }
+        //api/features/getuserbytoken/{token}
+        [HttpGet("{token}")]
+        public User GetUserByToken(string token)
+        {
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
+                if(user != null)
+                    return user;
+            else return null;
+        }
         //// GET: api/User/Search?Username=myusername
         [HttpGet]
         [ActionName("Search")]
@@ -31,6 +40,32 @@ namespace SkietbaanBE.Controllers
                 }
             }
             return null;
+        }
+
+        //// PUT: api/User/Update
+        [HttpPut]
+        [ActionName("Update")]
+        public async Task<IActionResult> PutUserMember([FromBody] User user)
+        {
+            if (user.Username == null)
+            {
+                return new BadRequestObjectResult("No empty fields allowed");
+            }
+            User dbUser = _context.Users.Where(u => u.Username == user.Username)
+                    .FirstOrDefault<User>();
+
+            if (dbUser == null)
+                {
+                    return BadRequest("User is null");
+                }
+
+                //now updating user details
+             dbUser.MemberID = user.MemberID;
+             dbUser.EntryDate = user.EntryDate;
+             dbUser.MemberExpiry = user.MemberExpiry;
+             _context.Users.Update(dbUser);
+             await _context.SaveChangesAsync();
+             return Ok("User update successful");
         }
     }
 }
