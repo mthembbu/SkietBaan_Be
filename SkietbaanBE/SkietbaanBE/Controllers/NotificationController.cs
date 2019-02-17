@@ -26,39 +26,11 @@ namespace SkietbaanBE.Controllers
             var notificationQuery = from noti in _context.Notifications
                                    where noti.IsRead == false
                                    select noti;
-            List<Notifications> notificationList = notificationQuery.ToList<Notifications>();
+           //var userQuery = from user in _context.Users
+                           // where user.Username == username
+                           // select user;
+            List < Notifications > notificationList = notificationQuery.ToList<Notifications>();
             return notificationList;
-        }
-
-        // GET: api/Notification/5
-        [HttpGet("{id}", Name = "GetNotifications")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-        
-        private string Notifications(User user)
-        {
-            return "";
-        }
-
-        // POST: api/Notification
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-
-        }
-        
-        // PUT: api/Notification/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-        
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

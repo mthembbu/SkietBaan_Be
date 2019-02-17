@@ -28,7 +28,7 @@ namespace SkietbaanBE.Controllers
                 {
                     return new NotFoundObjectResult("Competition not found");
                 }
-                var user = _context.Users.Where(x => x.Username == scoreCapture.Username).FirstOrDefault<User>();
+                var user = _context.Users.Where(x => x.Token == scoreCapture.Token).FirstOrDefault<User>();
                 if (user == null)
                 {
                     return new NotFoundObjectResult("User not found");
