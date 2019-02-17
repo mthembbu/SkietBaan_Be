@@ -27,7 +27,6 @@ namespace SkietbaanBE.Controllers
             else return null;
         }
 
-
         [HttpPost]
         public ActionResult Login ([FromBody]User user)
         {
