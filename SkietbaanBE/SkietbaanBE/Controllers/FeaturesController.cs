@@ -42,8 +42,8 @@ namespace SkietbaanBE.Controllers
             return null;
         }
 
-        //// PUT: api/User/Update
-        [HttpPut]
+        //// POST: api/User/Update
+        [HttpPost]
         [ActionName("Update")]
         public async Task<IActionResult> PutUserMember([FromBody] User user)
         {
