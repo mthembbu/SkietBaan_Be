@@ -28,5 +28,15 @@ namespace SkietbaanBE.Helper
             _context.Notifications.Add(notification);
             _context.SaveChanges();
         }
+
+        public void Notification(ModelsContext _context, Group group)
+        {
+            Notifications notification = new Notifications();
+            notification.IsRead = false;
+            notification.NotificationsHeading = "New Group Alert!";
+            notification.NotificationContent = "Hello valued member. Please note you have been invited to join a group named: " + group.Name;
+            _context.Notifications.Add(notification);
+            _context.SaveChanges();
+        }
     }
 }
