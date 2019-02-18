@@ -11,8 +11,8 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    [Migration("20190214073727_TokenUpdate")]
-    partial class TokenUpdate
+    [Migration("20190215162824_AwardEdit")]
+    partial class AwardEdit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,26 @@ namespace SkietbaanBE.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("SkietbaanBE.Models.Award", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("IconURL");
+
+                    b.Property<int>("Stat");
+
+                    b.Property<int?>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Awards");
+                });
 
             modelBuilder.Entity("SkietbaanBE.Models.Competition", b =>
                 {
@@ -52,13 +72,17 @@ namespace SkietbaanBE.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("NotificationMessage");
+                    b.Property<bool>("IsRead");
 
-                    b.Property<string>("NotitficationContent");
+                    b.Property<string>("NotificationContent");
 
-                    b.Property<bool>("isRead");
+                    b.Property<string>("NotificationsHeading");
+
+                    b.Property<int?>("UserId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
                 });
@@ -124,6 +148,8 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<int?>("CompetitionId");
 
+                    b.Property<int>("Total");
+
                     b.Property<int?>("UserId");
 
                     b.Property<int>("Year");
@@ -155,22 +181,18 @@ namespace SkietbaanBE.Migrations
                     b.ToTable("UserGroups");
                 });
 
-            modelBuilder.Entity("SkietbaanBE.Models.UserNotification", b =>
+            modelBuilder.Entity("SkietbaanBE.Models.Award", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
 
-                    b.Property<int?>("NotificationId");
-
-                    b.Property<int?>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NotificationId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserNotifications");
+            modelBuilder.Entity("SkietbaanBE.Models.Notification", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
@@ -200,17 +222,6 @@ namespace SkietbaanBE.Migrations
                     b.HasOne("SkietbaanBE.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId");
-
-                    b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("SkietbaanBE.Models.UserNotification", b =>
-                {
-                    b.HasOne("SkietbaanBE.Models.Notification", "Notification")
-                        .WithMany()
-                        .HasForeignKey("NotificationId");
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()

@@ -72,7 +72,7 @@ namespace SkietbaanBETest {
                 .Returns(Task.FromResult(mockData.Where(u => u.Id == id).First()));
 
             int invocationCountBeforeCall = mockContext.Invocations.Count;
-            await controller.UpdateUser(id, mockData.Where(u => u.Id == id).First());
+            //await controller.UpdateUser(id, mockData.Where(u => u.Id == id).First());
             int invocationCountAfterCall = mockContext.Invocations.Count;
             int invocationInFunction = 3;
             Assert.AreEqual(invocationCountBeforeCall, invocationCountAfterCall - invocationInFunction);
