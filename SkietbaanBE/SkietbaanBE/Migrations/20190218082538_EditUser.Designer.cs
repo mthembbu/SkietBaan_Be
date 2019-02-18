@@ -11,9 +11,10 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    partial class ModelsContextModelSnapshot : ModelSnapshot
+    [Migration("20190218082538_EditUser")]
+    partial class EditUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,11 +122,9 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<DateTime>("EntryDate");
 
-                    b.Property<DateTime?>("MemberExpiryDate");
+                    b.Property<DateTime?>("MemberExpiry");
 
                     b.Property<string>("MemberID");
-
-                    b.Property<DateTime?>("MemberStartDate");
 
                     b.Property<string>("Password");
 
@@ -148,8 +147,6 @@ namespace SkietbaanBE.Migrations
                     b.Property<int>("CompScore");
 
                     b.Property<int?>("CompetitionId");
-
-                    b.Property<int>("Month");
 
                     b.Property<int>("Total");
 

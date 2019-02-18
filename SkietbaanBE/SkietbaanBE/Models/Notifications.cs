@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SkietbaanBE.Models
 {
-    public class Notification
+    public class Notifications
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
