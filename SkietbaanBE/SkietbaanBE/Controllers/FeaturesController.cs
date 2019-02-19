@@ -33,8 +33,16 @@ namespace SkietbaanBE.Controllers
             return null;
         }
 
-        //// PUT: api/User/Update
-        [HttpPut]
+        //// GET: api/User/SearchMember
+        [HttpGet]
+        [ActionName("SearchMember")]
+        public IEnumerable<User> SearchMember()
+        {
+            return _context.Users.ToArray<User>().Where(u => u.MemberID != null && u.MemberID != "");
+        }
+
+        //// GET: api/User/Update
+        [HttpGet]
         [ActionName("Update")]
         public async Task<IActionResult> PutUserMember([FromBody] User user)
         {
@@ -52,8 +60,8 @@ namespace SkietbaanBE.Controllers
 
                 //now updating user details
                 dbUser.MemberID = user.MemberID;
-                dbUser.EntryDate = user.EntryDate;
-                dbUser.MemberExpiry = user.MemberExpiry;
+                dbUser.MemberStartDate = user.MemberStartDate;
+                dbUser.MemberExpiryDate = user.MemberExpiryDate;
                 _context.Users.Update(dbUser);
                 await _context.SaveChangesAsync();
                 return Ok("User update successful");
