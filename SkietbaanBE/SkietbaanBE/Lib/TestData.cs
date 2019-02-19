@@ -297,7 +297,7 @@ namespace SkietbaanBE.Lib {
                     ucs.User = users.ElementAt(u);
                     ucs.Competition = compts.ElementAt(c);
                     ucs.BestScore = 0;
-                    ucs.CompScore = 0; //average
+                    //ucs.CompScore = 0; //average
                     ucs.Total = 0;
                     ucs.Year = DateTime.Now.Year;
                     userCompStats.Add(ucs);
@@ -338,7 +338,7 @@ namespace SkietbaanBE.Lib {
                     var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
                                                   .FirstOrDefault<UserCompStats>();
                     userCompStats.Total = total;
-                    userCompStats.CompScore = (int)average;  // database attribute for Competition Score needs to be changed from int to double
+                    //userCompStats.CompScore = (int)average;  // database attribute for Competition Score needs to be changed from int to double
                     userCompStats.User = users.ElementAt(u);
                     //save
                     _context.UserCompStats.Update(userCompStats);
