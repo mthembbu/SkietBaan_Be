@@ -81,7 +81,7 @@ namespace SkietbaanBE.Controllers
                 //now updating user details
              dbUser.MemberID = user.MemberID;
              dbUser.EntryDate = user.EntryDate;
-             dbUser.MemberExpiry = user.MemberExpiry;
+             dbUser.MemberExpiryDate = user.MemberExpiryDate;
              _context.Users.Update(dbUser);
              await _context.SaveChangesAsync();
              return Ok("User update successful");
