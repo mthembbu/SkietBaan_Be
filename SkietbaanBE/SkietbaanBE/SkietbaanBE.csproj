@@ -7,6 +7,20 @@
   <ItemGroup>
     <Compile Remove="Migrations\20190214074005_TokenUpdate3.cs" />
     <Compile Remove="Migrations\20190214074005_TokenUpdate3.Designer.cs" />
+    <Compile Remove="Migrations\20190214124717_Test.cs" />
+    <Compile Remove="Migrations\20190214124717_Test.Designer.cs" />
+    <Compile Remove="Migrations\20190215065047_Award.cs" />
+    <Compile Remove="Migrations\20190215065047_Award.Designer.cs" />
+    <Compile Remove="Migrations\20190215071301_Awards.cs" />
+    <Compile Remove="Migrations\20190215071301_Awards.Designer.cs" />
+    <Compile Remove="Migrations\20190215081116_Update1.cs" />
+    <Compile Remove="Migrations\20190215081116_Update1.Designer.cs" />
+    <Compile Remove="Migrations\20190215081232_Update1.cs" />
+    <Compile Remove="Migrations\20190215081232_Update1.Designer.cs" />
+    <Compile Remove="Migrations\20190215085059_RemoveTypeInAward.cs" />
+    <Compile Remove="Migrations\20190215085059_RemoveTypeInAward.Designer.cs" />
+    <Compile Remove="Migrations\20190215162159_AwardEdit.cs" />
+    <Compile Remove="Migrations\20190215162159_AwardEdit.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -24,8 +19,9 @@ namespace SkietbaanBE
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(); services.AddDbContext<ModelsContext>
-                 (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanDatabase")));
+            services.AddMvc();
+            services.AddDbContext<ModelsContext>
+                 (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanTest")));
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -57,6 +53,15 @@ namespace SkietbaanBE
                 c.SwaggerEndpoint("/swagger/Skietbaan/swagger.json", "SkietbaanBE");
             });
             app.UseSwagger();
+            if (!true) {
+                using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope()) {
+                    var context = scope.ServiceProvider.GetService<ModelsContext>();
+                    context.Database.EnsureDeleted();
+                    context.Database.Migrate();
+                    DataSeeder.Seed(context, true);
+                }
+            }
+
         }
     }
 }

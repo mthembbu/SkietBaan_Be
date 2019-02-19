@@ -17,34 +17,6 @@ namespace SkietbaanBE.Controllers
         {
             _context = db;
         }
-        //api/features/getuserbytoken/{token}
-        [HttpGet("{token}")]
-        public User GetUserByToken(string token)
-        {
-            var user = _context.Users.FirstOrDefault(x => x.Token == token);
-                if(user != null)
-                    return user;
-            else return null;
-        }
-
-        [HttpPost]
-        public ActionResult Login ([FromBody]User user)
-        {
-            var dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
-            if (dbUser == null)
-            {
-                return new NotFoundObjectResult($"{user.Username} not found");
-            }
-            if (Security.HashSensitiveData(user.Password) == dbUser.Password)
-            {
-                return Ok(dbUser);
-            }
-            else
-            {
-                return new BadRequestObjectResult("Invalid Password");
-            }
-        }
-
         //// GET: api/User/Search?Username=myusername
         [HttpGet]
         [ActionName("Search")]
@@ -61,8 +33,8 @@ namespace SkietbaanBE.Controllers
             return null;
         }
 
-        //// POST: api/User/Update
-        [HttpPost]
+        //// PUT: api/User/Update
+        [HttpPut]
         [ActionName("Update")]
         public async Task<IActionResult> PutUserMember([FromBody] User user)
         {
@@ -70,21 +42,21 @@ namespace SkietbaanBE.Controllers
             {
                 return new BadRequestObjectResult("No empty fields allowed");
             }
-            User dbUser = _context.Users.Where(u => u.Username == user.Username)
+                var dbUser = _context.Users.Where(u => u.Username == user.Username)
                     .FirstOrDefault<User>();
 
-            if (dbUser == null)
+                if (dbUser != null)
                 {
-                    return BadRequest("User is null");
+                    return BadRequest("Cannot update user, Username already exists");
                 }
 
                 //now updating user details
-             dbUser.MemberID = user.MemberID;
-             dbUser.EntryDate = user.EntryDate;
-             dbUser.MemberExpiry = user.MemberExpiry;
-             _context.Users.Update(dbUser);
-             await _context.SaveChangesAsync();
-             return Ok("User update successful");
+                dbUser.MemberID = user.MemberID;
+                dbUser.EntryDate = user.EntryDate;
+                dbUser.MemberExpiry = user.MemberExpiry;
+                _context.Users.Update(dbUser);
+                await _context.SaveChangesAsync();
+                return Ok("User update successful");
         }
     }
 }

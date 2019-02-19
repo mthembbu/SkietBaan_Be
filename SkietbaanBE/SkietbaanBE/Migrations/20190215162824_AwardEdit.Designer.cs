@@ -11,9 +11,10 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    partial class ModelsContextModelSnapshot : ModelSnapshot
+    [Migration("20190215162824_AwardEdit")]
+    partial class AwardEdit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,7 +67,7 @@ namespace SkietbaanBE.Migrations
                     b.ToTable("Groups");
                 });
 
-            modelBuilder.Entity("SkietbaanBE.Models.Notifications", b =>
+            modelBuilder.Entity("SkietbaanBE.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -121,11 +122,9 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<DateTime>("EntryDate");
 
-                    b.Property<DateTime?>("MemberExpiryDate");
+                    b.Property<DateTime>("MemberExpiry");
 
                     b.Property<string>("MemberID");
-
-                    b.Property<DateTime?>("MemberStartDate");
 
                     b.Property<string>("Password");
 
@@ -148,8 +147,6 @@ namespace SkietbaanBE.Migrations
                     b.Property<int>("CompScore");
 
                     b.Property<int?>("CompetitionId");
-
-                    b.Property<int>("Month");
 
                     b.Property<int>("Total");
 
@@ -191,7 +188,7 @@ namespace SkietbaanBE.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("SkietbaanBE.Models.Notifications", b =>
+            modelBuilder.Entity("SkietbaanBE.Models.Notification", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()

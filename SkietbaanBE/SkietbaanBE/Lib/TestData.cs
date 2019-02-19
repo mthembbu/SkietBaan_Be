@@ -12,6 +12,13 @@ namespace SkietbaanBE.Lib
         public void AddTestData(ModelsContext db)
         {
             _context = db;
+            this.InsertGroups();
+            this.LinkUserGroups();
+            this.InsertCompetitions();
+            this.InsertScores();
+            this.insertUserCompetitionDataData();
+            this.calculateTotalAverageCompetitionScore();
+
         }
         public string InsertGroups()
         {
@@ -120,22 +127,22 @@ namespace SkietbaanBE.Lib
         {
             List<Competition> compts = new List<Competition>();
             Competition compt1 = new Competition();
-            compt1.Name = "Competition 1";
+            compt1.Name = "Pistol 100m";
             compt1.Status = true;
             compts.Add(compt1);
 
             Competition compt2 = new Competition();
-            compt2.Name = "Competition 2";
+            compt2.Name = "Pistol 50m";
             compt2.Status = true;
             compts.Add(compt2);
 
             Competition compt = new Competition();
-            compt.Name = "Competition 3";
+            compt.Name = "Rifle 100m";
             compt.Status = false;
             compts.Add(compt);
 
             Competition compt3 = new Competition();
-            compt3.Name = "Competition 4";
+            compt3.Name = "Rifle 150m";
             compt3.Status = true;
             compts.Add(compt3);
 
@@ -152,7 +159,7 @@ namespace SkietbaanBE.Lib
             score1.Competition = _context.Competitions.Find(1);
             score1.User = _context.Users.Find(1);
             score1.UploadDate = DateTime.Now;
-            score1.PictureURL = "";
+            score1.PictureURL = null;
             score1.UserScore = 54;
             scores.Add(score1);
 
@@ -161,7 +168,7 @@ namespace SkietbaanBE.Lib
             score2.Competition = _context.Competitions.Find(2);
             score2.User = _context.Users.Find(1);
             score2.UploadDate = DateTime.Now;
-            score2.PictureURL = "";
+            score2.PictureURL = null;
             score2.UserScore = 35;
             scores.Add(score2);
 
@@ -170,7 +177,7 @@ namespace SkietbaanBE.Lib
             score3.Competition = _context.Competitions.Find(3);
             score3.User = _context.Users.Find(1);
             score3.UploadDate = DateTime.Now;
-            score3.PictureURL = "";
+            score3.PictureURL = null;
             score3.UserScore = 87;
             scores.Add(score3);
 
@@ -179,7 +186,7 @@ namespace SkietbaanBE.Lib
             score4.Competition = _context.Competitions.Find(1);
             score4.User = _context.Users.Find(2);
             score4.UploadDate = DateTime.Now;
-            score4.PictureURL = "";
+            score4.PictureURL = null;
             score4.UserScore = 67;
             scores.Add(score4);
 
@@ -188,7 +195,7 @@ namespace SkietbaanBE.Lib
             score5.Competition = _context.Competitions.Find(2);
             score5.User = _context.Users.Find(2);
             score5.UploadDate = DateTime.Now;
-            score5.PictureURL = "";
+            score5.PictureURL = null;
             score5.UserScore = 86;
             scores.Add(score5);
 
@@ -197,7 +204,7 @@ namespace SkietbaanBE.Lib
             score6.Competition = _context.Competitions.Find(1);
             score6.User = _context.Users.Find(3);
             score6.UploadDate = DateTime.Now;
-            score6.PictureURL = "";
+            score6.PictureURL = null;
             score6.UserScore = 68;
             scores.Add(score6);
 
@@ -206,7 +213,7 @@ namespace SkietbaanBE.Lib
             score7.Competition = _context.Competitions.Find(2);
             score7.User = _context.Users.Find(3);
             score7.UploadDate = DateTime.Now;
-            score7.PictureURL = "";
+            score7.PictureURL = null;
             score7.UserScore = 58;
             scores.Add(score7);
 
@@ -215,7 +222,7 @@ namespace SkietbaanBE.Lib
             score8.Competition = _context.Competitions.Find(4);
             score8.User = _context.Users.Find(3);
             score8.UploadDate = DateTime.Now;
-            score8.PictureURL = "";
+            score8.PictureURL = null;
             score8.UserScore = 83;
             scores.Add(score8);
 
@@ -224,7 +231,7 @@ namespace SkietbaanBE.Lib
             score9.Competition = _context.Competitions.Find(1);
             score9.User = _context.Users.Find(4);
             score9.UploadDate = DateTime.Now;
-            score9.PictureURL = "";
+            score9.PictureURL = null;
             score9.UserScore = 94;
             scores.Add(score9);
 
@@ -233,7 +240,7 @@ namespace SkietbaanBE.Lib
             score10.Competition = _context.Competitions.Find(4);
             score10.User = _context.Users.Find(4);
             score10.UploadDate = DateTime.Now;
-            score10.PictureURL = "";
+            score10.PictureURL = null;
             score10.UserScore = 84;
             scores.Add(score10);
 
@@ -242,7 +249,7 @@ namespace SkietbaanBE.Lib
             score11.Competition = _context.Competitions.Find(2);
             score11.User = _context.Users.Find(5);
             score11.UploadDate = DateTime.Now;
-            score11.PictureURL = "";
+            score11.PictureURL = null;
             score11.UserScore = 35;
             scores.Add(score11);
 
@@ -251,7 +258,7 @@ namespace SkietbaanBE.Lib
             score12.Competition = _context.Competitions.Find(3);
             score12.User = _context.Users.Find(5);
             score12.UploadDate = DateTime.Now;
-            score12.PictureURL = "";
+            score12.PictureURL = null;
             score12.UserScore = 73;
             scores.Add(score12);
 
@@ -260,7 +267,7 @@ namespace SkietbaanBE.Lib
             score13.Competition = _context.Competitions.Find(4);
             score13.User = _context.Users.Find(5);
             score13.UploadDate = DateTime.Now;
-            score13.PictureURL = "";
+            score13.PictureURL = null;
             score13.UserScore = 37;
             scores.Add(score13);
 
@@ -313,6 +320,48 @@ namespace SkietbaanBE.Lib
             _context.SaveChanges();
 
             return "success";
+        }
+        public void calculateTotalAverageCompetitionScore() {
+
+            List<User> users = _context.Users.ToList<User>();
+            for (int u = 0; u < users.Count; u++) {
+                //get current user's competition(where the user has scores)
+                var competitionIDsQuery = from cust in _context.Scores
+                                          where cust.User.Id == users.ElementAt(u).Id
+                                          select cust.Competition.Id;
+                List<int> competitionsIDs = competitionIDsQuery.ToList<int>();
+
+                for (int c = 0; c < competitionsIDs.Count; c++) {
+                    //get user competition total score
+                    var competitionScoresQuery = from cust in _context.Scores
+                                                 where (cust.User.Id == users.ElementAt(u).Id && cust.Competition.Id == competitionsIDs.ElementAt(c))
+                                                 select cust.UserScore;
+                    List<int> competitionScores = competitionScoresQuery.ToList<int>();
+
+                    //calculate average
+                    int total = competitionScores.Sum();
+
+                    //calculate average
+                    double average = (double)total / (double)competitionScores.Count;
+
+                    //get competition object
+                    Competition competition = _context.Competitions.Find(competitionsIDs.ElementAt(c));
+
+                    //update
+                    var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
+                                                  .FirstOrDefault<UserCompStats>();
+                    userCompStats.Total = total;
+                    userCompStats.CompScore = (int)average;  // database attribute for Competition Score needs to be changed from int to double
+                    userCompStats.User = users.ElementAt(u);
+
+
+
+                    //save
+                    _context.UserCompStats.Update(userCompStats);
+                    _context.SaveChanges();
+
+                }
+            }
         }
     }
 }
