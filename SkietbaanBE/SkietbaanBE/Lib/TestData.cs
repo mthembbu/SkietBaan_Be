@@ -121,21 +121,25 @@ namespace SkietbaanBE.Lib {
             Competition compt1 = new Competition();
             compt1.Name = "Pistol 100m";
             compt1.Status = true;
+            compt1.BestScoresNumber = 4;
             compts.Add(compt1);
 
             Competition compt2 = new Competition();
             compt2.Name = "Pistol 50m";
             compt2.Status = true;
+            compt2.BestScoresNumber = 12;
             compts.Add(compt2);
 
             Competition compt = new Competition();
             compt.Name = "Rifle 100m";
             compt.Status = false;
+            compt.BestScoresNumber = 6;
             compts.Add(compt);
 
             Competition compt3 = new Competition();
             compt3.Name = "Rifle 150m";
             compt3.Status = true;
+            compt3.BestScoresNumber = 4;
             compts.Add(compt3);
 
             _context.Competitions.AddRange(compts);
@@ -298,7 +302,7 @@ namespace SkietbaanBE.Lib {
                     ucs.Competition = compts.ElementAt(c);
                     ucs.BestScore = 0;
                     //ucs.CompScore = 0; //average
-                    ucs.Total = 0;
+                    //ucs.Total = 0;
                     ucs.Year = DateTime.Now.Year;
                     userCompStats.Add(ucs);
                 }
@@ -337,7 +341,7 @@ namespace SkietbaanBE.Lib {
                     //update
                     var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
                                                   .FirstOrDefault<UserCompStats>();
-                    userCompStats.Total = total;
+                    //userCompStats.Total = total;
                     //userCompStats.CompScore = (int)average;  // database attribute for Competition Score needs to be changed from int to double
                     userCompStats.User = users.ElementAt(u);
                     //save
