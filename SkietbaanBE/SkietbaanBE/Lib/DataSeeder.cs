@@ -41,7 +41,7 @@ namespace SkietbaanBE.Lib {
                     },
                     new User {
                         Username = "Ilze", Password = "tw224!2", Email = "ilze@gmail.com",
-                        MemberID = null, EntryDate = DateTime.Now.Date, MemberStartDate = DateTime.Today,
+                        MemberID = "1423", EntryDate = DateTime.Now.Date, MemberStartDate = DateTime.Today,
                         MemberExpiryDate = DateTime.Today.AddYears(1).Date, Admin = true, Token = BuildToken()
                     }
                 });

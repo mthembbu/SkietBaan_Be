@@ -17,5 +17,6 @@ namespace SkietbaanBE.Models {
         public virtual DbSet<UserCompStats> UserCompStats { get; set; }
         public virtual DbSet<Notifications> Notifications { get; set; }
         public virtual DbSet<Award> Awards { get; set; }
+        public virtual DbSet<UserCompetitionTotalScore> UserCompetitionTotalScores { get; set; }
     }
 }
