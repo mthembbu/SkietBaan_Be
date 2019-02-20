@@ -76,12 +76,12 @@ namespace SkietbaanBE.Controllers
                         join User in _context.Users on UserGroup.User.Id equals User.Id
                         join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
                         where (UserCompStats.Competition.Id == competitionID && Group.Id == (groupID))
-                        orderby UserCompStats.CompScore
+                        //orderby UserCompStats.CompScore
                         select new
                         {
                             User.Username,
                             UserCompStats.Total,
-                            UserCompStats.CompScore,
+                           // UserCompStats.CompScore,
                             UserCompStats.BestScore
                         };
             int rank = 1;
@@ -94,7 +94,7 @@ namespace SkietbaanBE.Controllers
                 switch (ScoreType.ToUpper())
                 {
                     case "1":  //AVERAGE
-                        rankResult.Value = item.CompScore;
+                        //rankResult.Value = item.CompScore;
                         break;
                     case "2": //TOTAL
                         rankResult.Value = item.Total;
@@ -178,7 +178,6 @@ namespace SkietbaanBE.Controllers
                     var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
                                                   .FirstOrDefault<UserCompStats>();
                     userCompStats.Total = total;
-                    userCompStats.CompScore = (int)average;  // database attribute for Competition Score needs to be changed from int to double
                     userCompStats.User = users.ElementAt(u);
 
 

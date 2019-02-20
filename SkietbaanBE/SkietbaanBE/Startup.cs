@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -57,6 +58,15 @@ namespace SkietbaanBE
                 c.SwaggerEndpoint("/swagger/Skietbaan/swagger.json", "SkietbaanBE");
             });
             app.UseSwagger();
+
+            if (!true) {
+                using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope()) {
+                    var context = scope.ServiceProvider.GetService<ModelsContext>();
+                    context.Database.EnsureDeleted();
+                    context.Database.Migrate();
+                    DataSeeder.Seed(context, true);
+                }
+            }
         }
     }
 }

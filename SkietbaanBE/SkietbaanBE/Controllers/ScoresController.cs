@@ -20,7 +20,7 @@ namespace SkietbaanBE.Controllers
         }
         [HttpPost]
         public IActionResult ScoreCapture([FromBody]ScoreCapture scoreCapture)
-        {
+        { 
             if (ModelState.IsValid)
             {
                 var competition = _context.Competitions.Where(x => x.Name == scoreCapture.CompetitionName).FirstOrDefault<Competition>();
@@ -43,6 +43,8 @@ namespace SkietbaanBE.Controllers
                 };
                 _context.Scores.Add(score);
                 _context.SaveChanges();
+
+                UpdateUserCompStats(user, score, competition);
                 return Ok("Score Added Successfully");
             }
             else
@@ -50,6 +52,28 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("score cannot be null");
             }
             
+        }
+
+        public void UpdateUserCompStats(User user, Score score, Competition competition) {
+            
+            var userCompStatsRecords = _context.UserCompStats.Where(ucs => ucs.User.Id == user.Id &&
+                                            ucs.Month == score.UploadDate.Value.Month);
+
+            if (userCompStatsRecords.Count() < 1) {
+                UserCompStats userCompStats = new UserCompStats();
+                userCompStats.Competition = competition;
+                userCompStats.User = user;
+
+                _context.UserCompStats.Add(userCompStats);
+                _context.SaveChanges();
+            } else {
+                var userCompStats = userCompStatsRecords.First();
+                if (userCompStats.BestScore < score.UserScore) {
+                    userCompStats.BestScore = score.UserScore;
+                    _context.UserCompStats.Add(userCompStats);
+                    _context.SaveChanges();
+                }
+            }
         }
     }
 }
