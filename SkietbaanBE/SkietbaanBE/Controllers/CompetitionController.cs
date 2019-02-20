@@ -27,8 +27,7 @@ namespace SkietbaanBE.Controllers
             var competitionIDsQuery = from Comp in _context.Competitions
                                       where Comp.Status == true
                                       select Comp;
-            List<Competition> competitionsList = competitionIDsQuery.ToList<Competition>();
-            // return _context.Competitions.ToArray<Competition>();
+            List<Competition> competitionsList = competitionIDsQuery.ToList<Competition>();     
             return competitionsList;
         }
         /** The method that return an array of competition objects whether status is true or false*/
@@ -36,7 +35,7 @@ namespace SkietbaanBE.Controllers
         [HttpGet("all")]
         public IEnumerable<Competition> GetAll()
         {
-            //get the competitions where(Status == true)
+            //get the competitions where(Status == true / false)
              return _context.Competitions.ToArray<Competition>();
         }
         //Getting all competition by ID
