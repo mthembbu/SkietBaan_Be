@@ -80,11 +80,11 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
-                            UserCompStats.Total,
+                            //UserCompStats.Total,
                            // UserCompStats.CompScore,
                             UserCompStats.BestScore
                         };
-            int rank = 1;
+            //int rank = 1;
             foreach (var item in query)
             {
                 RankResults rankResult = new RankResults();
@@ -97,7 +97,7 @@ namespace SkietbaanBE.Controllers
                         //rankResult.Value = item.CompScore;
                         break;
                     case "2": //TOTAL
-                        rankResult.Value = item.Total;
+                        //rankResult.Value = item.Total;
                         break;
                     case "3": //BEST
                         rankResult.Value = item.BestScore;
@@ -177,7 +177,7 @@ namespace SkietbaanBE.Controllers
                     //update
                     var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
                                                   .FirstOrDefault<UserCompStats>();
-                    userCompStats.Total = total;
+                    //userCompStats.Total = total;
                     userCompStats.User = users.ElementAt(u);
 
 
