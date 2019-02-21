@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 using Swashbuckle.AspNetCore.Swagger;
@@ -37,6 +31,11 @@ namespace SkietbaanBE
             });
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("Skietbaan", new Info { Title = "Skietbaan API", Version = "v1" });
+                c.DocInclusionPredicate((docName, apiDesc) =>
+                {
+                    if (apiDesc.HttpMethod == null) return false;
+                    return true;
+                });
             });
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,15 +57,6 @@ namespace SkietbaanBE
                 c.SwaggerEndpoint("/swagger/Skietbaan/swagger.json", "SkietbaanBE");
             });
             app.UseSwagger();
-
-            if (!true) {
-                using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope()) {
-                    var context = scope.ServiceProvider.GetService<ModelsContext>();
-                    context.Database.EnsureDeleted();
-                    context.Database.Migrate();
-                    DataSeeder.Seed(context, true);
-                }
-            }
         }
     }
 }
