@@ -41,42 +41,47 @@ namespace SkietbaanBE.Controllers
             List<Group> groups = _context.Groups.ToList<Group>();
             User user = _context.Users.Find(userID);
 
-            List<Competition1> competitions1s = new List<Competition1>();
-            List<Group1> groups1s = new List<Group1>();
+            List<CompetitionLabel> competitionsLabels = new List<CompetitionLabel>();
+            List<GroupLabel> groupsLabels = new List<GroupLabel>();
 
-            leaderboardFilterData.competitions = competitions;
+            
             for (int i = 0; i < competitions.Count; i++)
             {
-                Competition1 competition1 = new Competition1();
-                competition1.label = competitions.ElementAt(i).Name;
-                competition1.value = competitions.ElementAt(i).Id;
-                competitions1s.Add(competition1);
+                CompetitionLabel competition = new CompetitionLabel();
+                competition.label = competitions.ElementAt(i).Name;
+                competition.value = competitions.ElementAt(i).Id;
+                competitionsLabels.Add(competition);
             }
-            leaderboardFilterData.groups = groups;
+
             for (int i = 0; i < groups.Count; i++)
             {
-                Group1 group1 = new Group1();
-                group1.label = groups.ElementAt(i).Name;
-                group1.value = groups.ElementAt(i).Id;
-                groups1s.Add(group1);
+                GroupLabel group = new GroupLabel();
+                group.label = groups.ElementAt(i).Name;
+                group.value = groups.ElementAt(i).Id;
+                groupsLabels.Add(group);
             }
-            leaderboardFilterData.competitions1 = competitions1s;
-            leaderboardFilterData.groups1 = groups1s;
+            leaderboardFilterData.competitions1 = competitionsLabels;
+            leaderboardFilterData.groups1 = groupsLabels;
             leaderboardFilterData.user = user;
 
             return leaderboardFilterData;
         }
         [HttpGet]
-        public List<RankResults> GetLeaderboardRankings(int competitionID, int groupID, string ScoreType)
+        public LeaderboardResults GetLeaderboardRankings(int competitionID, int groupID, string userToken)
         {
+            //from arry index to data base ID;
+            competitionID += 1;
+            groupID += 1;
+            LeaderboardResults leaderboardResults = new LeaderboardResults();
+
+            //ranking results for specific group's specific compentition
             List<RankResults> rankResults = new List<RankResults>();
-            //
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
                         join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
-                        where (UserCompStats.Competition.Id == competitionID && Group.Id == (groupID))
-                        //orderby UserCompStats.CompScore
+                        where (UserCompStats.Competition.Id == competitionID+1 && Group.Id == (groupID+1))
+                        orderby UserCompStats.CompScore
                         select new
                         {
                             User.Username,
@@ -84,44 +89,61 @@ namespace SkietbaanBE.Controllers
                            // UserCompStats.CompScore,
                             UserCompStats.BestScore
                         };
-            //int rank = 1;
             foreach (var item in query)
             {
                 RankResults rankResult = new RankResults();
+                rankResult.ShowMore = false;
 
-
+                
                 rankResult.Username = item.Username;
-                switch (ScoreType.ToUpper())
-                {
-                    case "1":  //AVERAGE
-                        //rankResult.Value = item.CompScore;
-                        break;
-                    case "2": //TOTAL
-                        //rankResult.Value = item.Total;
-                        break;
-                    case "3": //BEST
-                        rankResult.Value = item.BestScore;
-                        break;
-                    default:
-                        break;
-                }
+                rankResult.BestScore = item.BestScore;
+                rankResult.Total = item.Total;
+                rankResult.Average = item.CompScore;
                 rankResults.Add(rankResult);
             }
 
-            return sortAndRank(rankResults);
-        }
+            leaderboardResults.RankResults = sortAndRank(rankResults);
 
+            //Current User's results
+            User currentUser = new FeaturesController(_context).GetUserByToken(userToken);
+            //RankResults userRankResults = new RankResults();
+            //var competitionScoresQuery = from cust in _context.UserCompStats
+            //                             where cust.Competition.Id == competitionID && cust.User.Id == currentUser.Id
+            //                             select cust;
+            //List<UserCompStats> userscompStats = competitionScoresQuery.ToList<UserCompStats>(); //always will be 1 record
+           if(currentUser != null)
+            {
+                for (int i = 0; i < leaderboardResults.RankResults.Count; i++)
+                {
+                    if (leaderboardResults.RankResults.ElementAt(i).Username.Equals(currentUser.Username))
+                    {
+                        leaderboardResults.UserResults = leaderboardResults.RankResults.ElementAt(i);
+                    }
+                }
+            }
+            else
+            {
+                RankResults rankResult = new RankResults();
+                rankResult.Username = "Not logged in";
+                rankResult.Rank = 0;
+                rankResult.BestScore = 0;
+                rankResult.Total = 0;
+                rankResult.Average = 0;
+                leaderboardResults.UserResults = rankResult;
+
+            }
+            //final results
+            return leaderboardResults;
+        }
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
-            rankResults = rankResults.OrderByDescending(x => x.Value).ToList();
+            rankResults = rankResults.OrderByDescending(x => x.Average).ToList();
             for (int i = 0; i < rankResults.Count; i++)
             {
                 rankResults.ElementAt(i).Rank = i + 1;
             }
             return rankResults;
         }
-
-
         //Get Users Scores stats for a specific competition
         [HttpGet]
         public IEnumerable<UserCompStats> GetUsersCompetitionsScores(int competitionID)
@@ -133,21 +155,9 @@ namespace SkietbaanBE.Controllers
             userscompStats = competitionScoresQuery.ToList<UserCompStats>();
             return userscompStats;
         }
-
-
-        //TestData
-        [HttpGet]
-        public void insertTestData()
-        {
-
-            new TestData().AddTestData(_context);
-        }
-
-
         //helper methods
         public void calculateTotalAverageCompetitionScore()
         {
-
             List<User> users = _context.Users.ToList<User>();
             for (int u = 0; u < users.Count; u++)
             {
@@ -156,7 +166,6 @@ namespace SkietbaanBE.Controllers
                                           where cust.User.Id == users.ElementAt(u).Id
                                           select cust.Competition.Id;
                 List<int> competitionsIDs = competitionIDsQuery.ToList<int>();
-
                 for (int c = 0; c < competitionsIDs.Count; c++)
                 {
                     //get user competition total score
@@ -164,10 +173,8 @@ namespace SkietbaanBE.Controllers
                                                  where (cust.User.Id == users.ElementAt(u).Id && cust.Competition.Id == competitionsIDs.ElementAt(c))
                                                  select cust.UserScore;
                     List<int> competitionScores = competitionScoresQuery.ToList<int>();
-
                     //calculate average
                     int total = competitionScores.Sum();
-
                     //calculate average
                     double average = (double)total / (double)competitionScores.Count;
 
@@ -179,13 +186,9 @@ namespace SkietbaanBE.Controllers
                                                   .FirstOrDefault<UserCompStats>();
                     //userCompStats.Total = total;
                     userCompStats.User = users.ElementAt(u);
-
-
-
                     //save
                     _context.UserCompStats.Update(userCompStats);
                     _context.SaveChanges();
-
                 }
             }
         }
