@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SkietbaanBE.Helper;
+using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Controllers
@@ -70,6 +71,23 @@ namespace SkietbaanBE.Controllers
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
                 new HelperClass().Notification(_context, user);
+                //initialising user's competition scores to Zero
+                List<Competition> competitions = _context.Competitions.ToList<Competition>();
+                List<UserCompStats> userCompStats = new List<UserCompStats>();
+                for(int i = 0; i < competitions.Count; i++)
+                {
+                    UserCompStats userCompStat = new UserCompStats();
+                    userCompStat.User = user;
+                    userCompStat.Competition = competitions.ElementAt(i);
+                    userCompStat.BestScore = 0;
+                    userCompStat.CompScore = 0;
+                    userCompStat.Total = 0;
+                    userCompStats.Add(userCompStat);
+                }
+
+                //saving to UserCompstats table (bridging table between User and Competition)
+                _context.UserCompStats.AddRange(userCompStats);
+                _context.SaveChanges();
 
                 new OkObjectResult("User saved successfully");
             }
