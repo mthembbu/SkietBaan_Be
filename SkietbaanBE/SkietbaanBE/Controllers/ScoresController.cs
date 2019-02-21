@@ -25,7 +25,7 @@ namespace SkietbaanBE.Controllers
                 {
                     return new NotFoundObjectResult("Competition not found");
                 }
-                var user = _context.Users.Where(x => x.Username == scoreCapture.Username).FirstOrDefault<User>();
+                var user = _context.Users.Where(x => x.Token == scoreCapture.Token).FirstOrDefault<User>();
                 if (user == null)
                 {
                     return new NotFoundObjectResult("User not found");
@@ -35,7 +35,9 @@ namespace SkietbaanBE.Controllers
                     PictureURL = scoreCapture.PictureURL,
                     Competition = competition,
                     User = user,
-                    UploadDate = DateTime.Today
+                    Latitude = scoreCapture.Latitude,
+                    Longitude = scoreCapture.Longitude,
+                    UploadDate = DateTime.Now
                 };
                 _context.Scores.Add(score);
                 _context.SaveChanges();
