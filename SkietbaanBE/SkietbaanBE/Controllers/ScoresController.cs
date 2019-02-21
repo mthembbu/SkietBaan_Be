@@ -47,13 +47,10 @@ namespace SkietbaanBE.Controllers
             else
             {
                 return new BadRequestObjectResult("score cannot be null");
-            }
-            
+            }   
         }
 
-        private void UpdateUserCompStats(Score score) {
-
-            
+        private void UpdateUserCompStats(Score score) {         
             var userCompStatsRecords = _context.UserCompStats.Where(ucs => ucs.User.Id == score.User.Id &&
                                             ucs.Competition.Id == score.Competition.Id &&
                                             ucs.Month == score.UploadDate.Value.Month &&
@@ -93,7 +90,6 @@ namespace SkietbaanBE.Controllers
                         User = score.User,
                         Total = userCompStatsRecords.Sum(ucs => ucs.BestScore)
                     };
-                     
                     _context.Add(userCompetitionTotalScore);
                 } else {
                     userCompetitionTotalScore.Total = userCompStatsRecords.Sum(ucs => ucs.BestScore);

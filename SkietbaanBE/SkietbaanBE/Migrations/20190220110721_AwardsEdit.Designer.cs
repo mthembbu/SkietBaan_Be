@@ -11,9 +11,10 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    partial class ModelsContextModelSnapshot : ModelSnapshot
+    [Migration("20190220110721_AwardsEdit")]
+    partial class AwardsEdit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,6 +27,8 @@ namespace SkietbaanBE.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Description");
+
+                    b.Property<string>("IconURL");
 
                     b.Property<int?>("UserId");
 
@@ -91,9 +94,9 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<int?>("CompetitionId");
 
-                    b.Property<double?>("Latitude");
+                    b.Property<double>("Latitude");
 
-                    b.Property<double?>("Longitude");
+                    b.Property<double>("Longitude");
 
                     b.Property<string>("PictureURL");
 
