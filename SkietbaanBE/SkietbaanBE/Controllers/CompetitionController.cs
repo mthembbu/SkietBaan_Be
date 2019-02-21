@@ -33,7 +33,7 @@ namespace SkietbaanBE.Controllers
         /** The method that return an array of competition objects whether status is true or false*/
         // GET: api/Competition
         [HttpGet("all")]
-        public IEnumerable<Competition> GetAll()
+        public IEnumerable<Competition> GetAllCompetitions()
         {
             //get the competitions where(Status == true / false)
              return _context.Competitions.ToArray<Competition>();
