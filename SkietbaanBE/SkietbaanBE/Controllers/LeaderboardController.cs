@@ -85,11 +85,10 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
-                            UserCompStats.Total,
-                            UserCompStats.CompScore,
+                            //UserCompStats.Total,
+                           // UserCompStats.CompScore,
                             UserCompStats.BestScore
                         };
-            
             foreach (var item in query)
             {
                 RankResults rankResult = new RankResults();
@@ -136,7 +135,6 @@ namespace SkietbaanBE.Controllers
             //final results
             return leaderboardResults;
         }
-
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
             rankResults = rankResults.OrderByDescending(x => x.Average).ToList();
@@ -146,8 +144,6 @@ namespace SkietbaanBE.Controllers
             }
             return rankResults;
         }
-
-
         //Get Users Scores stats for a specific competition
         [HttpGet]
         public IEnumerable<UserCompStats> GetUsersCompetitionsScores(int competitionID)
@@ -159,12 +155,9 @@ namespace SkietbaanBE.Controllers
             userscompStats = competitionScoresQuery.ToList<UserCompStats>();
             return userscompStats;
         }
-
-
         //helper methods
         public void calculateTotalAverageCompetitionScore()
         {
-
             List<User> users = _context.Users.ToList<User>();
             for (int u = 0; u < users.Count; u++)
             {
@@ -173,7 +166,6 @@ namespace SkietbaanBE.Controllers
                                           where cust.User.Id == users.ElementAt(u).Id
                                           select cust.Competition.Id;
                 List<int> competitionsIDs = competitionIDsQuery.ToList<int>();
-
                 for (int c = 0; c < competitionsIDs.Count; c++)
                 {
                     //get user competition total score
@@ -181,10 +173,8 @@ namespace SkietbaanBE.Controllers
                                                  where (cust.User.Id == users.ElementAt(u).Id && cust.Competition.Id == competitionsIDs.ElementAt(c))
                                                  select cust.UserScore;
                     List<int> competitionScores = competitionScoresQuery.ToList<int>();
-
                     //calculate average
                     int total = competitionScores.Sum();
-
                     //calculate average
                     double average = (double)total / (double)competitionScores.Count;
 
@@ -194,16 +184,11 @@ namespace SkietbaanBE.Controllers
                     //update
                     var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
                                                   .FirstOrDefault<UserCompStats>();
-                    userCompStats.Total = total;
-                    userCompStats.CompScore = (int)average;  // database attribute for Competition Score needs to be changed from int to double
+                    //userCompStats.Total = total;
                     userCompStats.User = users.ElementAt(u);
-
-
-
                     //save
                     _context.UserCompStats.Update(userCompStats);
                     _context.SaveChanges();
-
                 }
             }
         }

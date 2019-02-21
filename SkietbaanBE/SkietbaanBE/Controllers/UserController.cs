@@ -29,6 +29,7 @@ namespace SkietbaanBE.Controllers
             _context = db;
             _config = config;
         }
+
         // GET: api/User
         [HttpGet]
         public IEnumerable<User> GetUsers()

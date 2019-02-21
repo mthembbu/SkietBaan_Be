@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SkietbaanBE.Models {
     public class Score {
@@ -15,5 +12,7 @@ namespace SkietbaanBE.Models {
         public int UserScore { get; set; }
         public string PictureURL { get; set; }
         public DateTime? UploadDate { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
     }
 }

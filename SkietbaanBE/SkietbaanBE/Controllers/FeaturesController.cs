@@ -26,6 +26,25 @@ namespace SkietbaanBE.Controllers
                     return user;
             else return null;
         }
+
+        [HttpPost]
+        public ActionResult Login ([FromBody]User user)
+        {
+            var dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+            if (dbUser == null)
+            {
+                return new NotFoundObjectResult($"{user.Username} not found");
+            }
+            if (Security.HashSensitiveData(user.Password) == dbUser.Password)
+            {
+                return Ok(dbUser);
+            }
+            else
+            {
+                return new BadRequestObjectResult("Invalid Password");
+            }
+        }
+
         //// GET: api/User/Search?Username=myusername
         [HttpGet]
         [ActionName("Search")]
@@ -42,8 +61,8 @@ namespace SkietbaanBE.Controllers
             return null;
         }
 
-        //// PUT: api/User/Update
-        [HttpPut]
+        //// POST: api/User/Update
+        [HttpPost]
         [ActionName("Update")]
         public async Task<IActionResult> PutUserMember([FromBody] User user)
         {
@@ -62,7 +81,7 @@ namespace SkietbaanBE.Controllers
                 //now updating user details
              dbUser.MemberID = user.MemberID;
              dbUser.EntryDate = user.EntryDate;
-             dbUser.MemberExpiry = user.MemberExpiry;
+             dbUser.MemberExpiryDate = user.MemberExpiryDate;
              _context.Users.Update(dbUser);
              await _context.SaveChangesAsync();
              return Ok("User update successful");
