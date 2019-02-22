@@ -2,14 +2,13 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SkietbaanBE.Models {
-    public class UserCompStats {
+    public class Award {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public virtual User User { get; set; }
-        public virtual Competition Competition { get; set; }
-        public int BestScore { get; set; }
-        public int Month { get; set; }
-        public int Year { get; set; }
+        public string IconURL { get; set; }
+        public string Description { get; set; }
+        public int Stat { get; set; }
     }
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SkietbaanBE.Controllers
+namespace SkietbaanBE.Lib
 {
-    public class Group1
+    public class CompetitionLabel
     {
         public string label { get; set; }
         public int value { get; set; }
