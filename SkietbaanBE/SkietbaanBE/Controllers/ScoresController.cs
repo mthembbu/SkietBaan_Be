@@ -93,12 +93,14 @@ namespace SkietbaanBE.Controllers
                     userCompetitionTotalScore = new UserCompetitionTotalScore {
                         Competition = score.Competition,
                         User = score.User,
-                        Total = userCompStatsRecords.Sum(ucs => ucs.Best)
+                        Total = userCompStatsRecords.Sum(ucs => ucs.Best),
+                        Average = (double)userCompStatsRecords.Sum(ucs => ucs.Best),
                     };
                      
                     _context.Add(userCompetitionTotalScore);
                 } else {
                     userCompetitionTotalScore.Total = userCompStatsRecords.Sum(ucs => ucs.Best);
+                    userCompetitionTotalScore.Average = (double)userCompetitionTotalScore.Total / (double)userCompStatsRecords.Count();
                     _context.UserCompetitionTotalScores.Update(userCompetitionTotalScore);
                 }
                 _context.SaveChanges();
@@ -108,10 +110,10 @@ namespace SkietbaanBE.Controllers
                                                     ucs.Competition.Id == score.Competition.Id).FirstOrDefault();
                 userCompetitionTotalScore.Total = userCompStatsRecords.OrderByDescending(x => x.Best)
                                                    .Take(score.Competition.BestScoresNumber).Sum(x => x.Best);
+                userCompetitionTotalScore.Average = (double)userCompetitionTotalScore.Total / (double)score.Competition.BestScoresNumber;
                 _context.UserCompetitionTotalScores.Update(userCompetitionTotalScore);
                 _context.SaveChanges();
             }
-
         }
     }
 }
