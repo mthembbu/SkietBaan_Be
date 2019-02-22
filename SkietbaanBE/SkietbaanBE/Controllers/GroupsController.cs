@@ -13,6 +13,8 @@ namespace SkietbaanBE.Controllers
     [Route("api/Groups")]
     public class GroupsController : Controller
     {
+        EmailService mailS = new EmailService();
+        /*LinkCode _model = new LinkCode();*/
         private readonly ModelsContext _context;
 
         public GroupsController(ModelsContext context)
@@ -122,13 +124,28 @@ namespace SkietbaanBE.Controllers
             return _context.Groups.Any(e => e.Id == id);
         }
 
+
+        [HttpPost]
+        [Route("sendMail")] //check if you need this routes
+        public ActionResult sendMail([FromBody] List<User> users)
+        {
+            for(int i = 0; i < users.Count; i++)
+            {
+                EmailService mailS = new EmailService();
+                User dbUser = _context.Users.FirstOrDefault(x => x.Email == users.ElementAt(i).Email);
+                mailS.SendMail("213546472t@gmail.com");
+            }
+            return Ok();
+        }
+
+
         [HttpPost]
         [Route("add")]
         public void AddListUsers([FromBody] List<User> users)
             
         {
-            int groupId = _context.Groups.ToArray().Length;
-            Group group = _context.Groups.Find(groupId);
+            //Group groupId =( _context.Groups.ToArray())[_context.Groups.ToArray().Length-1];
+            Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
             List<UserGroup> userGroups = new List<UserGroup>();
 
             for (int i = 0; i < users.Count; i++)
