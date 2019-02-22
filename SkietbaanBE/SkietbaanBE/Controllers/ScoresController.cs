@@ -35,13 +35,13 @@ namespace SkietbaanBE.Controllers
                     PictureURL = scoreCapture.PictureURL,
                     Competition = competition,
                     User = user,
-                    UploadDate = DateTime.Today
+                    UploadDate = DateTime.Today.AddMonths(3) //DONT FORGET TO REMOVE ADDMONTH!!!!!!!!!!!!!1
                 };
                 _context.Scores.Add(score);
                 _context.SaveChanges();
 
                 UpdateUserCompStats(score);
-                UpdateTotal(score);
+                UpdateTotalAndAverage(score);
                 return Ok("Score Added Successfully");
             }
             else
@@ -50,25 +50,33 @@ namespace SkietbaanBE.Controllers
             }   
         }
 
+        private void GetNumberOneRanked(Score score) {
+            var compStats = _context.UserCompStats.Where(x => x.Competition.Id == score.Id);
+            if (compStats.Count() == 0) return;
+
+            User leader = compStats.OrderByDescending(x => x.Best).First().User;
+
+        }
+
         private void UpdateUserCompStats(Score score) {         
             var userCompStatsRecords = _context.UserCompStats.Where(ucs => ucs.User.Id == score.User.Id &&
                                             ucs.Competition.Id == score.Competition.Id &&
                                             ucs.Month == score.UploadDate.Value.Month &&
                                             ucs.Year == score.UploadDate.Value.Year);
-
-            if (userCompStatsRecords.Count() < 1) {
+            //New month
+            if (userCompStatsRecords.Count() == 0) {
                 UserCompStats userCompStats = new UserCompStats();
                 userCompStats.Competition = score.Competition;
                 userCompStats.User = score.User;
-                userCompStats.BestScore = score.UserScore;
+                userCompStats.Best = score.UserScore;
                 userCompStats.Month = score.UploadDate.Value.Month;
                 userCompStats.Year = score.UploadDate.Value.Year;
 
                 _context.UserCompStats.Add(userCompStats);
             } else {
                 var userCompStats = userCompStatsRecords.First();
-                if (userCompStats.BestScore < score.UserScore) {
-                    userCompStats.BestScore = score.UserScore;
+                if (userCompStats.Best < score.UserScore) {
+                    userCompStats.Best = score.UserScore;
                     _context.UserCompStats.Update(userCompStats);
                 }
             }
@@ -76,7 +84,7 @@ namespace SkietbaanBE.Controllers
             _context.SaveChanges();
         }
 
-        private void UpdateTotal(Score score) {
+        private void UpdateTotalAndAverage(Score score) {
             var userCompStatsRecords = _context.UserCompStats.Where(ucs => ucs.User.Id == score.User.Id &&
                                         ucs.Competition.Id == score.Competition.Id);
 
@@ -88,20 +96,24 @@ namespace SkietbaanBE.Controllers
                     userCompetitionTotalScore = new UserCompetitionTotalScore {
                         Competition = score.Competition,
                         User = score.User,
-                        Total = userCompStatsRecords.Sum(ucs => ucs.BestScore)
+                        Total = userCompStatsRecords.Sum(ucs => ucs.Best)
                     };
+                    userCompetitionTotalScore.Average = (double)userCompetitionTotalScore.Total;
                     _context.Add(userCompetitionTotalScore);
                 } else {
-                    userCompetitionTotalScore.Total = userCompStatsRecords.Sum(ucs => ucs.BestScore);
+                    userCompetitionTotalScore.Total = userCompStatsRecords.Sum(ucs => ucs.Best);
+                    userCompetitionTotalScore.Average = (double)userCompetitionTotalScore.Total / (double)userCompStatsRecords.Count();
                     _context.UserCompetitionTotalScores.Update(userCompetitionTotalScore);
                 }
+
                 _context.SaveChanges();
             } else if(userCompStatsRecords.Count() > 0 && userCompStatsRecords.Count() > score.Competition.BestScoresNumber) {
                 UserCompetitionTotalScore userCompetitionTotalScore = _context.UserCompetitionTotalScores
                                                     .Where(ucs => ucs.User.Id == score.User.Id &&
                                                     ucs.Competition.Id == score.Competition.Id).FirstOrDefault();
-                userCompetitionTotalScore.Total = userCompStatsRecords.OrderByDescending(x => x.BestScore)
-                                                   .Take(score.Competition.BestScoresNumber).Sum(x => x.BestScore);
+                userCompetitionTotalScore.Total = userCompStatsRecords.OrderByDescending(x => x.Best)
+                                                   .Take(score.Competition.BestScoresNumber).Sum(x => x.Best);
+                userCompetitionTotalScore.Average = (double)userCompetitionTotalScore.Total / (double)score.Competition.BestScoresNumber;
                 _context.UserCompetitionTotalScores.Update(userCompetitionTotalScore);
                 _context.SaveChanges();
             }
