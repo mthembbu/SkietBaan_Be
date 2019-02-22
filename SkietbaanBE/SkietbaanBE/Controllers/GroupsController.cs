@@ -124,27 +124,11 @@ namespace SkietbaanBE.Controllers
             return _context.Groups.Any(e => e.Id == id);
         }
 
-
-        [HttpPost]
-        [Route("sendMail")] //check if you need this routes
-        public ActionResult sendMail([FromBody] List<User> users)
-        {
-            for(int i = 0; i < users.Count; i++)
-            {
-                EmailService mailS = new EmailService();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Email == users.ElementAt(i).Email);
-                mailS.SendMail("213546472t@gmail.com");
-            }
-            return Ok();
-        }
-
-
         [HttpPost]
         [Route("add")]
         public void AddListUsers([FromBody] List<User> users)
             
         {
-            //Group groupId =( _context.Groups.ToArray())[_context.Groups.ToArray().Length-1];
             Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
             List<UserGroup> userGroups = new List<UserGroup>();
 
