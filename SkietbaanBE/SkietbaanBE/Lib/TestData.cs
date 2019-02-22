@@ -14,8 +14,6 @@ namespace SkietbaanBE.Lib {
             InsertCompetitions();
             InsertScores();
             insertUserCompetitionDataData();
-            calculateTotalAverageCompetitionScore();
-
         }
         public string InsertGroups() {
             List<Group> groups = new List<Group>();
@@ -290,65 +288,74 @@ namespace SkietbaanBE.Lib {
 
             return "success";
         }
+
         public string insertUserCompetitionDataData() {
-            List<Competition> compts = _context.Competitions.ToList<Competition>(); ;
-            List<User> users = _context.Users.ToList<User>();
-            List<UserCompStats> userCompStats = new List<UserCompStats>();
-            for (int u = 0; u < users.Count; u++) {
-                for (int c = 0; c < compts.Count; c++) {
-                    // set default stats(initial)
-                    UserCompStats ucs = new UserCompStats();
-                    ucs.User = users.ElementAt(u);
-                    ucs.Competition = compts.ElementAt(c);
-                    ucs.BestScore = 0;
-                    //ucs.CompScore = 0; //average
-                    //ucs.Total = 0;
-                    ucs.Year = DateTime.Now.Year;
-                    userCompStats.Add(ucs);
-                }
+            foreach (var score in _context.Scores) {
+                UpdateUserCompStats(score);
+                UpdateTotal(score);
             }
-            _context.UserCompStats.AddRange(userCompStats);
-            _context.SaveChanges();
 
             return "success";
         }
-        public void calculateTotalAverageCompetitionScore() {
+        
+        private void UpdateUserCompStats(Score score) {
+            var userCompStatsRecords = _context.UserCompStats.Where(ucs => ucs.User.Id == score.User.Id &&
+                                            ucs.Competition.Id == score.Competition.Id &&
+                                            ucs.Month == score.UploadDate.Value.Month &&
+                                            ucs.Year == score.UploadDate.Value.Year);
 
-            List<User> users = _context.Users.ToList<User>();
-            for (int u = 0; u < users.Count; u++) {
-                //get current user's competition(where the user has scores)
-                var competitionIDsQuery = from cust in _context.Scores
-                                          where cust.User.Id == users.ElementAt(u).Id
-                                          select cust.Competition.Id;
-                List<int> competitionsIDs = competitionIDsQuery.ToList<int>();
+            if (userCompStatsRecords.Count() < 1) {
+                UserCompStats userCompStats = new UserCompStats();
+                userCompStats.Competition = score.Competition;
+                userCompStats.User = score.User;
+                userCompStats.Best = score.UserScore;
+                userCompStats.Month = score.UploadDate.Value.Month;
+                userCompStats.Year = score.UploadDate.Value.Year;
 
-                for (int c = 0; c < competitionsIDs.Count; c++) {
-                    //get user competition total score
-                    var competitionScoresQuery = from cust in _context.Scores
-                                                 where (cust.User.Id == users.ElementAt(u).Id && cust.Competition.Id == competitionsIDs.ElementAt(c))
-                                                 select cust.UserScore;
-                    List<int> competitionScores = competitionScoresQuery.ToList<int>();
-
-                    //calculate average
-                    int total = competitionScores.Sum();
-
-                    //calculate average
-                    double average = (double)total / (double)competitionScores.Count;
-
-                    //get competition object
-                    Competition competition = _context.Competitions.Find(competitionsIDs.ElementAt(c));
-
-                    //update
-                    var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
-                                                  .FirstOrDefault<UserCompStats>();
-                    //userCompStats.Total = total;
-                    //userCompStats.CompScore = (int)average;  // database attribute for Competition Score needs to be changed from int to double
-                    userCompStats.User = users.ElementAt(u);
-                    //save
+                _context.UserCompStats.Add(userCompStats);
+            } else {
+                var userCompStats = userCompStatsRecords.First();
+                if (userCompStats.Best < score.UserScore) {
+                    userCompStats.Best = score.UserScore;
                     _context.UserCompStats.Update(userCompStats);
-                    _context.SaveChanges();
-
                 }
+            }
+
+            _context.SaveChanges();
+        }
+
+        private void UpdateTotal(Score score) {
+            var userCompStatsRecords = _context.UserCompStats.Where(ucs => ucs.User.Id == score.User.Id &&
+                                        ucs.Competition.Id == score.Competition.Id);
+
+            if (userCompStatsRecords.Count() > 0 && userCompStatsRecords.Count() <= score.Competition.BestScoresNumber) {
+                UserCompetitionTotalScore userCompetitionTotalScore = _context.UserCompetitionTotalScores
+                                                                    .Where(ucs => ucs.User.Id == score.User.Id &&
+                                                                    ucs.Competition.Id == score.Competition.Id).FirstOrDefault();
+                if (userCompetitionTotalScore == null) {
+                    userCompetitionTotalScore = new UserCompetitionTotalScore {
+                        Competition = score.Competition,
+                        User = score.User,
+                        Total = userCompStatsRecords.Sum(ucs => ucs.Best),
+                        Average = (double)userCompStatsRecords.Sum(ucs => ucs.Best),
+                    };
+
+                    _context.Add(userCompetitionTotalScore);
+                } else {
+                    userCompetitionTotalScore.Total = userCompStatsRecords.Sum(ucs => ucs.Best);
+                    userCompetitionTotalScore.Average = (double)userCompetitionTotalScore.Total / (double)userCompStatsRecords.Count();
+                    _context.UserCompetitionTotalScores.Update(userCompetitionTotalScore);
+                }
+                _context.SaveChanges();
+            } else if (userCompStatsRecords.Count() > 0 && userCompStatsRecords.Count() > score.Competition.BestScoresNumber) {
+                UserCompetitionTotalScore userCompetitionTotalScore = _context.UserCompetitionTotalScores
+                                                    .Where(ucs => ucs.User.Id == score.User.Id &&
+                                                    ucs.Competition.Id == score.Competition.Id).FirstOrDefault();
+                userCompetitionTotalScore.Total = userCompStatsRecords.OrderByDescending(x => x.Best)
+                                                   .Take(score.Competition.BestScoresNumber).Sum(x => x.Best);
+                userCompetitionTotalScore.Average = (double)userCompetitionTotalScore.Total / (double)score.Competition.BestScoresNumber;
+                _context.UserCompetitionTotalScores.Update(userCompetitionTotalScore);
+                _context.SaveChanges();
             }
         }
     }
