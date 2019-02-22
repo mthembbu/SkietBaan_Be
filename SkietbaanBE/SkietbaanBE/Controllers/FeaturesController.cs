@@ -120,12 +120,10 @@ namespace SkietbaanBE.Controllers
             }
             User dbUser = _context.Users.Where(u => u.Username == user.Username)
                     .FirstOrDefault<User>();
-
             if (dbUser == null)
                 {
                     return BadRequest("User is null");
                 }
-            
              dbUser.MemberID = user.MemberID;
              dbUser.MemberStartDate = user.MemberExpiryDate;
              dbUser.MemberStartDate = dbUser.MemberStartDate.Value.AddYears(-1);
