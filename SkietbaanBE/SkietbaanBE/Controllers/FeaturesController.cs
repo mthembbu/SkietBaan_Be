@@ -125,11 +125,8 @@ namespace SkietbaanBE.Controllers
                 {
                     return BadRequest("User is null");
                 }
-
-                //now updating user details
+            
              dbUser.MemberID = user.MemberID;
-            //dbUser.MemberStartDate = dbUser.MemberExpiryDate;
-            //dbUser.MemberStartDate.Value.AddYears = dbUser.MemberExpiryDate.Value.Year - 1;
              dbUser.MemberStartDate = user.MemberExpiryDate;
              dbUser.MemberStartDate = dbUser.MemberStartDate.Value.AddYears(-1);
              dbUser.MemberExpiryDate = user.MemberExpiryDate;
