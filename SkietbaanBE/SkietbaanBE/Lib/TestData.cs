@@ -14,8 +14,6 @@ namespace SkietbaanBE.Lib {
             InsertCompetitions();
             InsertScores();
             insertUserCompetitionDataData();
-            //calculateTotalAverageCompetitionScore();
-
         }
         public string InsertGroups() {
             List<Group> groups = new List<Group>();

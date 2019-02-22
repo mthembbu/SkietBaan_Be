@@ -53,9 +53,7 @@ namespace SkietbaanBE.Controllers
             
         }
 
-        private void UpdateUserCompStats(Score score) {
-
-            
+        private void UpdateUserCompStats(Score score) {  
             var userCompStatsRecords = _context.UserCompStats.Where(ucs => ucs.User.Id == score.User.Id &&
                                             ucs.Competition.Id == score.Competition.Id &&
                                             ucs.Month == score.UploadDate.Value.Month &&
