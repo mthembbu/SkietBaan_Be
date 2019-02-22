@@ -61,6 +61,54 @@ namespace SkietbaanBE.Controllers
             return null;
         }
 
+        //// GET: api/User/TimeLeft
+        [HttpGet]
+        [ActionName("TimeLeft")]
+        public IEnumerable<int> TimeLeft()
+        {
+            var dbUsers = _context.Users.Where(u => u.MemberID != null && u.MemberID != "");
+            DateTime current = DateTime.Now;
+            var months = new List<int>();
+            foreach (var user in dbUsers)
+            {
+                int expiryYear = user.MemberExpiryDate.Value.Year;
+                int yearLeft = expiryYear - current.Year;
+                if (yearLeft == 0)
+                {
+                    int monthsLeft = user.MemberExpiryDate.Value.Month - current.Month;
+                    months.Add(monthsLeft);
+                }
+                else
+                {
+                    if (user.MemberExpiryDate.Value.Month > current.Month)
+                    {
+                        int diff = user.MemberExpiryDate.Value.Month - current.Month;
+                        int monthsLeft = 12 - diff;
+                        months.Add(monthsLeft);
+                    }
+                    else if (current.Month > user.MemberExpiryDate.Value.Month)
+                    {
+                        int diff = current.Month - user.MemberExpiryDate.Value.Month;
+                        int monthsLeft = 12 - diff;
+                        months.Add(monthsLeft);
+                    }
+                    else
+                    {
+                        months.Add(12);
+                    }
+                }
+            }
+            return months.ToArray();
+        }
+
+        //// GET: api/User/SearchMember
+        [HttpGet]
+        [ActionName("SearchMember")]
+        public IEnumerable<User> SearchMember()
+        {
+            return _context.Users.ToArray<User>().Where(u => u.MemberID != null && u.MemberID != "");
+        }
+
         //// POST: api/User/Update
         [HttpPost]
         [ActionName("Update")]
@@ -80,7 +128,10 @@ namespace SkietbaanBE.Controllers
 
                 //now updating user details
              dbUser.MemberID = user.MemberID;
-             dbUser.EntryDate = user.EntryDate;
+            //dbUser.MemberStartDate = dbUser.MemberExpiryDate;
+            //dbUser.MemberStartDate.Value.AddYears = dbUser.MemberExpiryDate.Value.Year - 1;
+             dbUser.MemberStartDate = user.MemberExpiryDate;
+             dbUser.MemberStartDate = dbUser.MemberStartDate.Value.AddYears(-1);
              dbUser.MemberExpiryDate = user.MemberExpiryDate;
              _context.Users.Update(dbUser);
              await _context.SaveChangesAsync();
