@@ -80,38 +80,32 @@ namespace SkietbaanBE.Controllers
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
                         join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
-                        where (UserCompStats.Competition.Id == competitionID+1 && Group.Id == (groupID+1))
-                        orderby UserCompStats.CompScore
+                        where (UserCompStats.Competition.Id == competitionID && Group.Id == groupID)
                         select new
                         {
                             User.Username,
-                            //UserCompStats.Total,
-                           // UserCompStats.CompScore,
-                            UserCompStats.BestScore
+                            UserCompStats.Best,
+                            UserCompStats.Total,
+                            UserCompStats.Average
                         };
+            //saving results in an List which will make sorting easier(ArrayList)
             foreach (var item in query)
             {
                 RankResults rankResult = new RankResults();
-                rankResult.ShowMore = false;
-
-                
                 rankResult.Username = item.Username;
-                rankResult.BestScore = item.BestScore;
+                rankResult.Best = item.Best;
                 rankResult.Total = item.Total;
-                rankResult.Average = item.CompScore;
+                rankResult.Average = item.Average;
                 rankResults.Add(rankResult);
             }
 
+            //sort and rank results
             leaderboardResults.RankResults = sortAndRank(rankResults);
 
             //Current User's results
             User currentUser = new FeaturesController(_context).GetUserByToken(userToken);
-            //RankResults userRankResults = new RankResults();
-            //var competitionScoresQuery = from cust in _context.UserCompStats
-            //                             where cust.Competition.Id == competitionID && cust.User.Id == currentUser.Id
-            //                             select cust;
-            //List<UserCompStats> userscompStats = competitionScoresQuery.ToList<UserCompStats>(); //always will be 1 record
-           if(currentUser != null)
+            //find current user in ranking results
+            if (currentUser != null)
             {
                 for (int i = 0; i < leaderboardResults.RankResults.Count; i++)
                 {
@@ -126,7 +120,7 @@ namespace SkietbaanBE.Controllers
                 RankResults rankResult = new RankResults();
                 rankResult.Username = "Not logged in";
                 rankResult.Rank = 0;
-                rankResult.BestScore = 0;
+                rankResult.Best = 0;
                 rankResult.Total = 0;
                 rankResult.Average = 0;
                 leaderboardResults.UserResults = rankResult;
@@ -137,7 +131,7 @@ namespace SkietbaanBE.Controllers
         }
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
-            rankResults = rankResults.OrderByDescending(x => x.Average).ToList();
+            rankResults = rankResults.OrderByDescending(x => x.Best).ToList();
             for (int i = 0; i < rankResults.Count; i++)
             {
                 rankResults.ElementAt(i).Rank = i + 1;

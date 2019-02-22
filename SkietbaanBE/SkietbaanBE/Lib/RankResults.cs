@@ -11,8 +11,6 @@ namespace SkietbaanBE.Lib
         public string Username { get; set; }
         public int Best { get; set; }
         public int Total { get; set; }
-        public double Average { get; set; }
-        public bool ShowMore { get; set; }//extra for front-End UI collapse feature
-
+        public int Average { get; set; }
     }
 }
