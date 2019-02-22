@@ -72,23 +72,29 @@ namespace SkietbaanBE.Controllers
             //from arry index to data base ID;
             competitionID += 1;
             groupID += 1;
-            LeaderboardResults leaderboardResults = new LeaderboardResults();
 
+            LeaderboardResults leaderboardResults = new LeaderboardResults();
+            
             //ranking results for specific group's specific compentition
             List<RankResults> rankResults = new List<RankResults>();
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
                         join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
+                        join Competition in _context.Competitions on UserCompStats.Competition.Id equals Competition.Id
+                        join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
                         where (UserCompStats.Competition.Id == competitionID && Group.Id == groupID)
                         select new
                         {
                             User.Username,
-                            UserCompStats.Best,
-                            UserCompStats.Total,
-                            UserCompStats.Average
+                            User.Id,
+                            UserCompetitionTotalScore.Average,
+                            UserCompetitionTotalScore.Total,
+                            UserCompStats.Best
                         };
             //saving results in an List which will make sorting easier(ArrayList)
+            Dictionary<int, RankResults> mapIdToBest = new Dictionary<int, RankResults>();
+            
             foreach (var item in query)
             {
                 RankResults rankResult = new RankResults();
@@ -96,11 +102,20 @@ namespace SkietbaanBE.Controllers
                 rankResult.Best = item.Best;
                 rankResult.Total = item.Total;
                 rankResult.Average = item.Average;
-                rankResults.Add(rankResult);
+
+                if (mapIdToBest.ContainsKey(item.Id)) {
+                    RankResults res = mapIdToBest.GetValueOrDefault(item.Id);
+                    if (res.Best < item.Best) {
+                        res.Best = item.Best;
+                        mapIdToBest[item.Id] = res;
+                    }
+                } else {
+                    mapIdToBest.Add(item.Id, rankResult);
+                }  
             }
 
             //sort and rank results
-            leaderboardResults.RankResults = sortAndRank(rankResults);
+            leaderboardResults.RankResults = sortAndRank(mapIdToBest.Values.ToList());
 
             //Current User's results
             User currentUser = new FeaturesController(_context).GetUserByToken(userToken);
@@ -126,9 +141,10 @@ namespace SkietbaanBE.Controllers
                 leaderboardResults.UserResults = rankResult;
 
             }
-            //final results
+            //final results*/
             return leaderboardResults;
         }
+
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
             rankResults = rankResults.OrderByDescending(x => x.Best).ToList();
@@ -138,6 +154,7 @@ namespace SkietbaanBE.Controllers
             }
             return rankResults;
         }
+
         //Get Users Scores stats for a specific competition
         [HttpGet]
         public IEnumerable<UserCompStats> GetUsersCompetitionsScores(int competitionID)
@@ -186,5 +203,6 @@ namespace SkietbaanBE.Controllers
                 }
             }
         }
+
     }
 }
