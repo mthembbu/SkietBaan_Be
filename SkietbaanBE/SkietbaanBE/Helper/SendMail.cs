@@ -13,8 +13,8 @@ namespace SkietbaanBE.Helper
         string smtpAddress = "smtp.gmail.com";
         int portNumber = 587;
         bool enableSSL = true;
-        string emailFromAddress = "manganyikyle@gmail.com"; //Sender Email Address  
-        string password = "tiyisela97"; //Sender Password   
+        string emailFromAddress = "*******@gmail.com"; //Sender Email Address  
+        string password = "*******"; //Sender Password   
 
         public bool SendEmail(string To, string Subject, Attachment attachment)
         {
