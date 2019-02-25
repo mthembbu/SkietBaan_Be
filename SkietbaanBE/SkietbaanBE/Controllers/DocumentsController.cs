@@ -22,7 +22,7 @@ namespace SkietbaanBE.Controllers
             _context = db;
         }
 
-        [Route("{mail}")]
+        [Route("{mail}/{url}")]
         public void Email(string mail,string url)
         {
             var ismember = _context.Users.FirstOrDefault(x => x.Email == mail);
