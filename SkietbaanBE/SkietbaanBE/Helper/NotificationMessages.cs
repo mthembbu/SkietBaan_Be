@@ -9,6 +9,11 @@ namespace SkietbaanBE.Helper
 {
     public class NotificationMessages
     {
+        public NotificationMessages()
+        {
+
+        }
+
         public void ConfirmationNotification(ModelsContext _context, User user)
         {
             Notifications notification = new Notifications
@@ -35,30 +40,30 @@ namespace SkietbaanBE.Helper
 
         public void RenewalNotification(ModelsContext _context, User user)
         {
-            var userMonth = user.MemberExpiry.Month;
-            var currentMonth = DateTime.Now.Month;
-            var result = currentMonth - userMonth;
-            Notifications notification = new Notifications();
-            if (result < 2)
-            {
-                notification.User = user;
-                notification.IsRead = false;
-                notification.typeOfNotification = "Renewal";
-                notification.NotificationMessage = "Dear " + user.Username + " your membership is due on " + user.MemberExpiry + " .";
-            }
+            //var userMonth = user.MemberExpiryDate;
+            //var currentMonth = DateTime.Now.Month;
+            //var result = currentMonth - userMonth;
+            //Notifications notification = new Notifications();
+            //if (result < 2)
+            //{
+            //    notification.User = user;
+            //    notification.IsRead = false;
+            //    notification.typeOfNotification = "Renewal";
+            //    notification.NotificationMessage = "Dear " + user.Username + " your membership is due on " + user.MemberExpiry + " .";
+            //}
 
-            string message = "";
-            try
-            {
-                _context.Notifications.Add(notification);
-                _context.SaveChanges();
+            //string message = "";
+            //try
+            //{
+            //    _context.Notifications.Add(notification);
+            //    _context.SaveChanges();
 
-                message = "successful";
-            }
-            catch (Exception e)
-            {
-                message = e.Message;
-            }
+            //    message = "successful";
+            //}
+            //catch (Exception e)
+            //{
+            //    message = e.Message;
+            //}
         }
 
         public void CompetitionNotification(ModelsContext _context, Competition comp)
