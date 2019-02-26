@@ -76,16 +76,23 @@ namespace SkietbaanBE.Controllers
                 //initialising user's competition scores to Zero
                 List<Competition> competitions = _context.Competitions.ToList<Competition>();
                 List<UserCompStats> userCompStats = new List<UserCompStats>();
+                List<UserCompetitionTotalScore> userCompetitionTotalScoresList = new List<UserCompetitionTotalScore>();
                 for(int i = 0; i < competitions.Count; i++)
                 {
                     UserCompStats userCompStat = new UserCompStats();
+                    UserCompetitionTotalScore userCompetitionTotalScore = new UserCompetitionTotalScore {
+                        User = user,
+                        Competition = competitions.ElementAt(i),
+                        Average = 0,
+                        Total = 0
+                    };
                     userCompStat.User = user;
                     userCompStat.Competition = competitions.ElementAt(i);
-                    userCompStat.BestScore = 0;
+                    userCompStat.Best = 0;
                    // userCompStat.CompScore = 0;
                    // userCompStat.Total = 0;
                     //userCompStats.Add(userCompStat);
-                    //userCompStats.Add(new UserCompStats
+                    userCompetitionTotalScoresList.Add(userCompetitionTotalScore);
                     //{
                     //    User =user,
                     //    Competition = competitions.ElementAt(i),
@@ -95,6 +102,7 @@ namespace SkietbaanBE.Controllers
 
                 //saving to UserCompstats table (bridging table between User and Competition)
                 _context.UserCompStats.AddRange(userCompStats);
+                _context.AddRange(userCompetitionTotalScoresList);
                 _context.SaveChanges();
 
                 new OkObjectResult("User saved successfully");

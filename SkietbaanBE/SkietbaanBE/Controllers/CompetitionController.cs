@@ -9,7 +9,6 @@ namespace SkietbaanBE.Controllers
 {
     [Produces("application/json")]
     [Route("api/Competition")]
-
     public class CompetitionController : Controller
     {
         private ModelsContext _context;
@@ -19,43 +18,49 @@ namespace SkietbaanBE.Controllers
             _context = db;
             _notificationMessages = notificationMessages;
         }
-        /** The method to return an array of competition objects that hold the true Status*/
+        /** The method to return an array of competition objects that hold Status == true*/
         // GET: api/Competition
         [HttpGet]
-        public IEnumerable<Competition> Get()
+        public IEnumerable<Competition> GetCompetitions()
         {
             //get the competitions where(Status == true)
             var competitionIDsQuery = from Comp in _context.Competitions
                                       where Comp.Status == true
                                       select Comp;
-            List<Competition> competitionsList = competitionIDsQuery.ToList<Competition>();
-            // return _context.Competitions.ToArray<Competition>();
+            List<Competition> competitionsList = competitionIDsQuery.ToList<Competition>();     
             return competitionsList;
         }
-        //Getting the competition by ID
-        // GET: api/Competition/5
+        /** The method that return an array of competition objects whether status is true or false*/
+        // GET: api/Competition
+        [HttpGet("all")]
+        public IEnumerable<Competition> GetAllCompetitions()
+        {
+            //get the competitions where(Status == true / false)
+             return _context.Competitions.ToArray<Competition>();
+        }
+        //Getting all competition by ID
+        // GET: api/Competition/all
         [HttpGet("{id}")]
-        public async Task<Competition> CompetitionGet(int id)
+        public async Task<Competition> CompetitionGetById(int id)
         {
             return await _context.Competitions.FindAsync(id);
         }
         //Getting the competition by ID
         // GET: api/Competition/5
         [HttpGet("{Name}")]
-        public async Task<Competition> CompetitionGet(string Name)
+        public async Task<Competition> CompetitionGetByName(string Name)
         {
             return await _context.Competitions.FindAsync(Name);
         }
         //posting the competition to the competition table
         // POST: api/Competition
         [HttpPost]
-        public async Task<IActionResult> addCompetition([FromBody]Competition comp)
+        public async Task<IActionResult> ddCompetition([FromBody]Competition comp)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
- 
             await _context.AddAsync(comp);
             await _context.SaveChangesAsync();
             _notificationMessages.CompetitionNotification(_context, comp);
@@ -79,7 +84,7 @@ namespace SkietbaanBE.Controllers
                     using (_context)
                     {
                         dbComp = _context.Competitions
-                                         .Where(u => u.Name == comp.Name && u.Id != comp.Id) //check if a different user with the new username already exists
+                                         .Where(u => u.Name == comp.Name && u.Id != comp.Id)
                                          .FirstOrDefault<Competition>();
                         if (dbComp != null)
                         {
@@ -108,5 +113,4 @@ namespace SkietbaanBE.Controllers
         {
         }
     }
-
 }
