@@ -94,7 +94,6 @@ namespace SkietbaanBE.Controllers
             }
 
             _context.Groups.Add(@group);
-            _notificationMessages.GroupNotification(_context, group);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
@@ -144,6 +143,7 @@ namespace SkietbaanBE.Controllers
                 userGroup.User = dbUser;
 
                 userGroups.Add(userGroup);
+                _notificationMessages.GroupNotification(_context, group, dbUser);
             }
 
             _context.UserGroups.AddRange(userGroups);
