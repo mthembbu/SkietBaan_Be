@@ -83,23 +83,41 @@ namespace SkietbaanBE.Controllers
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
         }
 
+
+       
+
         // DELETE: api/Groups/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGroup([FromRoute] int id)
+
         {
+            var query = from Group in _context.Groups
+                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                        where (Group.Id == id)
+                        select new
+                        {
+                            UserGroup
+                        };
+            foreach(var item in query)
+            {
+                UserGroup usergroup = new UserGroup();
+                usergroup = item.UserGroup;
+                _context.UserGroups.Remove(usergroup);
+            };
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var @group = await _context.Groups.SingleOrDefaultAsync(m => m.Id == id);
-            if (@group == null)
+            var group = await _context.Groups.SingleOrDefaultAsync(m => m.Id == id);
+            if (group == null)
             {
                 return NotFound();
             }
-            _context.Groups.Remove(@group);
+            _context.Groups.Remove(group);
             await _context.SaveChangesAsync();
 
-            return Ok(@group);
+            return Ok(group);
         }
 
         private bool GroupExists(int id)
@@ -124,6 +142,94 @@ namespace SkietbaanBE.Controllers
             _context.UserGroups.AddRange(userGroups);
             _context.SaveChanges();
         }
+
+        [HttpGet]
+        [Route("list")]
+        public List<User> getGroups(int id)
+        {
+            List<User> users = new List<User>();
+
+            var query = from Group in _context.Groups
+                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                        join User in _context.Users on UserGroup.User.Id equals User.Id
+                        where (Group.Id == id)
+                        select new
+                        {
+                            User
+                        };
+            var qry = _context.Users.Select(x => x).ToList();
+
+            
+
+
+            foreach (var item in query)
+            {
+                User user = new User();
+                user = item.User; users.Add(user);
+            }
+            var result = (qry).Except(users);
+
+            return result.ToList<User>();
+        }
+
+        [HttpGet]
+        [Route("edit")]
+        public List<User> getExistingMembers(int id)
+        {
+            List<User> users = new List<User>();
+
+            var query = from Group in _context.Groups
+                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                        join User in _context.Users on UserGroup.User.Id equals User.Id
+                        where (Group.Id == id)
+                        select new
+                        {
+                            User
+                            
+                        };
+            foreach (var item in query)
+            {
+                User user = new User();
+                user = item.User; users.Add(user);
+                
+            }
+
+            return users;
+        }
+
+        [HttpDelete]
+        [Route("deleteMember")]
+        public void deleteUsersOnTheList ( [FromBody] List<User> users)
+        {
+            int num = id;
+            List<User> theusers = new List<User>();
+
+            var query = from Group in _context.Groups
+                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                        join User in _context.Users on UserGroup.User.Id equals User.Id
+                        where (Group.Id == id)
+                        select new
+                        {
+                            UserGroup,
+                            User
+
+                            };
        
+    
+            foreach(var item in query)
+            {
+
+                if (users.Contains(item.UserGroup.User))
+                {
+                    UserGroup user = new UserGroup();
+                    user = item.UserGroup;
+                    _context.UserGroups.Remove(user);
+                    _context.SaveChanges();
+                }
+
+               
+            }
+           
+        }
     }
 }
