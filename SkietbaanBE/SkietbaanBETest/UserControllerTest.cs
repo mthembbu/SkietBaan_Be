@@ -16,11 +16,11 @@ namespace SkietbaanBETest {
         private IQueryable<User> mockData = new List<User> {
             new User{
                 Id=1, Username="Superman", Password="Clark Kent", Email="DC@comics.com", MemberID=null,
-                Admin=false, EntryDate=DateTime.Now.Date, MemberExpiry=DateTime.MinValue
+                Admin=false, EntryDate=DateTime.Now.Date, MemberExpiryDate=DateTime.MinValue
             },
             new User {
                 Id=2, Username="Thanos", Password="Infinity Stone", Email="mavel@comics.com", MemberID="YES",
-                Admin=false, EntryDate=DateTime.Now.Date, MemberExpiry=DateTime.MaxValue
+                Admin=false, EntryDate=DateTime.Now.Date, MemberExpiryDate=DateTime.MaxValue
             }
         }.AsQueryable();
 
@@ -30,10 +30,13 @@ namespace SkietbaanBETest {
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(mockData.GetEnumerator());
             var mockContext = new Mock<ModelsContext>();
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
-            var controller = new UserController(mockContext.Object);
+            var controller = new UserController(mockContext.Object, null);
+
             var users = controller.GetUsers();
 
-            Assert.IsNotEmpty(users);
+            var user = users.Where(u => u.Id == 1).First();
+            Assert.AreEqual("Superman", user.Username);
+            
             Assert.AreEqual(2, users.Count());
         }
 
@@ -43,7 +46,7 @@ namespace SkietbaanBETest {
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(mockData.GetEnumerator());
             var mockContext = new Mock<ModelsContext>();
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
-            var controller = new UserController(mockContext.Object);
+            var controller = new UserController(mockContext.Object, null);
 
             /*
              *  number of invocations on the context after AddUser call
@@ -66,7 +69,7 @@ namespace SkietbaanBETest {
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(mockData.GetEnumerator());
             var mockContext = new Mock<ModelsContext>();
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
-            var controller = new UserController(mockContext.Object);
+            var controller = new UserController(mockContext.Object, null);
 
             mockContext.Setup(x => x.Users.FindAsync(id))
                 .Returns(Task.FromResult(mockData.Where(u => u.Id == id).First()));

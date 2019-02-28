@@ -9,8 +9,6 @@ namespace SkietbaanBE.Models {
            : base(options) {
         }
 
-        public ModelsContext() { }
-
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Competition> Competitions { get; set; }
         public virtual DbSet<Score> Scores { get; set; }
@@ -18,5 +16,8 @@ namespace SkietbaanBE.Models {
         public virtual DbSet<UserGroup> UserGroups { get; set; }
         public virtual DbSet<UserCompStats> UserCompStats { get; set; }
         public virtual DbSet<Notifications> Notifications { get; set; }
+        public virtual DbSet<Award> Awards { get; set; }
+        public virtual DbSet<UserCompetitionTotalScore> UserCompetitionTotalScores { get; set; }
+        public virtual DbSet<LeaderInCompetition> LeaderInCompetitions { get; set; }
     }
 }

@@ -1,11 +1,19 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using SkietbaanBE.Helper;
+using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Controllers
@@ -15,25 +23,31 @@ namespace SkietbaanBE.Controllers
     public class UserController : Controller
     {
         private ModelsContext _context;
-        public UserController(ModelsContext db)
+        private IConfiguration _config;
+        public UserController(ModelsContext db, IConfiguration config)
         {
             _context = db;
+            _config = config;
         }
+
         // GET: api/User
         [HttpGet]
         public IEnumerable<User> GetUsers()
         {
             return _context.Users.ToArray<User>();
         }
+
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
         public async Task<User> GetUser(int id)
         {
             return await _context.Users.FindAsync(id);
         }
+
+        
         //POST: api/User
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] User user)
+        public async Task<ActionResult> AddUser([FromBody] User user)
         {
             if (ModelState.IsValid)
             {
@@ -44,22 +58,58 @@ namespace SkietbaanBE.Controllers
                 //if user aready exist return
                 if (dbUser != null)
                 {
-                    return BadRequest("User already exists");
+                    return new BadRequestObjectResult("User already exists");
                 }
                 //get today's date and save it under user entry date
                 user.EntryDate = DateTime.Now;
                 //encrypt password
                 user.Password = Security.HashSensitiveData(user.Password);
+                //generate token
+                string tokenString = BuildToken();
+                user.Token = tokenString;
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
+                new HelperClass().Notification(_context, user);
+                //initialising user's competition scores to Zero
+                List<Competition> competitions = _context.Competitions.ToList<Competition>();
+                List<UserCompStats> userCompStats = new List<UserCompStats>();
+                List<UserCompetitionTotalScore> userCompetitionTotalScoresList = new List<UserCompetitionTotalScore>();
+                for(int i = 0; i < competitions.Count; i++)
+                {
+                    UserCompStats userCompStat = new UserCompStats();
+                    UserCompetitionTotalScore userCompetitionTotalScore = new UserCompetitionTotalScore {
+                        User = user,
+                        Competition = competitions.ElementAt(i),
+                        Average = 0,
+                        Total = 0
+                    };
+                    userCompStat.User = user;
+                    userCompStat.Competition = competitions.ElementAt(i);
+                    userCompStat.Best = 0;
+                    userCompStats.Add(userCompStat);
+                    userCompetitionTotalScoresList.Add(userCompetitionTotalScore);
+                }
 
-                return Ok("User saved successfully");
+                //saving to UserCompstats table (bridging table between User and Competition)
+                _context.UserCompStats.AddRange(userCompStats);
+                _context.AddRange(userCompetitionTotalScoresList);
+                _context.SaveChanges();
+
+                new OkObjectResult("User saved successfully");
             }
             else
             {
-                return new BadRequestObjectResult("user cannot be null");
+                 return new BadRequestObjectResult("user cannot be null");
             }
+            return Ok(user);
+        }
+
+        private string BuildToken()
+        {
+            string guid = Guid.NewGuid().ToString();
+            int index = guid.LastIndexOf("-");
+            return guid.Substring(index + 1);
         }
 
         // PUT: api/User/

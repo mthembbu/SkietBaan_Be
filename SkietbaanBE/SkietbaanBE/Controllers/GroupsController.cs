@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Controllers
@@ -79,6 +80,7 @@ namespace SkietbaanBE.Controllers
                 return BadRequest(ModelState);
             }
             _context.Groups.Add(@group);
+            new HelperClass().Notification(_context, group);
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
         }

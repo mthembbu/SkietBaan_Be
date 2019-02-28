@@ -11,9 +11,10 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    partial class ModelsContextModelSnapshot : ModelSnapshot
+    [Migration("20190219191541_TotalTable")]
+    partial class TotalTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,6 +27,10 @@ namespace SkietbaanBE.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Description");
+
+                    b.Property<string>("IconURL");
+
+                    b.Property<int>("Stat");
 
                     b.Property<int?>("UserId");
 
@@ -64,26 +69,6 @@ namespace SkietbaanBE.Migrations
                     b.ToTable("Groups");
                 });
 
-            modelBuilder.Entity("SkietbaanBE.Models.LeaderInCompetition", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("CompetitionId");
-
-                    b.Property<DateTime>("DateAtTop");
-
-                    b.Property<int?>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompetitionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("LeaderInCompetitions");
-                });
-
             modelBuilder.Entity("SkietbaanBE.Models.Notifications", b =>
                 {
                     b.Property<int>("Id")
@@ -110,10 +95,6 @@ namespace SkietbaanBE.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<int?>("CompetitionId");
-
-                    b.Property<float?>("Latitude");
-
-                    b.Property<float?>("Longitude");
 
                     b.Property<string>("PictureURL");
 
@@ -165,8 +146,6 @@ namespace SkietbaanBE.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<double>("Average");
-
                     b.Property<int?>("CompetitionId");
 
                     b.Property<int>("Total");
@@ -187,7 +166,7 @@ namespace SkietbaanBE.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("Best");
+                    b.Property<int>("BestScore");
 
                     b.Property<int?>("CompetitionId");
 
@@ -226,17 +205,6 @@ namespace SkietbaanBE.Migrations
 
             modelBuilder.Entity("SkietbaanBE.Models.Award", b =>
                 {
-                    b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("SkietbaanBE.Models.LeaderInCompetition", b =>
-                {
-                    b.HasOne("SkietbaanBE.Models.Competition", "Competition")
-                        .WithMany()
-                        .HasForeignKey("CompetitionId");
-
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
