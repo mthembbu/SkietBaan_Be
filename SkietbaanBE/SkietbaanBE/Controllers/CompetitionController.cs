@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
+using SkietbaanBE.RequestModel;
 
 namespace SkietbaanBE.Controllers
 {
@@ -34,7 +35,7 @@ namespace SkietbaanBE.Controllers
         // GET: api/Competition
         [HttpGet("all")]
         public IEnumerable<Competition> GetAllCompetitions()
-        {
+       {
             //get the competitions where(Status == true / false)
              return _context.Competitions.ToArray<Competition>();
         }
@@ -55,7 +56,7 @@ namespace SkietbaanBE.Controllers
         //posting the competition to the competition table
         // POST: api/Competition
         [HttpPost]
-        public async Task<IActionResult> ddCompetition([FromBody]Competition comp)
+        public async Task<IActionResult> AddCompetition([FromBody]Competition comp)
         {
             if (!ModelState.IsValid)
             {
@@ -68,7 +69,7 @@ namespace SkietbaanBE.Controllers
         }
         //A method that updates the status of the competition
         // PUT: api/Competition/5
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateCompetition(int id, [FromBody]Competition comp)
         {
             if (ModelState.IsValid)
@@ -94,8 +95,8 @@ namespace SkietbaanBE.Controllers
                                          .Where(u => u.Id == comp.Id)
                                          .FirstOrDefault<Competition>();
 
-                        //now updating user details
-                        dbComp.Name = comp.Name;
+                        //now updating status to either true / false
+                        dbComp.Status = comp.Status;
                         _context.Competitions.Update(dbComp);
                         await _context.SaveChangesAsync();
                         return Ok("Status update successful");
