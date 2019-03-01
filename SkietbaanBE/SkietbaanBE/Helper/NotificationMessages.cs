@@ -16,7 +16,7 @@ namespace SkietbaanBE.Helper
 
         public void ConfirmationNotification(ModelsContext _context, User user)
         {
-            Notifications notification = new Notifications
+            var notification = new Notifications
             {
                 User = user,
                 IsRead = false,
@@ -24,7 +24,7 @@ namespace SkietbaanBE.Helper
                 NotificationMessage = "Welcome to the club " + user.Username + ". You are now a member."
             };
 
-            string message = "";
+            string message = string.Empty;
             try
             {
                 _context.Notifications.Add(notification);
@@ -55,14 +55,14 @@ namespace SkietbaanBE.Helper
 
         public void GroupNotification(ModelsContext _context, Group group, User user)
         {
-            Notifications notification = new Notifications
+            var notification = new Notifications
             {
                 User = user,
                 IsRead = false,
                 typeOfNotification = "Group",
                 NotificationMessage = "Hello valued member. Please note you have been invited to join a group named: " + group.Name
             };
-            string message = "";
+            string message = string.Empty;
             try
             {
                 _context.Notifications.Add(notification);
