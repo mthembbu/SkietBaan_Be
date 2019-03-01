@@ -35,7 +35,7 @@ namespace SkietbaanBE.Controllers
         // GET: api/Competition
         [HttpGet("all")]
         public IEnumerable<Competition> GetAllCompetitions()
-        {
+       {
             //get the competitions where(Status == true / false)
              return _context.Competitions.ToArray<Competition>();
         }
@@ -63,7 +63,8 @@ namespace SkietbaanBE.Controllers
                 return BadRequest(ModelState);
             }
             _notificationMessages.CompetitionNotification(_context, comp);
-            new HelperClass().Notification(_context, comp);
+            await _context.AddAsync(comp);
+            await _context.SaveChangesAsync();
             return Ok("Competition Added!!!!!!!");
         }
         //A method that updates the status of the competition
