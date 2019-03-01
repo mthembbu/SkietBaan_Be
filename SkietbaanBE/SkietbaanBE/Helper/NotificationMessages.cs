@@ -43,7 +43,7 @@ namespace SkietbaanBE.Helper
             var userlist = _context.Users.ToList();
             foreach (var user in userlist)
             {
-                Notifications notification = new Notifications();
+                var notification = new Notifications();
                 notification.User = user;
                 notification.IsRead = false;
                 notification.typeOfNotification = "Competition";
