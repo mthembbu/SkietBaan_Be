@@ -89,15 +89,7 @@ namespace SkietbaanBE.Controllers
                     userCompStat.User = user;
                     userCompStat.Competition = competitions.ElementAt(i);
                     userCompStat.Best = 0;
-                   // userCompStat.CompScore = 0;
-                   // userCompStat.Total = 0;
-                    //userCompStats.Add(userCompStat);
                     userCompetitionTotalScoresList.Add(userCompetitionTotalScore);
-                    //{
-                    //    User =user,
-                    //    Competition = competitions.ElementAt(i),
-                    //    BestScore = 0,
-                    //});
                 }
 
                 //saving to UserCompstats table (bridging table between User and Competition)
