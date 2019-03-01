@@ -70,33 +70,21 @@ namespace SkietbaanBE.Controllers
         public LeaderboardResults GetLeaderboardRankings(int competitionID, int groupID, string userToken)
         {
             //from arry index to data base ID;
-            competitionID += 1;
-            groupID += 1;
+            
             LeaderboardResults leaderboardResults = new LeaderboardResults();
 
             //ranking results for specific group's specific compentition
             List<RankResults> rankResults = new List<RankResults>();
-            var query = from Group in _context.Groups
-                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
-                        join User in _context.Users on UserGroup.User.Id equals User.Id
-                        join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
-                        where (UserCompStats.Competition.Id == competitionID && Group.Id == groupID)
-                        select new
-                        {
-                            User.Username,
-                            UserCompStats.Best,
-                            UserCompStats.Total,
-                            UserCompStats.Average
-                        };
-            //saving results in an List which will make sorting easier(ArrayList)
-            foreach (var item in query)
+            
+            if(groupID == -1)//Individual grankings
             {
-                RankResults rankResult = new RankResults();
-                rankResult.Username = item.Username;
-                rankResult.Best = item.Best;
-                rankResult.Total = item.Total;
-                rankResult.Average = item.Average;
-                rankResults.Add(rankResult);
+                rankResults = this.individualRankings(competitionID);
+            }
+            else//Groups rankings
+            {
+                competitionID += 1;
+                groupID += 1;
+                rankResults = this.groupRankings(competitionID,groupID);
             }
 
             //sort and rank results
@@ -185,6 +173,66 @@ namespace SkietbaanBE.Controllers
                     _context.SaveChanges();
                 }
             }
+        }
+        private List<RankResults> individualRankings(int competitionID)
+        {
+            List<RankResults> list = new List<RankResults>();
+            var query = from Group in _context.Groups
+                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                        join User in _context.Users on UserGroup.User.Id equals User.Id
+                        join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
+                        where (UserCompStats.Competition.Id == competitionID)
+                        select new
+                        {
+                            User.Username,
+                            UserCompStats.Best,
+                            UserCompStats.Total,
+                            UserCompStats.Average
+                        };
+
+
+            //saving results in an List which will make sorting easier(ArrayList)
+            foreach (var item in query)
+            {
+                RankResults rankResult = new RankResults();
+                rankResult.Username = item.Username;
+                rankResult.Best = item.Best;
+                rankResult.Total = item.Total;
+                rankResult.Average = item.Average;
+                list.Add(rankResult);
+            }
+
+            return list;
+        }
+        private List<RankResults> groupRankings(int competitionID, int groupID)
+        {
+            List<RankResults> list = new List<RankResults>();
+            var query = from Group in _context.Groups
+                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                        join User in _context.Users on UserGroup.User.Id equals User.Id
+                        join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
+                        where (UserCompStats.Competition.Id == competitionID && Group.Id == groupID)
+                        select new
+                        {
+                            User.Username,
+                            UserCompStats.Best,
+                            UserCompStats.Total,
+                            UserCompStats.Average
+                        };
+
+
+            //saving results in an List which will make sorting easier(ArrayList)
+            foreach (var item in query)
+            {
+                RankResults rankResult = new RankResults();
+                rankResult.Username = item.Username;
+                rankResult.Best = item.Best;
+                rankResult.Total = item.Total;
+                rankResult.Average = item.Average;
+                list.Add(rankResult);
+            }
+
+            return list;
         }
     }
 }
