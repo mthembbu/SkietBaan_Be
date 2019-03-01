@@ -14,14 +14,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="IronPdf" Version="5.0.5.2" />
+    <PackageReference Include="iTextSharp" Version="5.5.13" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
+    <PackageReference Include="Microsoft.Office.Interop.Word" Version="15.0.4797.1003" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.4" />
+    <PackageReference Include="Select.Pdf.NetCore" Version="18.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
 	
   </ItemGroup>
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Code7248.word_reader">
+      <HintPath>..\..\..\..\..\Downloads\Code7248.word_reader.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
