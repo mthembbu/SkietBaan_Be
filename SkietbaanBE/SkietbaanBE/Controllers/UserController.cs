@@ -24,10 +24,12 @@ namespace SkietbaanBE.Controllers
     {
         private ModelsContext _context;
         private IConfiguration _config;
-        public UserController(ModelsContext db, IConfiguration config)
+        private NotificationMessages _notificationMessages;
+        public UserController(ModelsContext db, IConfiguration config, NotificationMessages notificationMessages)
         {
             _context = db;
             _config = config;
+            _notificationMessages = notificationMessages;
         }
 
         // GET: api/User
@@ -70,7 +72,7 @@ namespace SkietbaanBE.Controllers
                 //Save User
                 await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
-                new HelperClass().Notification(_context, user);
+                _notificationMessages.ConfirmationNotification(_context, user);
                 //initialising user's competition scores to Zero
                 List<Competition> competitions = _context.Competitions.ToList<Competition>();
                 List<UserCompStats> userCompStats = new List<UserCompStats>();
@@ -87,7 +89,6 @@ namespace SkietbaanBE.Controllers
                     userCompStat.User = user;
                     userCompStat.Competition = competitions.ElementAt(i);
                     userCompStat.Best = 0;
-                    userCompStats.Add(userCompStat);
                     userCompetitionTotalScoresList.Add(userCompetitionTotalScore);
                 }
 
