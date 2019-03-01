@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
 
 namespace SkietbaanBE.Models {
     public class ModelsContext : DbContext {
@@ -8,7 +6,6 @@ namespace SkietbaanBE.Models {
         public ModelsContext(DbContextOptions<ModelsContext> options)
            : base(options) {
         }
-
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Competition> Competitions { get; set; }
         public virtual DbSet<Score> Scores { get; set; }
