@@ -15,10 +15,12 @@ namespace SkietbaanBE.Controllers
     public class GroupsController : Controller
     {
         private readonly ModelsContext _context;
+        private NotificationMessages _notificationMessages;
 
-        public GroupsController(ModelsContext context)
+        public GroupsController(ModelsContext context, NotificationMessages notificationMessages)
         {
             _context = context;
+            _notificationMessages = notificationMessages;
         }
 
         // GET: api/Groups
@@ -92,7 +94,6 @@ namespace SkietbaanBE.Controllers
             }
 
             _context.Groups.Add(@group);
-            new HelperClass().Notification(_context, group);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
@@ -142,6 +143,7 @@ namespace SkietbaanBE.Controllers
                 userGroup.User = dbUser;
 
                 userGroups.Add(userGroup);
+                _notificationMessages.GroupNotification(_context, group, dbUser);
             }
 
             _context.UserGroups.AddRange(userGroups);

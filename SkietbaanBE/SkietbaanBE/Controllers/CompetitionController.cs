@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
@@ -15,9 +13,11 @@ namespace SkietbaanBE.Controllers
     public class CompetitionController : Controller
     {
         private ModelsContext _context;
-        public CompetitionController(ModelsContext db)
+        private NotificationMessages _notificationMessages;
+        public CompetitionController(ModelsContext db , NotificationMessages notificationMessages)
         {
             _context = db;
+            _notificationMessages = notificationMessages;
         }
         /** The method to return an array of competition objects that hold Status == true*/
         // GET: api/Competition
@@ -62,9 +62,9 @@ namespace SkietbaanBE.Controllers
             {
                 return BadRequest(ModelState);
             }
+            _notificationMessages.CompetitionNotification(_context, comp);
             await _context.AddAsync(comp);
             await _context.SaveChangesAsync();
-            new HelperClass().Notification(_context, comp);
             return Ok("Competition Added!!!!!!!");
         }
         //A method that updates the status of the competition
