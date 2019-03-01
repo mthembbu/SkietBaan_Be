@@ -22,7 +22,7 @@ namespace SkietbaanBE.Controllers
         [HttpGet("{id}", Name = "GetNotificationById")]
         public async Task<Notifications> GetNotificationById(int id)
         {
-            var notification = _context.Notifications.SingleOrDefault(notification => notification.Id == id);
+            var notification = _context.Notifications.SingleOrDefault(x => x.Id == id);
             if(notification == null)
             {
                 NotFound();
