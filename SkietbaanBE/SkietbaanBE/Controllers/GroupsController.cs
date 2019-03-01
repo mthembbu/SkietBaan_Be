@@ -85,10 +85,6 @@ namespace SkietbaanBE.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
         }
-
-
-       
-
         // DELETE: api/Groups/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGroup([FromRoute] int id)
@@ -133,7 +129,6 @@ namespace SkietbaanBE.Controllers
         {
             Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
             List<UserGroup> userGroups = new List<UserGroup>();
-
             for (int i = 0; i < users.Count; i++)
             {
                 UserGroup userGroup = new UserGroup();
@@ -151,7 +146,6 @@ namespace SkietbaanBE.Controllers
         public List<User> getGroups(int id)
         {
             List<User> users = new List<User>();
-
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
@@ -161,26 +155,22 @@ namespace SkietbaanBE.Controllers
                             User
                         };
             var qry = _context.Users.Select(x => x).ToList();
-
-            
-
-
-            foreach (var item in query)
+            if (qry != null)
             {
-                User user = new User();
-                user = item.User; users.Add(user);
+                foreach (var item in query)
+                {
+                    User user = new User();
+                    user = item.User; users.Add(user);
+                }
             }
             var result = (qry).Except(users);
-
             return result.ToList<User>();
         }
-
         [HttpGet]
         [Route("edit")]
         public List<User> getExistingMembers(int id)
         {
             List<User> users = new List<User>();
-
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
@@ -203,16 +193,11 @@ namespace SkietbaanBE.Controllers
         [Route("deleteMember")]
         public void deleteUsersOnTheList ( [FromBody] Filter usersobj)
         {
-
             List<string> userss = new List<string>();
-
-
-
             for(int i = 0; i < usersobj.users.Length;i++)
             {
                 userss.Add(usersobj.users.ElementAt(i).Token);
             }
-
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
@@ -221,32 +206,29 @@ namespace SkietbaanBE.Controllers
                         {
                          UserGroup,
                             User
-
                             };
-
+            
             var d = query.ToList();
-            foreach(var item in d)
+            if (d != null)
             {
-                if (userss.Contains(item.User.Token))
+                foreach (var item in d)
                 {
-                    UserGroup user = new UserGroup();
-                    user = item.UserGroup;
-                    _context.UserGroups.Remove(user);
-                    _context.SaveChanges();
+                    if (userss.Contains(item.User.Token))
+                    {
+                        UserGroup user = new UserGroup();
+                        user = item.UserGroup;
+                        _context.UserGroups.Remove(user);
+                        _context.SaveChanges();
+                    }
                 }
-
-               
             }
-           
         }
         
         [HttpPost]
         [Route("postMember")]
         public void addUsersOnTheList([FromBody] Filter usersobj)
         {
-
             List<string> userss = new List<string>();
-
             Group group = _context.Groups.FirstOrDefault(x => x.Id == usersobj.GroupIds);
             for (int i = 0; i < usersobj.users.Length; i++)
             {
@@ -257,11 +239,6 @@ namespace SkietbaanBE.Controllers
                 _context.UserGroups.Add(userGroup);
                 _context.SaveChanges();
             }
-
-          
-
-         
-
         }
     }
 }
