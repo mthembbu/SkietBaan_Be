@@ -5,23 +5,27 @@ using System.Threading.Tasks;
 using System.Text;
 using System.Net;
 using System.Net.Mail;
+using System.IO;
+using IronPdf;
 
 namespace SkietbaanBE.Helper
 {
+
     public class SendMail
     {
         string smtpAddress = "smtp.gmail.com";
         int portNumber = 587;
         bool enableSSL = true;
-        string emailFromAddress = "*******@gmail.com"; //Sender Email Address  
-        string password = "*******"; //Sender Password   
+        string emailFromAddress = "manganyikyle@gmail.com"; //Sender Email Address  
+        string password = "tiyisela97"; //Sender Password   
 
-        public bool SendEmail(string To, string Subject, Attachment attachment)
+        public bool SendEmail(string To, string Subject, string file)
         {
             try
             {
                 using (MailMessage mail = new MailMessage())
                 {
+                    Attachment attachment = new System.Net.Mail.Attachment(file);
                     MailAssignment(mail, emailFromAddress, To, Subject, "<h>view attachment</h1>");
                     mail.Attachments.Add(attachment);
                     SmtpSend(mail);
