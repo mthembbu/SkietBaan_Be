@@ -61,8 +61,6 @@ namespace SkietbaanBE.Controllers
             {
                 return BadRequest(ModelState);
             }
-            await _context.AddAsync(comp);
-            await _context.SaveChangesAsync();
             _notificationMessages.CompetitionNotification(_context, comp);
             return Ok("Competition Added!!!!!!!");
         }
