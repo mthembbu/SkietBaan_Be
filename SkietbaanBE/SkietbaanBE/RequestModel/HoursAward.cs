@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace SkietbaanBE.RequestModel {
     public class HoursAward {
-        public bool gold { get; set; }
-        public bool silver { get; set; }
-        public bool bronze { get; set; }
+        public bool Gold { get; set; }
+        public bool Silver { get; set; }
+        public bool Bronze { get; set; }
     }
 }
