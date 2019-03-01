@@ -16,7 +16,8 @@ namespace SkietbaanBE.Lib {
                 context.AddRange(new User[] {
                     new User {
                         Username = "Zintle", Password = "q@eg$24t58", Email = "zintle@gmail.com",
-                        MemberID = null, EntryDate = DateTime.Now.Date, MemberExpiryDate = null, Admin = false,
+                        MemberID = "2598724", EntryDate = DateTime.Now.Date, MemberStartDate = DateTime.Today,
+                        MemberExpiryDate = DateTime.Today.AddYears(1).Date, Admin = false,
                         Token = BuildToken()
                     },
                     new User {
