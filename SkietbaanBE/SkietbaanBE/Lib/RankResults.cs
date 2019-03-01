@@ -11,6 +11,6 @@ namespace SkietbaanBE.Lib
         public string Username { get; set; }
         public int Best { get; set; }
         public int Total { get; set; }
-        public int Average { get; set; }
+        public double Average { get; set; }
     }
 }

@@ -31,9 +31,12 @@ namespace SkietbaanBETest {
             var mockContext = new Mock<ModelsContext>();
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
             var controller = new UserController(mockContext.Object, null);
+
             var users = controller.GetUsers();
 
-            Assert.IsNotEmpty(users);
+            var user = users.Where(u => u.Id == 1).First();
+            Assert.AreEqual("Superman", user.Username);
+            
             Assert.AreEqual(2, users.Count());
         }
 

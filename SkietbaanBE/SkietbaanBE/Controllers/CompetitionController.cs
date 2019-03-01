@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
+using SkietbaanBE.RequestModel;
 
 namespace SkietbaanBE.Controllers
 {
@@ -18,10 +19,10 @@ namespace SkietbaanBE.Controllers
         {
             _context = db;
         }
-        /** The method to return an array of competition objects that hold the true Status*/
+        /** The method to return an array of competition objects that hold Status == true*/
         // GET: api/Competition
         [HttpGet]
-        public IEnumerable<Competition> Get()
+        public IEnumerable<Competition> GetCompetitions()
         {
             //get the competitions where(Status == true)
             var competitionIDsQuery = from Comp in _context.Competitions
@@ -33,29 +34,29 @@ namespace SkietbaanBE.Controllers
         /** The method that return an array of competition objects whether status is true or false*/
         // GET: api/Competition
         [HttpGet("all")]
-        public IEnumerable<Competition> GetAll()
-        {
+        public IEnumerable<Competition> GetAllCompetitions()
+       {
             //get the competitions where(Status == true / false)
              return _context.Competitions.ToArray<Competition>();
         }
         //Getting all competition by ID
         // GET: api/Competition/all
         [HttpGet("{id}")]
-        public async Task<Competition> CompetitionGet(int id)
+        public async Task<Competition> CompetitionGetById(int id)
         {
             return await _context.Competitions.FindAsync(id);
         }
         //Getting the competition by ID
         // GET: api/Competition/5
         [HttpGet("{Name}")]
-        public async Task<Competition> CompetitionGet(string Name)
+        public async Task<Competition> CompetitionGetByName(string Name)
         {
             return await _context.Competitions.FindAsync(Name);
         }
         //posting the competition to the competition table
         // POST: api/Competition
         [HttpPost]
-        public async Task<IActionResult> addCompetition([FromBody]Competition comp)
+        public async Task<IActionResult> AddCompetition([FromBody]Competition comp)
         {
             if (!ModelState.IsValid)
             {
@@ -68,7 +69,7 @@ namespace SkietbaanBE.Controllers
         }
         //A method that updates the status of the competition
         // PUT: api/Competition/5
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateCompetition(int id, [FromBody]Competition comp)
         {
             if (ModelState.IsValid)
@@ -94,8 +95,8 @@ namespace SkietbaanBE.Controllers
                                          .Where(u => u.Id == comp.Id)
                                          .FirstOrDefault<Competition>();
 
-                        //now updating user details
-                        dbComp.Name = comp.Name;
+                        //now updating status to either true / false
+                        dbComp.Status = comp.Status;
                         _context.Competitions.Update(dbComp);
                         await _context.SaveChangesAsync();
                         return Ok("Status update successful");

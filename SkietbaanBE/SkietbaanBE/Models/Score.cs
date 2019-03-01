@@ -12,7 +12,7 @@ namespace SkietbaanBE.Models {
         public int UserScore { get; set; }
         public string PictureURL { get; set; }
         public DateTime? UploadDate { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public float? Latitude { get; set; }
+        public float? Longitude { get; set; }
     }
 }

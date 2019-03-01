@@ -70,12 +70,10 @@ namespace SkietbaanBE.Controllers
         public LeaderboardResults GetLeaderboardRankings(int competitionID, int groupID, string userToken)
         {
             //from arry index to data base ID;
-            
             LeaderboardResults leaderboardResults = new LeaderboardResults();
-
-            //ranking results for specific group's specific compentition
-            List<RankResults> rankResults = new List<RankResults>();
             
+            //ranking results for specific group's specific compentition
+            List<RankResults> rankResults = new List<RankResults>();       
             if(groupID == -1)//Individual grankings
             {
                 rankResults = this.individualRankings(competitionID);
@@ -88,7 +86,7 @@ namespace SkietbaanBE.Controllers
             }
 
             //sort and rank results
-            leaderboardResults.RankResults = sortAndRank(rankResults);
+            leaderboardResults.RankResults = sortAndRank(mapIdToBest.Values.ToList());
 
             //Current User's results
             User currentUser = new FeaturesController(_context).GetUserByToken(userToken);
@@ -114,9 +112,10 @@ namespace SkietbaanBE.Controllers
                 leaderboardResults.UserResults = rankResult;
 
             }
-            //final results
+            //final results*/
             return leaderboardResults;
         }
+
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
             rankResults = rankResults.OrderByDescending(x => x.Best).ToList();
@@ -126,6 +125,7 @@ namespace SkietbaanBE.Controllers
             }
             return rankResults;
         }
+
         //Get Users Scores stats for a specific competition
         [HttpGet]
         public IEnumerable<UserCompStats> GetUsersCompetitionsScores(int competitionID)
