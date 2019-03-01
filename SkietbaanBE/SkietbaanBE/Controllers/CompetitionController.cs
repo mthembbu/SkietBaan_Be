@@ -11,7 +11,6 @@ namespace SkietbaanBE.Controllers
 {
     [Produces("application/json")]
     [Route("api/Competition")]
-
     public class CompetitionController : Controller
     {
         private ModelsContext _context;
@@ -28,12 +27,19 @@ namespace SkietbaanBE.Controllers
             var competitionIDsQuery = from Comp in _context.Competitions
                                       where Comp.Status == true
                                       select Comp;
-            List<Competition> competitionsList = competitionIDsQuery.ToList<Competition>();
-            // return _context.Competitions.ToArray<Competition>();
+            List<Competition> competitionsList = competitionIDsQuery.ToList<Competition>();     
             return competitionsList;
         }
-        //Getting the competition by ID
-        // GET: api/Competition/5
+        /** The method that return an array of competition objects whether status is true or false*/
+        // GET: api/Competition
+        [HttpGet("all")]
+        public IEnumerable<Competition> GetAll()
+        {
+            //get the competitions where(Status == true / false)
+             return _context.Competitions.ToArray<Competition>();
+        }
+        //Getting all competition by ID
+        // GET: api/Competition/all
         [HttpGet("{id}")]
         public async Task<Competition> CompetitionGet(int id)
         {
@@ -55,7 +61,6 @@ namespace SkietbaanBE.Controllers
             {
                 return BadRequest(ModelState);
             }
- 
             await _context.AddAsync(comp);
             await _context.SaveChangesAsync();
             new HelperClass().Notification(_context, comp);
@@ -79,7 +84,7 @@ namespace SkietbaanBE.Controllers
                     using (_context)
                     {
                         dbComp = _context.Competitions
-                                         .Where(u => u.Name == comp.Name && u.Id != comp.Id) //check if a different user with the new username already exists
+                                         .Where(u => u.Name == comp.Name && u.Id != comp.Id)
                                          .FirstOrDefault<Competition>();
                         if (dbComp != null)
                         {
@@ -108,5 +113,4 @@ namespace SkietbaanBE.Controllers
         {
         }
     }
-
 }
