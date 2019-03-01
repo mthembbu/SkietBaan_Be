@@ -19,46 +19,41 @@ namespace SkietbaanBE.Controllers
             _context = context;
         }
 
-        // GET: api/Notification
-        [HttpGet]
-        public IEnumerable<Notifications> Get()
+        [HttpGet("{id}", Name = "GetNotificationById")]
+        public async Task<Notifications> GetNotificationById(int id)
         {
-            var notificationQuery = from noti in _context.Notifications
-                                   where noti.IsRead == false
-                                   select noti;
-            List<Notifications> notificationList = notificationQuery.ToList<Notifications>();
-            return notificationList;
+            var notification = _context.Notifications.SingleOrDefault(x => x.Id == id);
+            if(notification == null)
+            {
+                NotFound();
+            }
+            else
+            {
+                Ok();
+            }
+            return await _context.Notifications.FindAsync(id);
         }
 
-        // GET: api/Notification/5
-        [HttpGet("{id}", Name = "GetNotifications")]
-        public string Get(int id)
+        public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
-            return "value";
-        }
-        
-        private string Notifications(User user)
-        {
-            return "";
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
+            var notifications = _context.Notifications.Where(x => x.User == user);
+           
+            if (notifications != null)
+            {
+                return notifications.ToList();
+            }
+            else
+                return null;
         }
 
-        // POST: api/Notification
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-
-        }
-        
-        // PUT: api/Notification/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-        
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+
+        public async Task DeleteAsync(int id)
         {
+            var notification = await GetNotificationById(id);
+           _context.Notifications.Remove(notification);
+            await _context.SaveChangesAsync();
         }
     }
 }

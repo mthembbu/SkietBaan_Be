@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SkietbaanBE.Helper;
 using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 using Swashbuckle.AspNetCore.Swagger;
@@ -19,8 +20,10 @@ namespace SkietbaanBE
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(); services.AddDbContext<ModelsContext>
-                 (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanDatabase")));
+            services.AddMvc();
+            services.AddDbContext<ModelsContext>
+            (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanDatabase")));
+            services.AddScoped<NotificationMessages>();
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
