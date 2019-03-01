@@ -47,7 +47,7 @@ namespace SkietbaanBE.Helper
                 notification.User = user;
                 notification.IsRead = false;
                 notification.typeOfNotification = "Competition";
-                notification.NotificationMessage = "Hello valued member. Please note there is a new competition that has been created: " + comp.Name;
+                notification.NotificationMessage = "Competition " + comp.Name + " created.";
                 _context.Notifications.Add(notification);
             }
             _context.SaveChanges();
@@ -60,7 +60,7 @@ namespace SkietbaanBE.Helper
                 User = user,
                 IsRead = false,
                 typeOfNotification = "Group",
-                NotificationMessage = "Hello valued member. Please note you have been invited to join a group named: " + group.Name
+                NotificationMessage = group.Name + " created"
             };
             string message = string.Empty;
             try
