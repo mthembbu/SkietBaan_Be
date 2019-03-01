@@ -12,5 +12,6 @@ namespace SkietbaanBE.Lib
         public int Best { get; set; }
         public int Total { get; set; }
         public double Average { get; set; }
+        public bool IsIncreasing { get; set; }
     }
 }
