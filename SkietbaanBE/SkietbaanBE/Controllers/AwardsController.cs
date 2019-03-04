@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 using SkietbaanBE.RequestModel;
 using System;
@@ -41,7 +42,7 @@ namespace SkietbaanBE.Controllers
                                              select new {
                                                  UserCompetitionTotalScore.Competition,
                                                  UserCompetitionTotalScore.Average,
-                                                 UserCompetitionTotalScore
+                                                 UserCompetitionTotalScore.Total
                                              };
             foreach(var comp in context.Competitions) {
                 if(competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
@@ -54,8 +55,11 @@ namespace SkietbaanBE.Controllers
                                         .Where(x => x.Competition.Id == comp.Id).First().Average,
                         MembershipNumber = membershipID,
                         Username = username,
-                        
-
+                        HoursAward = CheckAward.Hours(),
+                        TotalAward = CheckAward.Total(competitionsUserPartakesIn
+                                        .Where(x => x.Competition.Id == comp.Id).First().Total, false),
+                        AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
+                                        .Where(x => x.Competition.Id == comp.Id).First().Average), false)
                     };
                     
                     awardCompetitions.Add(awardObject);
@@ -66,7 +70,10 @@ namespace SkietbaanBE.Controllers
                         Total = "0",
                         Accuracy = 0,
                         MembershipNumber = membershipID,
-                        Username = username
+                        Username = username,
+                        HoursAward = CheckAward.Hours(),
+                        TotalAward = CheckAward.Total(0, true),
+                        AccuracyAward = CheckAward.Accuracy(0, true)
                     };
                     awardCompetitions.Add(awardObject);
                 }
