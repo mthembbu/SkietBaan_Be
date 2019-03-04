@@ -38,4 +38,13 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Controllers\Documents\edit.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Helper\Documents\edit.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
