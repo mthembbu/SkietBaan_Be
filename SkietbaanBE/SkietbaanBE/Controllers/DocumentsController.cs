@@ -56,12 +56,20 @@ namespace SkietbaanBE.Controllers
 
                     streamReader.Close();
 
+                    var content1 = content.Replace("Nadeem", Member.Username)
+                        .Replace("Front End Development", "Letter Of Status");
 
-                    return (content.ToString());
+                    SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                    SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+                    doc.Save(Directory.GetCurrentDirectory().ToString()+"/Controllers/Documents/LOSWorking.pdf");
+                    doc.Close();
+                    //sendMail.SendEmail(Member.Email, "Letter Of Status", "./Controllers/Documents/LOS.pdf");
+
+                    return ("document saved");
 
                 }
 
-                return ("no file");
+                return (Directory.GetCurrentDirectory().ToString());
 
 
             }
