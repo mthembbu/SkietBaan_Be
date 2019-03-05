@@ -36,27 +36,47 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet]
         [Route("{Token}")]
-        public void SendLOS(string Token)
+        public string SendLOS(string Token)
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            StreamReader streamReader;
+            if(Member != null)
+            {
+                StreamReader streamReader;
 
-            streamReader = new StreamReader("./Controllers/Documents/edit.htm");
-            string content = streamReader.ReadToEnd();
+                streamReader = new StreamReader("./Controllers/Documents/edit.htm");
 
-            content.ToString();
+                if(streamReader != null)
+                {
+                    string content = streamReader.ReadToEnd();
 
-            streamReader.Close();
+                    
 
-            var content1 = content.Replace("Nadeem", Member.Username)
-                .Replace("Front End Development","Letter Of Status");
+                    content.ToString();
 
-            SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-            SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-            doc.Save(Directory.GetCurrentDirectory() + "./Controllers/Documents/LOS.pdf");
-            doc.Close();
-            sendMail.SendEmail(Member.Email,"Letter Of Status", "./Controllers/Documents/LOS.pdf");
+                    streamReader.Close();
+
+                    var content1 = content.Replace("Nadeem", Member.Username)
+                        .Replace("Front End Development", "Letter Of Status");
+
+                    SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                    SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+                    doc.Save("./Controllers/Documents/LOS.pdf");
+                    doc.Close();
+                    sendMail.SendEmail(Member.Email, "Letter Of Status", "./Controllers/Documents/LOS.pdf");
+
+                    return (Directory.GetCurrentDirectory().ToString());
+
+                }
+
+                return (Directory.GetCurrentDirectory().ToString());
+
+
+            }
+
+            return (Directory.GetCurrentDirectory().ToString());
+
+           
         }
 
         [HttpGet]
