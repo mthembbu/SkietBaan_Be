@@ -71,7 +71,6 @@ namespace SkietbaanBE.Controllers
                 user.Token = tokenString;
                 //Save User
                 await _context.AddAsync(user);
-                await _context.SaveChangesAsync();
                 _notificationMessages.ConfirmationNotification(_context, user);
                 //initialising user's competition scores to Zero
                 List<Competition> competitions = _context.Competitions.ToList<Competition>();
@@ -93,9 +92,9 @@ namespace SkietbaanBE.Controllers
                 }
 
                 //saving to UserCompstats table (bridging table between User and Competition)
-                _context.UserCompStats.AddRange(userCompStats);
-                _context.AddRange(userCompetitionTotalScoresList);
-                _context.SaveChanges();
+                 _context.UserCompStats.AddRange(userCompStats);
+                 _context.AddRange(userCompetitionTotalScoresList);
+                 _context.SaveChangesAsync();
 
                 new OkObjectResult("User saved successfully");
             }
