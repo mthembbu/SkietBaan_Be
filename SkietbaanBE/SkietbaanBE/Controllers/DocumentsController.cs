@@ -42,7 +42,7 @@ namespace SkietbaanBE.Controllers
 
             StreamReader streamReader;
 
-            streamReader = new StreamReader("C:/inetpub/wwwroot/skietbaan/Controllers/Documents/edit.htm");
+            streamReader = new StreamReader("C://inetpub//wwwroot//skietbaan//Controllers//Documents//edit.htm");
 
             string content = streamReader.ReadToEnd();
 
@@ -55,9 +55,9 @@ namespace SkietbaanBE.Controllers
 
             SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
             SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-            doc.Save("C:/inetpub/wwwroot/skietbaan/Controllers/Documents/LOS.pdf");
+            doc.Save("C://inetpub//wwwroot//skietbaan//Controllers//Documents//LOS.pdf");
             doc.Close();
-            sendMail.SendEmail(Member.Email,"Letter Of Status", "C:/inetpub/wwwroot/skietbaan/Controllers/Documents/LOS.pdf");
+            sendMail.SendEmail(Member.Email,"Letter Of Status", "C://inetpub//wwwroot//skietbaan//Controllers//Documents//LOS.pdf");
         }
 
         [HttpGet]
@@ -68,7 +68,7 @@ namespace SkietbaanBE.Controllers
 
             StreamReader streamReader;
 
-            streamReader = new StreamReader("C:/inetpub/wwwroot/skietbaan/Controllers/Documents/edit.htm");
+            streamReader = new StreamReader("C:\\inetpub\\wwwroot\\skietbaan\\Controllers\\Documents\\edit.htm");
 
             string content = streamReader.ReadToEnd();
 
@@ -86,10 +86,10 @@ namespace SkietbaanBE.Controllers
             converter.Options.MarginTop = 20;
             converter.Options.MarginBottom = 20;
             SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-            doc.Save("C:/inetpub/wwwroot/skietbaan/Controllers/Documents/LOGS.pdf");
+            doc.Save("C:\\inetpub\\wwwroot\\skietbaan\\Controllers\\Documents\\LOGS.pdf");
             doc.Close();
 
-            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", "C:/inetpub/wwwroot/skietbaan/Controllers/Documents/LOGS.pdf");
+            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", "C:\\inetpub\\wwwroot\\skietbaan\\Controllers\\Documents\\LOGS.pdf");
         }
 
         [HttpGet]
