@@ -44,7 +44,7 @@ namespace SkietbaanBE.Controllers
             {
                 StreamReader streamReader;
 
-                streamReader = new StreamReader("./Controllers/Documents/edit.htm");
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() +"/Controllers/Documents/edit.htm");
 
                 if(streamReader != null)
                 {
@@ -56,20 +56,12 @@ namespace SkietbaanBE.Controllers
 
                     streamReader.Close();
 
-                    var content1 = content.Replace("Nadeem", Member.Username)
-                        .Replace("Front End Development", "Letter Of Status");
 
-                    SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-                    SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-                    doc.Save("./Controllers/Documents/LOS.pdf");
-                    doc.Close();
-                    sendMail.SendEmail(Member.Email, "Letter Of Status", "./Controllers/Documents/LOS.pdf");
-
-                    return (Directory.GetCurrentDirectory().ToString());
+                    return (content.ToString());
 
                 }
 
-                return (Directory.GetCurrentDirectory().ToString());
+                return ("no file");
 
 
             }
