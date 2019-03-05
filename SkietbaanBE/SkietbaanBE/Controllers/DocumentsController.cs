@@ -43,14 +43,13 @@ namespace SkietbaanBE.Controllers
             if(Member != null)
             {
                 StreamReader streamReader;
+                MemoryStream memoryStream = new MemoryStream();
 
                 streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() +"/Controllers/Documents/edit.htm");
 
                 if(streamReader != null)
                 {
                     string content = streamReader.ReadToEnd();
-
-                    
 
                     content.ToString();
 
@@ -61,9 +60,16 @@ namespace SkietbaanBE.Controllers
 
                     SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
                     SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-                    doc.Save(Directory.GetCurrentDirectory().ToString()+"/Controllers/Documents/LOSWorking.pdf");
+
+                    doc.Save(memoryStream);
+
+                    byte[] bytes = memoryStream.ToArray();
+
+                    memoryStream.Close();
+
+                    sendMail.SendEmail(Member.Email, "Letter Of Status", new Attachment(new MemoryStream(bytes),"LOS.pdf"));
+
                     doc.Close();
-                    //sendMail.SendEmail(Member.Email, "Letter Of Status", "./Controllers/Documents/LOS.pdf");
 
                     return ("document saved");
 
@@ -85,6 +91,9 @@ namespace SkietbaanBE.Controllers
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
+            MemoryStream memoryStream = new MemoryStream();
+
+
             StreamReader streamReader;
 
             streamReader = new StreamReader("./Controllers/Documents/edit.htm");
@@ -105,10 +114,18 @@ namespace SkietbaanBE.Controllers
             converter.Options.MarginTop = 20;
             converter.Options.MarginBottom = 20;
             SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-            doc.Save("./Controllers/Documents/LOGS.pdf");
-            doc.Close();
 
-            sendMail.SendEmail(Member.Email, "Letter Of Good Standing","./Controllers/Documents/LOGS.pdf");
+            doc.Save(memoryStream);
+
+            byte[] bytes = memoryStream.ToArray();
+
+            memoryStream.Close();
+
+            
+
+            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "Prueba.pdf"));
+
+            doc.Close();
         }
 
         [HttpGet]
@@ -152,5 +169,7 @@ namespace SkietbaanBE.Controllers
             }            
             return ("No Document");
         }
+
+
     }
 }
