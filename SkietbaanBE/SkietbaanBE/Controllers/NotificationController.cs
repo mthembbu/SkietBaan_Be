@@ -25,7 +25,7 @@ namespace SkietbaanBE.Controllers
             var notification = _context.Notifications.SingleOrDefault(x => x.Id == id);
             if(notification == null)
             {
-                NotFound();
+               NotFound();
             }
             else
             {
