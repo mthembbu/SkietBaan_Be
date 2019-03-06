@@ -37,7 +37,6 @@ namespace SkietbaanBE.Controllers
         public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
             var notifications = _context.Notifications.Where(x => x.User.Token == token);
-
             if (notifications != null)
             {
                 return notifications.ToList();
