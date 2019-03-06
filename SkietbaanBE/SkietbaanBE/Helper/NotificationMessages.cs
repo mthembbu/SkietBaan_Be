@@ -47,7 +47,7 @@ namespace SkietbaanBE.Helper
                 notification.User = user;
                 notification.IsRead = false;
                 notification.typeOfNotification = "Competition";
-                notification.NotificationMessage = "Competition " + comp.Name + " created. Check it out!";
+                notification.NotificationMessage = "Check it out! Competition " + comp.Name + " has been created.";
                 _context.Notifications.Add(notification);
             }
             _context.SaveChanges();
