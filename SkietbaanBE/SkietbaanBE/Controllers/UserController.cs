@@ -70,8 +70,9 @@ namespace SkietbaanBE.Controllers
                 string tokenString = BuildToken();
                 user.Token = tokenString;
                 //Save User
-                 _context.Add(user);
-                
+                 await _context.AddAsync(user);
+
+
                 _notificationMessages.ConfirmationNotification(_context, user);
                 //initialising user's competition scores to Zero
                 List<Competition> competitions = _context.Competitions.ToList<Competition>();
