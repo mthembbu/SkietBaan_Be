@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace SkietbaanBE.Controllers
     {
         private ModelsContext _context;
         private NotificationMessages _notificationMessages;
+        
         public CompetitionController(ModelsContext db , NotificationMessages notificationMessages)
         {
             _context = db;
@@ -32,15 +34,15 @@ namespace SkietbaanBE.Controllers
             return competitionsList;
         }
         /** The method that return an array of competition objects whether status is true or false*/
-        // GET: api/Competition
+        // GET: api/Competition/{all}
         [HttpGet("all")]
         public IEnumerable<Competition> GetAllCompetitions()
        {
             //get the competitions where(Status == true / false)
              return _context.Competitions.ToArray<Competition>();
         }
-        //Getting all competition by ID
-        // GET: api/Competition/all
+        //Getting a competition by ID
+        // GET: api/Competition/{id}
         [HttpGet("{id}")]
         public async Task<Competition> CompetitionGetById(int id)
         {
@@ -58,14 +60,20 @@ namespace SkietbaanBE.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCompetition([FromBody]Competition comp)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                Competition dbComp = _context.Competitions.FirstOrDefault(C => C.Name == comp.Name);
+                if (dbComp != null)
+                    return new BadRequestObjectResult(comp.Name+"already exists");
+
+                _notificationMessages.CompetitionNotification(_context, comp);
+                await _context.AddAsync(comp);
+                await _context.SaveChangesAsync();
+                return Ok("Competition Added!!!!!!!");
             }
-            _notificationMessages.CompetitionNotification(_context, comp);
-            await _context.AddAsync(comp);
-            await _context.SaveChangesAsync();
-            return Ok("Competition Added!!!!!!!");
+            else {
+                return new BadRequestObjectResult("competiton cannot be null");
+            }
         }
         //A method that updates the status of the competition
         // PUT: api/Competition/5
@@ -112,6 +120,24 @@ namespace SkietbaanBE.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+        //GET: api/competition/participants
+        [HttpGet("participants")]
+        public Dictionary<int, int> getUsersPerCompetition()
+        {
+            Dictionary<int, int> mapCompToNumUser = new Dictionary<int, int>();
+            //var CompListQuery = from score in _context.Scores
+            var competitionsList = this.GetCompetitions();
+
+            foreach (var comp in competitionsList)
+            {
+                int count = (from score in _context.Scores
+                             where score.Competition.Id == comp.Id
+                             select score.User.Id).Distinct().ToList().Count();
+               mapCompToNumUser.Add(comp.Id,count);
+            }
+
+            return mapCompToNumUser;
         }
     }
 }
