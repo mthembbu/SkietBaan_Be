@@ -70,7 +70,7 @@ namespace SkietbaanBE.Controllers
                 _context.UserCompStats.Add(userCompStats);
                 //update overal best score
                 UserCompetitionTotalScore overallStats = _context.UserCompetitionTotalScores.Where(ucs => ucs.Competition.Id == score.Competition.Id && ucs.User.Id == score.User.Id).FirstOrDefault<UserCompetitionTotalScore>();
-                if(overallStats != null) {
+                if(overallStats == null) {
                     overallStats = new UserCompetitionTotalScore();
                     overallStats.Best = score.UserScore;
                     _context.UserCompetitionTotalScores.Add(overallStats);
