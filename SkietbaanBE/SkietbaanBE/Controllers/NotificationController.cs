@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Controllers
@@ -13,10 +14,34 @@ namespace SkietbaanBE.Controllers
     public class NotificationController : Controller
     {
         private ModelsContext _context;
+        private NotificationMessages _notificationMessage;
 
-        public NotificationController(ModelsContext context)
+        public NotificationController(ModelsContext context, NotificationMessages notificationMessage)
         {
             _context = context;
+            _notificationMessage = notificationMessage;
+        }
+
+        [HttpPost]
+        public NotificationMessages AddNotification(string token)
+        {
+            var _document = new DocumentsController(_context);
+            var doccieLOS = _document.UserLOS(token); 
+            var doccieLOGS = _document.UserLOGS(token);
+            if (doccieLOS == "Document")
+            {
+                if(doccieLOGS == "Document")
+                {
+                    _notificationMessage.DocumenstNotification(token);
+                }
+            }else if (doccieLOGS == "Document")
+            {
+                _notificationMessage.LOGS(token);
+            }else if (doccieLOS == "Document")
+            {
+                _notificationMessage.LOS(token);
+            }
+            return _notificationMessage;
         }
 
         [HttpGet("{id}", Name = "GetNotificationById")]

@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SkietbaanBE.Controllers;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Helper
 {
     public class NotificationMessages
     {
-        public NotificationMessages()
+        ModelsContext _context;
+        public NotificationMessages(ModelsContext context)
         {
-
+            _context = context;
         }
 
         public void ConfirmationNotification(ModelsContext _context, User user)
@@ -74,6 +76,48 @@ namespace SkietbaanBE.Helper
             {
                 message = e.Message;
             }
+        }
+
+        public void LOS(string token)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Token == token);
+            var notification = new Notifications
+            {
+                User = user,
+                IsRead = false,
+                typeOfNotification = "Document",
+                NotificationMessage = "Hello " + user.Username + " Letter of Status received. Check your documents"
+            };
+            _context.Add(notification);
+            _context.SaveChanges();
+        }
+
+        public void LOGS(string token)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Token == token);
+            var notification = new Notifications
+            {
+                User = user,
+                IsRead = false,
+                typeOfNotification = "Document",
+                NotificationMessage = "Hello " + user.Username + " Letter of Good Standing received. Check your documents"
+            };
+            _context.Add(notification);
+            _context.SaveChanges();
+        }
+
+        public void DocumenstNotification(string token)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Token == token);
+            var notification = new Notifications
+            {
+                User = user,
+                IsRead = false,
+                typeOfNotification = "Document",
+                NotificationMessage = "Hello " + user.Username + " Letter of Status and Letter of Good Standing received. Check your documents"
+            };
+            _context.Add(notification);
+            _context.SaveChanges();
         }
     }
 }
