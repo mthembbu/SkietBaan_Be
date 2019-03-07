@@ -89,7 +89,7 @@ namespace SkietbaanBE.Controllers
                     };
                     userCompStat.User = user;
                     userCompStat.Competition = competitions.ElementAt(i);
-                    userCompStat.Best = 0;
+                    userCompStat.MonthBestScore = 0;
                     userCompetitionTotalScoresList.Add(userCompetitionTotalScore);
                 }
 

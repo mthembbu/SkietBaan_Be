@@ -147,6 +147,7 @@ namespace SkietbaanBE.Lib {
         }
         public string InsertScores() {
             List<Score> scores = new List<Score>();
+            ScoresController controller = new ScoresController(_context);
 
             Score score1 = new Score();
             //1
@@ -155,6 +156,8 @@ namespace SkietbaanBE.Lib {
             score1.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score1.PictureURL = null;
             score1.UserScore = 54;
+            controller.UpdateUserCompStats(score1);
+            controller.UpdateTotal(score1);
             scores.Add(score1);
 
             Score score2 = new Score();
@@ -164,6 +167,8 @@ namespace SkietbaanBE.Lib {
             score2.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score2.PictureURL = null;
             score2.UserScore = 35;
+            controller.UpdateUserCompStats(score2);
+            controller.UpdateTotal(score2);
             scores.Add(score2);
 
             Score score3 = new Score();
@@ -173,6 +178,8 @@ namespace SkietbaanBE.Lib {
             score3.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score3.PictureURL = null;
             score3.UserScore = 87;
+            controller.UpdateUserCompStats(score3);
+            controller.UpdateTotal(score3);
             scores.Add(score3);
 
             Score score4 = new Score();
@@ -182,6 +189,8 @@ namespace SkietbaanBE.Lib {
             score4.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score4.PictureURL = null;
             score4.UserScore = 67;
+            controller.UpdateUserCompStats(score4);
+            controller.UpdateTotal(score4);
             scores.Add(score4);
 
             Score score5 = new Score();
@@ -191,6 +200,8 @@ namespace SkietbaanBE.Lib {
             score5.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score5.PictureURL = null;
             score5.UserScore = 86;
+            controller.UpdateUserCompStats(score4);
+            controller.UpdateTotal(score4);
             scores.Add(score5);
 
             Score score6 = new Score();
@@ -200,6 +211,8 @@ namespace SkietbaanBE.Lib {
             score6.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score6.PictureURL = null;
             score6.UserScore = 68;
+            controller.UpdateUserCompStats(score1);
+            controller.UpdateTotal(score1);
             scores.Add(score6);
 
             Score score7 = new Score();
@@ -209,6 +222,8 @@ namespace SkietbaanBE.Lib {
             score7.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score7.PictureURL = null;
             score7.UserScore = 58;
+            controller.UpdateUserCompStats(score7);
+            controller.UpdateTotal(score7);
             scores.Add(score7);
 
             Score score8 = new Score();
@@ -218,6 +233,8 @@ namespace SkietbaanBE.Lib {
             score8.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score8.PictureURL = null;
             score8.UserScore = 83;
+            controller.UpdateUserCompStats(score8);
+            controller.UpdateTotal(score8);
             scores.Add(score8);
 
             Score score9 = new Score();
@@ -227,6 +244,8 @@ namespace SkietbaanBE.Lib {
             score9.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score9.PictureURL = null;
             score9.UserScore = 94;
+            controller.UpdateUserCompStats(score9);
+            controller.UpdateTotal(score9);
             scores.Add(score9);
 
             Score score10 = new Score();
@@ -236,6 +255,8 @@ namespace SkietbaanBE.Lib {
             score10.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score10.PictureURL = null;
             score10.UserScore = 84;
+            controller.UpdateUserCompStats(score10);
+            controller.UpdateTotal(score10);
             scores.Add(score10);
 
             Score score11 = new Score();
@@ -245,6 +266,8 @@ namespace SkietbaanBE.Lib {
             score11.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score11.PictureURL = null;
             score11.UserScore = 35;
+            controller.UpdateUserCompStats(score11);
+            controller.UpdateTotal(score11);
             scores.Add(score11);
 
             Score score12 = new Score();
@@ -254,6 +277,8 @@ namespace SkietbaanBE.Lib {
             score12.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 9));
             score12.PictureURL = null;
             score12.UserScore = 73;
+            controller.UpdateUserCompStats(score12);
+            controller.UpdateTotal(score12);
             scores.Add(score12);
 
             Score score13 = new Score();
@@ -263,6 +288,8 @@ namespace SkietbaanBE.Lib {
             score13.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 1));
             score13.PictureURL = null;
             score13.UserScore = 37;
+            controller.UpdateUserCompStats(score13);
+            controller.UpdateTotal(score13);
             scores.Add(score13);
 
             Score score14 = new Score();
@@ -271,6 +298,8 @@ namespace SkietbaanBE.Lib {
             score14.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 1));
             score14.PictureURL = null;
             score14.UserScore = 96;
+            controller.UpdateUserCompStats(score14);
+            controller.UpdateTotal(score14);
             scores.Add(score14);
 
             Score score15 = new Score();
@@ -279,6 +308,8 @@ namespace SkietbaanBE.Lib {
             score15.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 1));
             score15.PictureURL = null;
             score15.UserScore = 81;
+            controller.UpdateUserCompStats(score15);
+            controller.UpdateTotal(score15);
             scores.Add(score14);
 
             Score score16 = new Score();
@@ -287,6 +318,8 @@ namespace SkietbaanBE.Lib {
             score16.UploadDate = DateTime.Now.AddMonths(new Random().Next(0, 1));
             score16.PictureURL = null;
             score16.UserScore = 50;
+            controller.UpdateUserCompStats(score16);
+            controller.UpdateTotal(score16);
             scores.Add(score16);
 
 

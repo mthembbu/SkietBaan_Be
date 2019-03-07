@@ -8,7 +8,7 @@ namespace SkietbaanBE.Models {
         public int Id { get; set; }
         public virtual User User { get; set; }
         public virtual Competition Competition { get; set; }
-        public int Best { get; set; }
+        public int MonthBestScore { get; set; }
         public int Month { get; set; }
         public int Year { get; set; }
     }

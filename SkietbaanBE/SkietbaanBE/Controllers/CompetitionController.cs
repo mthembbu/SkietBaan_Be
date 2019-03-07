@@ -22,7 +22,7 @@ namespace SkietbaanBE.Controllers
         /** The method to return an array of competition objects that hold Status == true*/
         // GET: api/Competition
         [HttpGet]
-        public IEnumerable<Competition> GetCompetitions()
+        public IEnumerable<Competition> GetCompetitions()    
         {
             //get the competitions where(Status == true)
             var competitionIDsQuery = from Comp in _context.Competitions
