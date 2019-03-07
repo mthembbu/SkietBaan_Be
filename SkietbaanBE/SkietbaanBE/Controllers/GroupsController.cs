@@ -87,7 +87,7 @@ namespace SkietbaanBE.Controllers
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
         }
         // DELETE: api/Groups/5
-        [HttpDelete("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> DeleteGroup([FromRoute] int id)
 
         {
