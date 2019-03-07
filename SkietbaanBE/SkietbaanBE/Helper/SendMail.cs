@@ -16,18 +16,17 @@ namespace SkietbaanBE.Helper
         string smtpAddress = "smtp.gmail.com";
         int portNumber = 587;
         bool enableSSL = true;
-        string emailFromAddress = "manganyikyle@gmail.com"; //Sender Email Address  
-        string password = "tiyisela97"; //Sender Password   
+        string emailFromAddress = "skietbaanskiet@gmail.com"; //Sender Email Address  
+        string password = "skietbaan999"; //Sender Password   
 
-        public bool SendEmail(string To, string Subject, string file)
+        public bool SendEmail(string To, string Subject, Attachment file)
         {
             try
             {
                 using (MailMessage mail = new MailMessage())
                 {
-                    Attachment attachment = new System.Net.Mail.Attachment(file);
                     MailAssignment(mail, emailFromAddress, To, Subject, "<h>view attachment</h1>");
-                    mail.Attachments.Add(attachment);
+                    mail.Attachments.Add(file);
                     SmtpSend(mail);
                 }
             }

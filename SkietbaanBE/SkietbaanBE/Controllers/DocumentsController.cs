@@ -36,30 +36,53 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet]
         [Route("{Token}")]
-        public void SendLOS(string Token)
+        public string SendLOS(string Token)
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            StreamReader streamReader;
+            if(Member != null)
+            {
+                StreamReader streamReader;
+                MemoryStream memoryStream = new MemoryStream();
+
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() +"/Controllers/Documents/edit.htm");
+
+                if(streamReader != null)
+                {
+                    string content = streamReader.ReadToEnd();
+
+                    content.ToString();
+
+                    streamReader.Close();
+
+                    var content1 = content.Replace("Nadeem", Member.Username)
+                        .Replace("Front End Development", "Letter Of Status");
+
+                    SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                    SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+
+                    doc.Save(memoryStream);
+
+                    byte[] bytes = memoryStream.ToArray();
+
+                    memoryStream.Close();
+
+                    sendMail.SendEmail(Member.Email, "Letter Of Status", new Attachment(new MemoryStream(bytes),"LOS.pdf"));
+
+                    doc.Close();
+
+                    return ("document saved");
+
+                }
+
+                return (Directory.GetCurrentDirectory().ToString());
 
 
+            }
 
-            streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\edit.htm");
+            return (Directory.GetCurrentDirectory().ToString());
 
-            string content = streamReader.ReadToEnd();
-
-            content.ToString();
-
-            streamReader.Close();
-
-            var content1 = content.Replace("Nadeem", Member.Username)
-                .Replace("Front End Development","Letter Of Status");
-
-            SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-            SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-            doc.Save(Directory.GetCurrentDirectory().ToString() + "\\LOS.pdf");
-            doc.Close();
-            sendMail.SendEmail(Member.Email,"Letter Of Status", Directory.GetCurrentDirectory().ToString() + "\\LOS.pdf");
+           
         }
 
         [HttpGet]
@@ -68,9 +91,12 @@ namespace SkietbaanBE.Controllers
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
+            MemoryStream memoryStream = new MemoryStream();
+
+
             StreamReader streamReader;
 
-            streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString()+"\\Controllers\\Documents\\edit.htm");
+            streamReader = new StreamReader("./Controllers/Documents/edit.htm");
 
             string content = streamReader.ReadToEnd();
 
@@ -88,10 +114,18 @@ namespace SkietbaanBE.Controllers
             converter.Options.MarginTop = 20;
             converter.Options.MarginBottom = 20;
             SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-            doc.Save(Directory.GetCurrentDirectory().ToString() + "\\LOGS.pdf");
-            doc.Close();
 
-            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", Directory.GetCurrentDirectory().ToString() + "\\LOGS.pdf");
+            doc.Save(memoryStream);
+
+            byte[] bytes = memoryStream.ToArray();
+
+            memoryStream.Close();
+
+            
+
+            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "Prueba.pdf"));
+
+            doc.Close();
         }
 
         [HttpGet]
@@ -135,5 +169,7 @@ namespace SkietbaanBE.Controllers
             }            
             return ("No Document");
         }
+
+
     }
 }
