@@ -8,6 +8,7 @@ namespace SkietbaanBE.Models {
         public int Id { get; set; }
         public virtual User User { get; set; }
         public virtual Competition Competition { get; set; }
+        public int Best { get; set; }
         public int Total { get; set; }
         public double Average { get; set; }
     }

@@ -11,9 +11,10 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    partial class ModelsContextModelSnapshot : ModelSnapshot
+    [Migration("20190305190151_MonthAward")]
+    partial class MonthAward
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,8 +172,6 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<double>("Average");
 
-                    b.Property<int>("Best");
-
                     b.Property<int?>("CompetitionId");
 
                     b.Property<int>("Total");
@@ -193,11 +192,11 @@ namespace SkietbaanBE.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("Best");
+
                     b.Property<int?>("CompetitionId");
 
                     b.Property<int>("Month");
-
-                    b.Property<int>("MonthBestScore");
 
                     b.Property<int?>("UserId");
 

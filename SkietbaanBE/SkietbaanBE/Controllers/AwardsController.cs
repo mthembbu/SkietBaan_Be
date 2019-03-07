@@ -81,5 +81,10 @@ namespace SkietbaanBE.Controllers
 
             return awardCompetitions;
         }
+
+        [HttpGet("start-time")]
+        public void CountHours() {
+
+        }
     }
 }

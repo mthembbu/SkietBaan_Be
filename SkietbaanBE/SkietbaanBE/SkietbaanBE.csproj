@@ -34,4 +34,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="award_rules.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
