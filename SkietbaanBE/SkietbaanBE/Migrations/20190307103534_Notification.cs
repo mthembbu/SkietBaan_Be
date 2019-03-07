@@ -5,11 +5,10 @@ using System.Collections.Generic;
 
 namespace SkietbaanBE.Migrations
 {
-    public partial class UpdateNotificationsModel : Migration
+    public partial class Notification : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            
             migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
@@ -18,8 +17,8 @@ namespace SkietbaanBE.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsRead = table.Column<bool>(nullable: false),
                     NotificationMessage = table.Column<string>(nullable: true),
-                    UserId = table.Column<int>(nullable: true),
-                    typeOfNotification = table.Column<string>(nullable: true)
+                    TypeOfNotification = table.Column<string>(nullable: true),
+                    UserId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -36,31 +35,12 @@ namespace SkietbaanBE.Migrations
                 name: "IX_Notifications_UserId",
                 table: "Notifications",
                 column: "UserId");
-            
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "Notifications");
-
-            migrationBuilder.DropTable(
-                name: "Scores");
-
-            migrationBuilder.DropTable(
-                name: "UserCompStats");
-
-            migrationBuilder.DropTable(
-                name: "UserGroups");
-
-            migrationBuilder.DropTable(
-                name: "Competitions");
-
-            migrationBuilder.DropTable(
-                name: "Groups");
-
-            migrationBuilder.DropTable(
-                name: "Users");
         }
     }
 }
