@@ -34,7 +34,7 @@ namespace SkietbaanBE.Controllers
             return competitionsList;
         }
         /** The method that return an array of competition objects whether status is true or false*/
-        // GET: api/Competition/{all}
+        // GET: api/Competition/all
         [HttpGet("all")]
         public IEnumerable<Competition> GetAllCompetitions()
        {
@@ -42,7 +42,7 @@ namespace SkietbaanBE.Controllers
              return _context.Competitions.ToArray<Competition>();
         }
         //Getting a competition by ID
-        // GET: api/Competition/{id}
+        // GET: api/Competition/id
         [HttpGet("{id}")]
         public async Task<Competition> CompetitionGetById(int id)
         {
@@ -62,9 +62,9 @@ namespace SkietbaanBE.Controllers
         {
             if (ModelState.IsValid)
             {
-                Competition dbComp = _context.Competitions.FirstOrDefault(C => C.Name == comp.Name);
-                if (dbComp != null)
-                    return new BadRequestObjectResult(comp.Name+"already exists");
+                Competition dbcomp = _context.Competitions.FirstOrDefault(C => C.Name == comp.Name);
+                if (dbcomp != null)
+                    return new BadRequestObjectResult(comp.Name +" already exists");
 
                 _notificationMessages.CompetitionNotification(_context, comp);
                 await _context.AddAsync(comp);
@@ -126,15 +126,15 @@ namespace SkietbaanBE.Controllers
         public Dictionary<int, int> getUsersPerCompetition()
         {
             Dictionary<int, int> mapCompToNumUser = new Dictionary<int, int>();
-            //var CompListQuery = from score in _context.Scores
             var competitionsList = this.GetCompetitions();
 
             foreach (var comp in competitionsList)
             {
                 int count = (from score in _context.Scores
-                             where score.Competition.Id == comp.Id
-                             select score.User.Id).Distinct().ToList().Count();
-               mapCompToNumUser.Add(comp.Id,count);
+                                where score.Competition.Id == comp.Id
+                                select score.User.Id).Distinct().ToList().Count();
+
+                mapCompToNumUser.Add(comp.Id,count);
             }
 
             return mapCompToNumUser;
