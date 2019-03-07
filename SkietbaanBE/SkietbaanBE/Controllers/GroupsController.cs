@@ -191,7 +191,7 @@ namespace SkietbaanBE.Controllers
             return users;
         }
 
-        [HttpDelete]
+        [HttpPost]
         [Route("deleteMember")]
         public void deleteUsersOnTheList ( [FromBody] Filter usersobj)
         {
