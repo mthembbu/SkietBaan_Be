@@ -62,9 +62,9 @@ namespace SkietbaanBE.Controllers
         {
             if (ModelState.IsValid)
             {
-                Competition dbcomp = _context.Competitions.FirstOrDefault(C => C.Name == comp.Name);
-                if (dbcomp != null)
-                    return new BadRequestObjectResult(comp.Name +" already exists");
+                Competition dbComp = _context.Competitions.FirstOrDefault(c => c.Name == comp.Name);
+                if (dbComp != null)
+                    return new BadRequestObjectResult(comp.Name + " already exists");
 
                 _notificationMessages.CompetitionNotification(_context, comp);
                 await _context.AddAsync(comp);
