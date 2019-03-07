@@ -85,7 +85,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                typeOfNotification = "Document",
+                TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Status received. Check your documents"
             };
             _context.Add(notification);
@@ -99,7 +99,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                typeOfNotification = "Document",
+                TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Good Standing received. Check your documents"
             };
             _context.Add(notification);
@@ -113,7 +113,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                typeOfNotification = "Document",
+                TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Status and Letter of Good Standing received. Check your documents"
             };
             _context.Add(notification);
