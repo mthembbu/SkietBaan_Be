@@ -11,8 +11,8 @@ using System;
 namespace SkietbaanBE.Migrations
 {
     [DbContext(typeof(ModelsContext))]
-    [Migration("20190221134612_UpdateNotificationsModel")]
-    partial class UpdateNotificationsModel
+    [Migration("20190307090859_Best")]
+    partial class Best
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,10 +21,32 @@ namespace SkietbaanBE.Migrations
                 .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("SkietbaanBE.Models.Award", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("CompetitionId");
+
+                    b.Property<string>("Description");
+
+                    b.Property<int?>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetitionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Awards");
+                });
+
             modelBuilder.Entity("SkietbaanBE.Models.Competition", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int>("BestScoresNumber");
 
                     b.Property<string>("Name");
 
@@ -47,6 +69,26 @@ namespace SkietbaanBE.Migrations
                     b.ToTable("Groups");
                 });
 
+            modelBuilder.Entity("SkietbaanBE.Models.LeaderInCompetition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("CompetitionId");
+
+                    b.Property<DateTime>("DateAtTop");
+
+                    b.Property<int?>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetitionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LeaderInCompetitions");
+                });
+
             modelBuilder.Entity("SkietbaanBE.Models.Notifications", b =>
                 {
                     b.Property<int>("Id")
@@ -54,11 +96,11 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<bool>("IsRead");
 
-                    b.Property<string>("NotificationMessage");
+                    b.Property<string>("NotificationContent");
+
+                    b.Property<string>("NotificationsHeading");
 
                     b.Property<int?>("UserId");
-
-                    b.Property<string>("typeOfNotification");
 
                     b.HasKey("Id");
 
@@ -73,6 +115,10 @@ namespace SkietbaanBE.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<int?>("CompetitionId");
+
+                    b.Property<float?>("Latitude");
+
+                    b.Property<float?>("Longitude");
 
                     b.Property<string>("PictureURL");
 
@@ -102,9 +148,11 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<DateTime>("EntryDate");
 
-                    b.Property<DateTime>("MemberExpiry");
+                    b.Property<DateTime?>("MemberExpiryDate");
 
                     b.Property<string>("MemberID");
+
+                    b.Property<DateTime?>("MemberStartDate");
 
                     b.Property<string>("Password");
 
@@ -117,18 +165,40 @@ namespace SkietbaanBE.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SkietbaanBE.Models.UserCompetitionTotalScore", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("Average");
+
+                    b.Property<int>("Best");
+
+                    b.Property<int?>("CompetitionId");
+
+                    b.Property<int>("Total");
+
+                    b.Property<int?>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetitionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCompetitionTotalScores");
+                });
+
             modelBuilder.Entity("SkietbaanBE.Models.UserCompStats", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("BestScore");
-
-                    b.Property<int>("CompScore");
-
                     b.Property<int?>("CompetitionId");
 
-                    b.Property<int>("Total");
+                    b.Property<int>("Month");
+
+                    b.Property<int>("MonthBestScore");
 
                     b.Property<int?>("UserId");
 
@@ -161,6 +231,28 @@ namespace SkietbaanBE.Migrations
                     b.ToTable("UserGroups");
                 });
 
+            modelBuilder.Entity("SkietbaanBE.Models.Award", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.Competition", "Competition")
+                        .WithMany()
+                        .HasForeignKey("CompetitionId");
+
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.LeaderInCompetition", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.Competition", "Competition")
+                        .WithMany()
+                        .HasForeignKey("CompetitionId");
+
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("SkietbaanBE.Models.Notifications", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.User", "User")
@@ -169,6 +261,17 @@ namespace SkietbaanBE.Migrations
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.Competition", "Competition")
+                        .WithMany()
+                        .HasForeignKey("CompetitionId");
+
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.UserCompetitionTotalScore", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
                         .WithMany()

@@ -49,23 +49,6 @@ namespace SkietbaanBE.Lib {
                 context.SaveChanges();
                 new TestData().AddTestData(context);
             }
-
-            if (!context.Awards.Any()) {
-                context.AddRange(new Award[] {
-                    new Award {
-                        User = context.Users.Where(u => u.Id == 1).First(), Description = "Reached 500pts in Competition1",
-                        
-                    },
-                    new Award {
-                        User = context.Users.Where(u => u.Id == 1).First(), Description = "Reached 1200pts in Competition3",
-                    },
-                    new Award {
-                        User = context.Users.Where(u => u.Id == 1).First(), Description = "Reached Accuracy of 80% in Competition1",
-                    }
-                });
-                context.SaveChanges();
-            }
-
         }
     }
 }
