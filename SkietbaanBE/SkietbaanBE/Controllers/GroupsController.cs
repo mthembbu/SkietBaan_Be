@@ -87,7 +87,7 @@ namespace SkietbaanBE.Controllers
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
         }
         // DELETE: api/Groups/5
-        [HttpDelete("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> DeleteGroup([FromRoute] int id)
 
         {
@@ -129,6 +129,7 @@ namespace SkietbaanBE.Controllers
         public void AddListUsers([FromBody] List<User> users)
         {
             Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
+           
             List<UserGroup> userGroups = new List<UserGroup>();
             for (int i = 0; i < users.Count; i++)
             {
@@ -191,7 +192,7 @@ namespace SkietbaanBE.Controllers
             return users;
         }
 
-        [HttpDelete]
+        [HttpPost]
         [Route("deleteMember")]
         public void deleteUsersOnTheList ( [FromBody] Filter usersobj)
         {
