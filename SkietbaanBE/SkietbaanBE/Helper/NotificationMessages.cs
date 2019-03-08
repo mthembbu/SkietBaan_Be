@@ -20,7 +20,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                typeOfNotification = "Confirmation",
+                TypeOfNotification = "Confirmation",
                 NotificationMessage = "Welcome to the club " + user.Username + ". You are now a member."
             };
 
@@ -46,7 +46,7 @@ namespace SkietbaanBE.Helper
                 var notification = new Notifications();
                 notification.User = user;
                 notification.IsRead = false;
-                notification.typeOfNotification = "Competition";
+                notification.TypeOfNotification = "Competition";
                 notification.NotificationMessage = "Check it out! Competition " + comp.Name + " has been created.";
                 _context.Notifications.Add(notification);
             }
@@ -59,7 +59,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                typeOfNotification = "Group",
+                TypeOfNotification = "Group",
                 NotificationMessage = group.Name + " created. Check it out!"
             };
             string message = string.Empty;

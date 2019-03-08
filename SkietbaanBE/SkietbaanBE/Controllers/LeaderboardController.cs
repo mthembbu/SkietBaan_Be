@@ -80,12 +80,10 @@ namespace SkietbaanBE.Controllers
             }
             else//Groups rankings
             {
-                competitionID += 1;
-                groupID += 1;
                 rankResults = this.groupRankings(competitionID,groupID);
             }
             //sort and rank results
-            leaderboardResults.RankResults = sortAndRank(rankResults);
+            leaderboardResults.RankResults = rankResults;
 
             //Current User's results
             User currentUser = new FeaturesController(_context).GetUserByToken(userToken);
@@ -175,40 +173,47 @@ namespace SkietbaanBE.Controllers
         }
         private List<RankResults> individualRankings(int competitionID)
         {
+            //need to update with Outer join query
             var query = from User in _context.Users
-                        join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
-                        join Competition in _context.Competitions on UserCompStats.Competition.Id equals Competition.Id
                         join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
-                        where (UserCompStats.Competition.Id == competitionID)
-                        select new {
+                        where (UserCompetitionTotalScore.Competition.Id == competitionID)
+                            select new {
                             User.Username,
                             User.Id,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
-                            UserCompStats.MonthBestScore
+                            UserCompetitionTotalScore.Best
                         };
-            //saving results in an List which will make sorting easier(ArrayList)
-            Dictionary<int, RankResults> mapIdToBest = new Dictionary<int, RankResults>();
+            var queryAllCustomers = from user in _context.Users
+                                    select user.Username;
+            List<string> users = queryAllCustomers.ToList<string>();
 
+            //saving results in an List which will make sorting easier(ArrayList)
+            int rank = 1;
+            List<RankResults> ranklist = new List<RankResults>();
             foreach (var item in query) {
                 RankResults rankResult = new RankResults();
                 rankResult.Username = item.Username;
-                rankResult.Best = item.MonthBestScore;
+                rankResult.Best = item.Best;
                 rankResult.Total = item.Total;
                 rankResult.Average = item.Average;
-
-                if (mapIdToBest.ContainsKey(item.Id)) {
-                    RankResults res = mapIdToBest.GetValueOrDefault(item.Id);
-                    if (res.Best < item.MonthBestScore) {
-                        res.Best = item.MonthBestScore;
-                        mapIdToBest[item.Id] = res;
-                    }
-                } else {
-                    mapIdToBest.Add(item.Id, rankResult);
-                }
+                rankResult.Rank = rank;
+                ranklist.Add(rankResult);
+                //remove user from users without scores
+                users.Remove(item.Username);
+                rank++;
             }
-
-            return mapIdToBest.Values.ToList();
+            for(int i = 0; i < users.Count; i++)
+            {
+                RankResults tempRankResult = new RankResults();
+                tempRankResult.Username = users.ElementAt(i);
+                tempRankResult.Total = 0;
+                tempRankResult.Best = 0;
+                tempRankResult.Average = 0;
+                tempRankResult.Rank = ranklist.Count + (i + 1);
+                ranklist.Add(tempRankResult);
+            }
+            return ranklist;
         }
         private List<RankResults> groupRankings(int competitionID, int groupID)
         {
@@ -224,30 +229,23 @@ namespace SkietbaanBE.Controllers
                             User.Id,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
-                            UserCompStats.MonthBestScore
+                            UserCompetitionTotalScore.Best
                         };
             //saving results in an List which will make sorting easier(ArrayList)
-            Dictionary<int, RankResults> mapIdToBest = new Dictionary<int, RankResults>();
+            List<RankResults> ranklist = new List<RankResults>();
 
-            foreach (var item in query) {
+            foreach (var item in query)
+            {
                 RankResults rankResult = new RankResults();
                 rankResult.Username = item.Username;
-                rankResult.Best = item.MonthBestScore;
+                rankResult.Best = item.Best;
                 rankResult.Total = item.Total;
                 rankResult.Average = item.Average;
 
-                if (mapIdToBest.ContainsKey(item.Id)) {
-                    RankResults res = mapIdToBest.GetValueOrDefault(item.Id);
-                    if (res.Best < item.MonthBestScore) {
-                        res.Best = item.MonthBestScore;
-                        mapIdToBest[item.Id] = res;
-                    }
-                } else {
-                    mapIdToBest.Add(item.Id, rankResult);
-                }
+                ranklist.Add(rankResult);
             }
-
-            return mapIdToBest.Values.ToList();
+            //rank and return results
+            return sortAndRank(ranklist);
         }
     }
 }
