@@ -231,10 +231,9 @@ namespace SkietbaanBE.Controllers
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
-                        join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
-                        join Competition in _context.Competitions on UserCompStats.Competition.Id equals Competition.Id
                         join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
-                        where (UserCompStats.Competition.Id == competitionID && Group.Id == groupID)
+                        join Competition in _context.Competitions on UserCompStats.Competition.Id equals Competition.Id                  
+                        where (UserCompetitionTotalScore.Competition.Id == competitionID && Group.Id == groupID)
                         select new {
                             User.Username,
                             User.Id,
@@ -243,17 +242,17 @@ namespace SkietbaanBE.Controllers
                             UserCompetitionTotalScore.Best
                         };
             //saving results in an List which will make sorting easier(ArrayList)
+            int rank = 1;
             List<RankResults> ranklist = new List<RankResults>();
-
-            foreach (var item in query)
-            {
+            foreach (var item in query) {
                 RankResults rankResult = new RankResults();
                 rankResult.Username = item.Username;
                 rankResult.Best = item.Best;
                 rankResult.Total = item.Total;
                 rankResult.Average = item.Average;
-
+                rankResult.Rank = rank;
                 ranklist.Add(rankResult);
+                rank++;
             }
             //rank and return results
             return sortAndRank(ranklist);
