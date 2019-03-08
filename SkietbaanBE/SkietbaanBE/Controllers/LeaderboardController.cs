@@ -221,7 +221,7 @@ namespace SkietbaanBE.Controllers
                 tempRankResult.Total = 0;
                 tempRankResult.Best = 0;
                 tempRankResult.Average = 0;
-                tempRankResult.Rank = ranklist.Count + (i + 1);
+                tempRankResult.Rank = 0;
                 ranklist.Add(tempRankResult);
             }
             return ranklist;
