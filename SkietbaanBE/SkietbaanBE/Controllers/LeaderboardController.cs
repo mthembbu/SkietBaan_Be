@@ -176,7 +176,7 @@ namespace SkietbaanBE.Controllers
             //need to update with Outer join query
             var query = from User in _context.Users
                         join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
-                        where (UserCompetitionTotalScore.Competition.Id == 1)
+                        where (UserCompetitionTotalScore.Competition.Id == competitionID)
                             select new {
                             User.Username,
                             User.Id,
