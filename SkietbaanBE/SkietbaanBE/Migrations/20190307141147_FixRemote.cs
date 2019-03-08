@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SkietbaanBE.Migrations
 {
-    public partial class NewMigration : Migration
+    public partial class FixRemote : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,6 +15,7 @@ namespace SkietbaanBE.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    BestScoresNumber = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Status = table.Column<bool>(nullable: false)
                 },
@@ -29,6 +30,7 @@ namespace SkietbaanBE.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    IsActive = table.Column<bool>(nullable: false),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -63,14 +65,19 @@ namespace SkietbaanBE.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CompetitionId = table.Column<int>(nullable: true),
                     Description = table.Column<string>(nullable: true),
-                    IconURL = table.Column<string>(nullable: true),
-                    Stat = table.Column<int>(nullable: false),
                     UserId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Awards", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Awards_Competitions_CompetitionId",
+                        column: x => x.CompetitionId,
+                        principalTable: "Competitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Awards_Users_UserId",
                         column: x => x.UserId,
@@ -86,8 +93,8 @@ namespace SkietbaanBE.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsRead = table.Column<bool>(nullable: false),
-                    NotificationContent = table.Column<string>(nullable: true),
-                    NotificationsHeading = table.Column<string>(nullable: true),
+                    NotificationMessage = table.Column<string>(nullable: true),
+                    TypeOfNotification = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -108,6 +115,8 @@ namespace SkietbaanBE.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CompetitionId = table.Column<int>(nullable: true),
+                    Latitude = table.Column<float>(nullable: true),
+                    Longitude = table.Column<float>(nullable: true),
                     PictureURL = table.Column<string>(nullable: true),
                     UploadDate = table.Column<DateTime>(nullable: true),
                     UserId = table.Column<int>(nullable: true),
@@ -131,16 +140,43 @@ namespace SkietbaanBE.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserCompetitionTotalScores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Average = table.Column<double>(nullable: false),
+                    Best = table.Column<int>(nullable: false),
+                    CompetitionId = table.Column<int>(nullable: true),
+                    Total = table.Column<int>(nullable: false),
+                    UserId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserCompetitionTotalScores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserCompetitionTotalScores_Competitions_CompetitionId",
+                        column: x => x.CompetitionId,
+                        principalTable: "Competitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserCompetitionTotalScores_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserCompStats",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    BestScore = table.Column<int>(nullable: false),
-                    CompScore = table.Column<int>(nullable: false),
                     CompetitionId = table.Column<int>(nullable: true),
                     Month = table.Column<int>(nullable: false),
-                    Total = table.Column<int>(nullable: false),
+                    MonthBestScore = table.Column<int>(nullable: false),
                     UserId = table.Column<int>(nullable: true),
                     Year = table.Column<int>(nullable: false)
                 },
@@ -188,6 +224,11 @@ namespace SkietbaanBE.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Awards_CompetitionId",
+                table: "Awards",
+                column: "CompetitionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Awards_UserId",
                 table: "Awards",
                 column: "UserId");
@@ -205,6 +246,16 @@ namespace SkietbaanBE.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Scores_UserId",
                 table: "Scores",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCompetitionTotalScores_CompetitionId",
+                table: "UserCompetitionTotalScores",
+                column: "CompetitionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCompetitionTotalScores_UserId",
+                table: "UserCompetitionTotalScores",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -238,6 +289,9 @@ namespace SkietbaanBE.Migrations
 
             migrationBuilder.DropTable(
                 name: "Scores");
+
+            migrationBuilder.DropTable(
+                name: "UserCompetitionTotalScores");
 
             migrationBuilder.DropTable(
                 name: "UserCompStats");
