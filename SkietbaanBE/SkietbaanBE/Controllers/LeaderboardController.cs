@@ -126,11 +126,7 @@ namespace SkietbaanBE.Controllers
 
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
-            rankResults = rankResults.OrderByDescending(x => x.Best).ToList();
-            for (int i = 0; i < rankResults.Count; i++)
-            {
-                rankResults.ElementAt(i).Rank = i + 1;
-            }
+            rankResults = rankResults.OrderByDescending(x => x.Rank).ToList()
             return rankResults;
         }
 
@@ -239,7 +235,6 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
-                            User.Id,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
                             UserCompetitionTotalScore.Best
