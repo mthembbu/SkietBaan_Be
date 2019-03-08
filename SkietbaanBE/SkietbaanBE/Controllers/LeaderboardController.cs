@@ -97,6 +97,17 @@ namespace SkietbaanBE.Controllers
                         leaderboardResults.UserResults = leaderboardResults.RankResults.ElementAt(i);
                     }
                 }
+                if(leaderboardResults.UserResults == null)
+                {
+                    leaderboardResults.UserResults = new RankResults()
+                    {
+                        Username = currentUser.Username,
+                        Best = 0,
+                        Total = 0,
+                        Average = 0,
+                        Rank = 0
+                    };
+                }
             }
             else
             {
