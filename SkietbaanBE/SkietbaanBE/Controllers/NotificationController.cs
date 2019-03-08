@@ -70,7 +70,7 @@ namespace SkietbaanBE.Controllers
                 return null;
         }
 
-        [HttpDelete("{id}")]
+        [HttpPost("{id}")]
 
         public async Task DeleteAsync(int id)
         {
