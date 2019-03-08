@@ -129,6 +129,7 @@ namespace SkietbaanBE.Controllers
         public void AddListUsers([FromBody] List<User> users)
         {
             Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
+           
             List<UserGroup> userGroups = new List<UserGroup>();
             for (int i = 0; i < users.Count; i++)
             {
