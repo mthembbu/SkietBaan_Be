@@ -126,7 +126,7 @@ namespace SkietbaanBE.Controllers
 
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
-            rankResults = rankResults.OrderByDescending(x => x.Rank).ToList()
+            rankResults = rankResults.OrderByDescending(x => x.Rank).ToList();
             return rankResults;
         }
 
