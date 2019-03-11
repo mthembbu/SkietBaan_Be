@@ -83,7 +83,7 @@ namespace SkietbaanBE.Controllers
                 rankResults = this.groupRankings(competitionID, groupID);
             }
             //sort and rank results
-            leaderboardResults.RankResults = rankResults;
+            leaderboardResults.RankResults = sortAndRank(rankResults);
 
             //Current User's results
             User currentUser = new FeaturesController(_context).GetUserByToken(userToken);
@@ -126,8 +126,12 @@ namespace SkietbaanBE.Controllers
 
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
-            rankResults = rankResults.OrderByDescending(x => x.Rank).ToList();
-            return rankResults;
+           List<RankResults> results = rankResults.OrderByDescending(x => x.Best).ToList();
+            for(int i = 0; i < results.Count; i++)
+            {
+                results.ElementAt(i).Rank = i + 1;
+            }
+            return results;
         }
 
         //Get Users Scores stats for a specific competition
@@ -197,7 +201,6 @@ namespace SkietbaanBE.Controllers
             List<string> users = queryAllCustomers.ToList<string>();
 
             //saving results in an List which will make sorting easier(ArrayList)
-            int rank = 1;
             List<RankResults> ranklist = new List<RankResults>();
             foreach (var item in query)
             {
@@ -206,11 +209,10 @@ namespace SkietbaanBE.Controllers
                 rankResult.Best = item.Best;
                 rankResult.Total = item.Total;
                 rankResult.Average = item.Average;
-                rankResult.Rank = rank;
+                rankResult.Rank = 0;
                 ranklist.Add(rankResult);
                 //remove user from users without scores
                 users.Remove(item.Username);
-                rank++;
             }
             for (int i = 0; i < users.Count; i++)
             {
@@ -254,7 +256,7 @@ namespace SkietbaanBE.Controllers
                 rank++;
             }
             //rank and return results
-            return sortAndRank(ranklist);
+            return ranklist;
         }
     }
 }
