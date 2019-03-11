@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,7 +44,7 @@ namespace SkietbaanBE.Controllers
             List<CompetitionLabel> competitionsLabels = new List<CompetitionLabel>();
             List<GroupLabel> groupsLabels = new List<GroupLabel>();
 
-            
+
             for (int i = 0; i < competitions.Count; i++)
             {
                 CompetitionLabel competition = new CompetitionLabel();
@@ -71,19 +71,19 @@ namespace SkietbaanBE.Controllers
         {
             //from arry index to data base ID;
             LeaderboardResults leaderboardResults = new LeaderboardResults();
-            
+
             //ranking results for specific group's specific compentition
-            List<RankResults> rankResults = new List<RankResults>();       
-            if(groupID == -1)//Individual grankings
+            List<RankResults> rankResults = new List<RankResults>();
+            if (groupID == -1)//Individual grankings
             {
                 rankResults = this.individualRankings(competitionID);
             }
             else//Groups rankings
             {
-                rankResults = this.groupRankings(competitionID,groupID);
+                rankResults = this.groupRankings(competitionID, groupID);
             }
             //sort and rank results
-            leaderboardResults.RankResults = rankResults;
+            leaderboardResults.RankResults = sortAndRank(rankResults);
 
             //Current User's results
             User currentUser = new FeaturesController(_context).GetUserByToken(userToken);
@@ -97,7 +97,7 @@ namespace SkietbaanBE.Controllers
                         leaderboardResults.UserResults = leaderboardResults.RankResults.ElementAt(i);
                     }
                 }
-                if(leaderboardResults.UserResults == null)
+                if (leaderboardResults.UserResults == null)
                 {
                     leaderboardResults.UserResults = new RankResults()
                     {
@@ -126,12 +126,12 @@ namespace SkietbaanBE.Controllers
 
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
-            rankResults = rankResults.OrderByDescending(x => x.Best).ToList();
-            for (int i = 0; i < rankResults.Count; i++)
+           List<RankResults> results = rankResults.OrderByDescending(x => x.Best).ToList();
+            for(int i = 0; i < results.Count; i++)
             {
-                rankResults.ElementAt(i).Rank = i + 1;
+                results.ElementAt(i).Rank = i + 1;
             }
-            return rankResults;
+            return results;
         }
 
         //Get Users Scores stats for a specific competition
@@ -188,7 +188,8 @@ namespace SkietbaanBE.Controllers
             var query = from User in _context.Users
                         join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
                         where (UserCompetitionTotalScore.Competition.Id == competitionID)
-                            select new {
+                        select new
+                        {
                             User.Username,
                             User.Id,
                             UserCompetitionTotalScore.Average,
@@ -200,21 +201,20 @@ namespace SkietbaanBE.Controllers
             List<string> users = queryAllCustomers.ToList<string>();
 
             //saving results in an List which will make sorting easier(ArrayList)
-            int rank = 1;
             List<RankResults> ranklist = new List<RankResults>();
-            foreach (var item in query) {
+            foreach (var item in query)
+            {
                 RankResults rankResult = new RankResults();
                 rankResult.Username = item.Username;
                 rankResult.Best = item.Best;
                 rankResult.Total = item.Total;
                 rankResult.Average = item.Average;
-                rankResult.Rank = rank;
+                rankResult.Rank = 0;
                 ranklist.Add(rankResult);
                 //remove user from users without scores
                 users.Remove(item.Username);
-                rank++;
             }
-            for(int i = 0; i < users.Count; i++)
+            for (int i = 0; i < users.Count; i++)
             {
                 RankResults tempRankResult = new RankResults();
                 tempRankResult.Username = users.ElementAt(i);
@@ -231,20 +231,19 @@ namespace SkietbaanBE.Controllers
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
-                        join UserCompStats in _context.UserCompStats on User.Id equals UserCompStats.User.Id
-                        join Competition in _context.Competitions on UserCompStats.Competition.Id equals Competition.Id
                         join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
-                        where (UserCompStats.Competition.Id == competitionID && Group.Id == groupID)
-                        select new {
+                        join Competition in _context.Competitions on UserCompetitionTotalScore.Competition.Id equals Competition.Id
+                        where (UserCompetitionTotalScore.Competition.Id == competitionID && Group.Id == groupID)
+                        select new
+                        {
                             User.Username,
-                            User.Id,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
                             UserCompetitionTotalScore.Best
                         };
             //saving results in an List which will make sorting easier(ArrayList)
+            int rank = 1;
             List<RankResults> ranklist = new List<RankResults>();
-
             foreach (var item in query)
             {
                 RankResults rankResult = new RankResults();
@@ -252,11 +251,12 @@ namespace SkietbaanBE.Controllers
                 rankResult.Best = item.Best;
                 rankResult.Total = item.Total;
                 rankResult.Average = item.Average;
-
+                rankResult.Rank = rank;
                 ranklist.Add(rankResult);
+                rank++;
             }
             //rank and return results
-            return sortAndRank(ranklist);
+            return ranklist;
         }
     }
 }
