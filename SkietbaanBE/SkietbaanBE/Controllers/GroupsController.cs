@@ -75,19 +75,7 @@ namespace SkietbaanBE.Controllers
             }
             return NoContent();
         }
-        // POST: api/Groups
-        [HttpPost]
-        public async Task<IActionResult> PostGroup([FromBody] Group @group)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            group.IsActive = true;
-            _context.Groups.Add(@group);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
-        }
+   
         // DELETE: api/Groups/5
         [HttpPost("{id}")]
         public async Task<IActionResult> DeleteGroup([FromRoute] int id)
