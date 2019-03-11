@@ -28,20 +28,24 @@ namespace SkietbaanBE.Controllers
             var _document = new DocumentsController(_context);
             var doccieLOS = _document.UserLOS(token); 
             var doccieLOGS = _document.UserLOGS(token);
-            if (doccieLOS == "Document")
+
+            if(doccieLOGS == "Document" && doccieLOS == "Document")
             {
-                if(doccieLOGS == "Document")
-                {
-                    _notificationMessage.DocumenstNotification(token);
-                }
-            }else if (doccieLOGS == "Document")
+                _notificationMessage.DocumenstNotification(token);
+                return _notificationMessage;
+            }
+            else if (doccieLOGS == "Document" && doccieLOS == "No Document")
             {
                 _notificationMessage.LOGS(token);
-            }else if (doccieLOS == "Document")
+                return _notificationMessage;
+            }
+            else if (doccieLOGS == "No Document" && doccieLOS == "Document")
             {
                 _notificationMessage.LOS(token);
+                return _notificationMessage;
             }
-            return _notificationMessage;
+
+            return null;
         }
 
         [HttpGet("{id}", Name = "GetNotificationById")]
