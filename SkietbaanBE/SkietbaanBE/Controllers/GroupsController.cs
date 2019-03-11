@@ -91,23 +91,18 @@ namespace SkietbaanBE.Controllers
         // DELETE: api/Groups/5
         [HttpPost("{id}")]
         public async Task<IActionResult> DeleteGroup([FromRoute] int id)
-
-        {
-           
+        {   
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
             var group = await _context.Groups.SingleOrDefaultAsync(m => m.Id == id);
             group.IsActive = false;
             if (group == null)
             {
                 return NotFound();
-            }
-            
+            }        
             await _context.SaveChangesAsync();
-
             return Ok(group);
         }
 
@@ -117,14 +112,17 @@ namespace SkietbaanBE.Controllers
         }
         [HttpPost]
         [Route("add")]
-        public void AddListUsers([FromBody] List<User> users)
+        public void AddListUsers([FromBody] CreateGroup createobj)
         {
-            Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
+            Group group = new Group();
+            group.Name = createobj.name;
+            group.IsActive = true;
+
             List<UserGroup> userGroups = new List<UserGroup>();
-            for (int i = 0; i < users.Count; i++)
+            for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Username == users.ElementAt(i).Username);
+                User dbUser = _context.Users.FirstOrDefault(x => x.Username == createobj.users.ElementAt(i).Username);
                 userGroup.Group = group;
                 userGroup.User = dbUser;
                 userGroup.active = true;
@@ -177,10 +175,8 @@ namespace SkietbaanBE.Controllers
             foreach (var item in query)
             {
                 User user = new User();
-                user = item.User; users.Add(user);
-                
+                user = item.User; users.Add(user);             
             }
-
             return users;
         }
 
