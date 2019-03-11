@@ -133,6 +133,7 @@ namespace SkietbaanBE.Controllers
             _context.SaveChanges();
         }
 
+        //get users that do not in the group
         [HttpGet]
         [Route("list")]
         public List<User> getUsersThatAreNotInTheGroup(int id)
@@ -159,6 +160,8 @@ namespace SkietbaanBE.Controllers
             var result = (qry).Except(users);
             return result.ToList<User>();
         }
+
+        //get existing members in a group
         [HttpGet]
         [Route("edit")]
         public List<User> getExistingMembers(int id)
@@ -179,7 +182,7 @@ namespace SkietbaanBE.Controllers
             }
             return users;
         }
-
+        //delete members in a group
         [HttpPost]
         [Route("deleteMember")]
         public void deleteUsersOnTheList ( [FromBody] Filter usersobj)
