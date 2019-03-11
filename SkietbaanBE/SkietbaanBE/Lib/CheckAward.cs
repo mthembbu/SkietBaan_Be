@@ -52,17 +52,6 @@ namespace SkietbaanBE.Lib {
         }
 
         public static HoursAward Hours() {
-            /*HoursAward hours = new HoursAward();
-            var requirements = ReadAwardsRules("award_rules.txt")["Hours"];
-            foreach (string req in requirements.Split(',')) {
-                if (req.Contains("gold")) {
-                    hours.gold = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                } else if (req.Contains("silver")) {
-                    hours.silver = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                } else {
-                    hours.bronze = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                }
-            }*/
             HoursAward hours = new HoursAward {
                 Gold = false,
                 Bronze = false,
