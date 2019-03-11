@@ -116,8 +116,7 @@ namespace SkietbaanBE.Controllers
         {
             Group group = new Group();
             group.Name = createobj.name;
-            group.IsActive = true;
-
+            group.IsActive = true;    
             List<UserGroup> userGroups = new List<UserGroup>();
             for (int i = 0; i < createobj.users.Length; i++)
             {
