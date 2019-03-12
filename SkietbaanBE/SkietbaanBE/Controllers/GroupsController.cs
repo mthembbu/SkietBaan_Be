@@ -100,23 +100,23 @@ namespace SkietbaanBE.Controllers
             return _context.Groups.Any(e => e.Id == id);
         }
         
-        //creating groups and adding members to the group
+        //creating groups and adding members to the groups
         [HttpPost]
         [Route("add")]
         public void AddListUsers([FromBody] CreateGroup createobj)
         {
-            Group group = new Group();
-            group.Name = createobj.name;
-            group.IsActive = true;
+            Group groups = new Group();
+            groups.Name = createobj.name;
+            groups.IsActive = true;
             List<UserGroup> userGroups = new List<UserGroup>();
             for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
                 User dbUser = _context.Users.FirstOrDefault(x => x.Username == createobj.users.ElementAt(i).Username);
-                userGroup.Group = group;
+                userGroup.Group = groups;
                 userGroup.User = dbUser;
                 userGroups.Add(userGroup);
-                _notificationMessages.GroupNotification(_context, group, dbUser);
+                _notificationMessages.GroupNotification(_context, groups, dbUser);
             }
             _context.UserGroups.AddRange(userGroups);
             _context.SaveChanges();
