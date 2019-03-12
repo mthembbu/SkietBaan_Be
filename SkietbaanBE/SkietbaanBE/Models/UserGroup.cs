@@ -8,7 +8,6 @@ namespace SkietbaanBE.Models {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public virtual User User { get; set; }
-        public bool active { get; set; }
         public virtual Group Group { get; set; }
 
     }
