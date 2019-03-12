@@ -105,9 +105,7 @@ namespace SkietbaanBE.Controllers
             {
                 return NotFound();
             }
-
             await _context.SaveChangesAsync();
-
             return Ok(group);
         }
 
@@ -115,16 +113,18 @@ namespace SkietbaanBE.Controllers
         {
             return _context.Groups.Any(e => e.Id == id);
         }
+        
+        //creating groups and adding members to the groups
         [HttpPost]
         [Route("add")]
-        public void AddListUsers([FromBody] List<User> users)
+        public void AddListUsers([FromBody] CreateGroup createobj)
         {
             Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
             List<UserGroup> userGroups = new List<UserGroup>();
-            for (int i = 0; i < users.Count; i++)
+            for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Username == users.ElementAt(i).Username);
+                User dbUser = _context.Users.FirstOrDefault(x => x.Username == createobj.users.ElementAt(i).Username);
                 userGroup.Group = group;
                 userGroup.User = dbUser;
                 userGroups.Add(userGroup);
@@ -134,6 +134,7 @@ namespace SkietbaanBE.Controllers
             _context.SaveChanges();
         }
 
+        //get users that do not in the group
         [HttpGet]
         [Route("list")]
         public List<User> getUsersThatAreNotInTheGroup(int id)
@@ -160,6 +161,8 @@ namespace SkietbaanBE.Controllers
             var result = (qry).Except(users);
             return result.ToList<User>();
         }
+
+        //get existing members in a group
         [HttpGet]
         [Route("edit")]
         public List<User> getExistingMembers(int id)
@@ -177,12 +180,10 @@ namespace SkietbaanBE.Controllers
             {
                 User user = new User();
                 user = item.User; users.Add(user);
-
             }
-
             return users;
         }
-
+        //delete members in a group
         [HttpPost]
         [Route("deleteMember")]
         public void deleteUsersOnTheList([FromBody] Filter usersobj)
@@ -214,7 +215,6 @@ namespace SkietbaanBE.Controllers
                 }
             }
         }
-
         [HttpPost]
         [Route("postMember")]
         public void addUsersOnTheList([FromBody] Filter usersobj)
@@ -226,6 +226,7 @@ namespace SkietbaanBE.Controllers
                 UserGroup userGroup = new UserGroup();
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == usersobj.users.ElementAt(i).Token);
                 userGroup.Group = group;
+      
                 userGroup.User = dbUser;
                 _context.UserGroups.Add(userGroup);
                 _context.SaveChanges();
