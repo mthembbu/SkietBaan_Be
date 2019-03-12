@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Data.OleDb;
-using System.IO;
-using OfficeOpenXml;
+//using System.Threading.Tasks;
+//using System.Data.OleDb;
+//using System.IO;
+//using OfficeOpenXml;
 using SkietbaanBE.Models;
 
 namespace SkietbaanBE.Lib
@@ -22,27 +22,27 @@ namespace SkietbaanBE.Lib
         {
             string testData = "";
             string filePath = @"C:\Users\Sibusiso Malatji\source\repos\SkietBaan_Be\SkietbaanBE\SkietbaanBE\Lib\SkietbaanData.xlsx";
-            FileInfo file = new FileInfo(filePath);
+            //FileInfo file = new FileInfo(filePath);
             List<ExelData> exelDataList = new List<ExelData>();
-            using(ExcelPackage package = new ExcelPackage(file))
-            {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                int rowCount = worksheet.Dimension.Rows;
-                int ColCount = worksheet.Dimension.Columns;
+            //using(ExcelPackage package = new ExcelPackage(file))
+            //{
+            //    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+            //    int rowCount = worksheet.Dimension.Rows;
+            //    int ColCount = worksheet.Dimension.Columns;
 
-                var rawText = string.Empty;
-                for (int row = 2; row <= rowCount; row++)
-                {
-                    ExelData exelData = new ExelData();
-                    exelData.CompetitionName = validateText(worksheet.Cells[row, 1].Value.ToString());
-                    exelData.Score = int.Parse(validateNumber(worksheet.Cells[row, 2].Value.ToString()));
-                    exelData.Name = validateText(worksheet.Cells[row, 3].Value.ToString());
-                    exelData.Surname = validateText(worksheet.Cells[row, 4].Value.ToString());
-                    exelData.ScoreEntryDate = DateTime.Parse(validateText(worksheet.Cells[row, 5].Text.ToString()));
-                    exelData.UserId = long.Parse(validateNumber(worksheet.Cells[row, 6].Value.ToString()));
-                    exelDataList.Add(exelData);
-                }
-            }
+            //    var rawText = string.Empty;
+            //    for (int row = 2; row <= rowCount; row++)
+            //    {
+            //        ExelData exelData = new ExelData();
+            //        exelData.CompetitionName = validateText(worksheet.Cells[row, 1].Value.ToString());
+            //        exelData.Score = int.Parse(validateNumber(worksheet.Cells[row, 2].Value.ToString()));
+            //        exelData.Name = validateText(worksheet.Cells[row, 3].Value.ToString());
+            //        exelData.Surname = validateText(worksheet.Cells[row, 4].Value.ToString());
+            //        exelData.ScoreEntryDate = DateTime.Parse(validateText(worksheet.Cells[row, 5].Text.ToString()));
+            //        exelData.UserId = long.Parse(validateNumber(worksheet.Cells[row, 6].Value.ToString()));
+            //        exelDataList.Add(exelData);
+            //    }
+            //}
 
 
             return exelDataList;
