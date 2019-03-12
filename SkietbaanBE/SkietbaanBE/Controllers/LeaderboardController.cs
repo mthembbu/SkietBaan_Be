@@ -37,8 +37,8 @@ namespace SkietbaanBE.Controllers
         public LeaderboardFilterData GetLeaderboardFilterData(int userID)
         {
             LeaderboardFilterData leaderboardFilterData = new LeaderboardFilterData();
-            List<Competition> competitions = _context.Competitions.ToList<Competition>();
-            List<Group> groups = _context.Groups.ToList<Group>();
+            List<Competition> competitions = _context.Competitions.Where(c=>c.Status == true).ToList<Competition>();
+            List<Group> groups = _context.Groups.Where(c => c.IsActive == true).ToList<Group>();
             User user = _context.Users.Find(userID);
 
             List<CompetitionLabel> competitionsLabels = new List<CompetitionLabel>();
@@ -137,55 +137,6 @@ namespace SkietbaanBE.Controllers
             }
             return results;
         }
-
-        //Get Users Scores stats for a specific competition
-        [HttpGet]
-        public IEnumerable<UserCompStats> GetUsersCompetitionsScores(int competitionID)
-        {
-            List<UserCompStats> userscompStats = new List<UserCompStats>();
-            var competitionScoresQuery = from cust in _context.UserCompStats
-                                         where cust.Competition.Id == competitionID
-                                         select cust;
-            userscompStats = competitionScoresQuery.ToList<UserCompStats>();
-            return userscompStats;
-        }
-        //helper methods
-        public void calculateTotalAverageCompetitionScore()
-        {
-            List<User> users = _context.Users.ToList<User>();
-            for (int u = 0; u < users.Count; u++)
-            {
-                //get current user's competition(where the user has scores)
-                var competitionIDsQuery = from cust in _context.Scores
-                                          where cust.User.Id == users.ElementAt(u).Id
-                                          select cust.Competition.Id;
-                List<int> competitionsIDs = competitionIDsQuery.ToList<int>();
-                for (int c = 0; c < competitionsIDs.Count; c++)
-                {
-                    //get user competition total score
-                    var competitionScoresQuery = from cust in _context.Scores
-                                                 where (cust.User.Id == users.ElementAt(u).Id && cust.Competition.Id == competitionsIDs.ElementAt(c))
-                                                 select cust.UserScore;
-                    List<int> competitionScores = competitionScoresQuery.ToList<int>();
-                    //calculate average
-                    int total = competitionScores.Sum();
-                    //calculate average
-                    double average = (double)total / (double)competitionScores.Count;
-
-                    //get competition object
-                    Competition competition = _context.Competitions.Find(competitionsIDs.ElementAt(c));
-
-                    //update
-                    var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
-                                                  .FirstOrDefault<UserCompStats>();
-                    //userCompStats.Total = total;
-                    userCompStats.User = users.ElementAt(u);
-                    //save
-                    _context.UserCompStats.Update(userCompStats);
-                    _context.SaveChanges();
-                }
-            }
-        }
         private List<RankResults> individualRankings(int competitionID)
         {
             //need to update with Outer join query
@@ -195,7 +146,6 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
-                            User.Id,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
                             UserCompetitionTotalScore.Best

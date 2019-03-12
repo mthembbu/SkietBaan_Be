@@ -31,67 +31,67 @@ namespace SkietbaanBE.Controllers
             return total;
         }
 
-        [HttpGet("{token}")]
-        public List<AwardObject> GetAllAwards(string token) {
-            List<AwardObject> awardCompetitions = new List<AwardObject>();
-            string membershipID;
-            string username;
-            try {
-                membershipID = context.Users.Where(x => x.Token == token).First().MemberID;
-                username = context.Users.Where(x => x.Token == token).First().Username;
-            } catch (Exception) {
-                return awardCompetitions;
-            }
+        //[HttpGet("{token}")]
+        //public List<AwardObject> GetAllAwards(string token) {
+        //    List<AwardObject> awardCompetitions = new List<AwardObject>();
+        //    string membershipID;
+        //    string username;
+        //    try {
+        //        membershipID = context.Users.Where(x => x.Token == token).First().MemberID;
+        //        username = context.Users.Where(x => x.Token == token).First().Username;
+        //    } catch (Exception) {
+        //        return awardCompetitions;
+        //    }
 
 
-            var competitionsUserPartakesIn = from UserCompetitionTotalScore in context.UserCompetitionTotalScores
-                                             where (UserCompetitionTotalScore.User.Token == token)
-                                             select new {
-                                                 UserCompetitionTotalScore.Competition,
-                                                 UserCompetitionTotalScore.Average,
-                                                 UserCompetitionTotalScore.Total
-                                             };
-            foreach(var comp in context.Competitions) {
-                if(competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
-                    AwardObject awardObject = new AwardObject {
-                        CompetitionName = comp.Name,
-                        IsCompetitionLocked = false,
-                        Total = GetTotalScore(token, comp.Name),
-                        //REMOVE
-                        Accuracy = (int)competitionsUserPartakesIn
-                                        .Where(x => x.Competition.Id == comp.Id).First().Average,
-                        MembershipNumber = membershipID,
-                        Username = username,
-                        HoursAward = CheckAward.Hours(),
-                        TotalAward = CheckAward.Total(competitionsUserPartakesIn
-                                        .Where(x => x.Competition.Id == comp.Id).First().Total, false),
-                        AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
-                                        .Where(x => x.Competition.Id == comp.Id).First().Average), false)
-                    };
+        //    var competitionsUserPartakesIn = from UserCompetitionTotalScore in context.UserCompetitionTotalScores
+        //                                     where (UserCompetitionTotalScore.User.Token == token)
+        //                                     select new {
+        //                                         UserCompetitionTotalScore.Competition,
+        //                                         UserCompetitionTotalScore.Average,
+        //                                         UserCompetitionTotalScore.Total
+        //                                     };
+        //    foreach(var comp in context.Competitions) {
+        //        if(competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
+        //            AwardObject awardObject = new AwardObject {
+        //                CompetitionName = comp.Name,
+        //                IsCompetitionLocked = false,
+        //                Total = GetTotalScore(token, comp.Name),
+        //                //REMOVE
+        //                Accuracy = (int)competitionsUserPartakesIn
+        //                                .Where(x => x.Competition.Id == comp.Id).First().Average,
+        //                MembershipNumber = membershipID,
+        //                Username = username,
+        //                HoursAward = CheckAward.Hours(),
+        //                TotalAward = CheckAward.Total(competitionsUserPartakesIn
+        //                                .Where(x => x.Competition.Id == comp.Id).First().Total, false),
+        //                AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
+        //                                .Where(x => x.Competition.Id == comp.Id).First().Average), false)
+        //            };
                     
-                    awardCompetitions.Add(awardObject);
-                } else {
-                    AwardObject awardObject = new AwardObject {
-                        CompetitionName = comp.Name,
-                        IsCompetitionLocked = true,
-                        Total = "0",
-                        Accuracy = 0,
-                        MembershipNumber = membershipID,
-                        Username = username,
-                        HoursAward = CheckAward.Hours(),
-                        TotalAward = CheckAward.Total(0, true),
-                        AccuracyAward = CheckAward.Accuracy(0, true)
-                    };
-                    awardCompetitions.Add(awardObject);
-                }
-            }
+        //            awardCompetitions.Add(awardObject);
+        //        } else {
+        //            AwardObject awardObject = new AwardObject {
+        //                CompetitionName = comp.Name,
+        //                IsCompetitionLocked = true,
+        //                Total = "0",
+        //                Accuracy = 0,
+        //                MembershipNumber = membershipID,
+        //                Username = username,
+        //                HoursAward = CheckAward.Hours(),
+        //                TotalAward = CheckAward.Total(0, true),
+        //                AccuracyAward = CheckAward.Accuracy(0, true)
+        //            };
+        //            awardCompetitions.Add(awardObject);
+        //        }
+        //    }
 
-            return awardCompetitions;
-        }
+        //    return awardCompetitions;
+        //}
 
-        [HttpGet("start-time")]
-        public void CountHours() {
+        //[HttpGet("start-time")]
+        //public void CountHours() {
 
-        }
+        //}
     }
 }
