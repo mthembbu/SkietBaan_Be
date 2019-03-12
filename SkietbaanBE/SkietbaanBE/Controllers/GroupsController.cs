@@ -105,18 +105,18 @@ namespace SkietbaanBE.Controllers
         [Route("add")]
         public void AddListUsers([FromBody] CreateGroup createobj)
         {
-            Group groups = new Group();
-            groups.Name = createobj.name;
-            groups.IsActive = true;
+            Group group = new Group();
+            group.Name = createobj.name;
+            group.IsActive = true;
             List<UserGroup> userGroups = new List<UserGroup>();
             for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
                 User dbUser = _context.Users.FirstOrDefault(x => x.Username == createobj.users.ElementAt(i).Username);
-                userGroup.Group = groups;
+                userGroup.Group = group;
                 userGroup.User = dbUser;
                 userGroups.Add(userGroup);
-                _notificationMessages.GroupNotification(_context, groups, dbUser);
+                _notificationMessages.GroupNotification(_context, group, dbUser);
             }
             _context.UserGroups.AddRange(userGroups);
             _context.SaveChanges();
