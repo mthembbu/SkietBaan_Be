@@ -85,11 +85,12 @@ namespace SkietbaanBE.Controllers
                 return BadRequest(ModelState);
             }
             var group = await _context.Groups.SingleOrDefaultAsync(m => m.Id == id);
-            group.IsActive = false;
+            
             if (group == null)
             {
                 return NotFound();
-            }        
+            }
+            group.IsActive = false;
             await _context.SaveChangesAsync();
             return Ok(group);
         }
