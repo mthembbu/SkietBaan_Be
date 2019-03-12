@@ -2,14 +2,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SkietbaanBE.Models {
-    public class UserGroup {
+namespace SkietbaanBE.Models
+{
+    public class UserGroup
+    {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        public virtual User User { get; set; }
+        public int GroupId { get; set; }
+        [Key]
+        public int UserId { get; set; }
+        [ForeignKey("GroupId")]
         public virtual Group Group { get; set; }
-
-      
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; }
     }
 }

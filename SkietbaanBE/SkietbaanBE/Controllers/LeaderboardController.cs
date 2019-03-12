@@ -37,8 +37,8 @@ namespace SkietbaanBE.Controllers
         public LeaderboardFilterData GetLeaderboardFilterData(int userID)
         {
             LeaderboardFilterData leaderboardFilterData = new LeaderboardFilterData();
-            List<Competition> competitions = _context.Competitions.ToList<Competition>();
-            List<Group> groups = _context.Groups.ToList<Group>();
+            List<Competition> competitions = _context.Competitions.Where(c=>c.Status == true).ToList<Competition>();
+            List<Group> groups = _context.Groups.Where(c => c.IsActive == true).ToList<Group>();
             User user = _context.Users.Find(userID);
 
             List<CompetitionLabel> competitionsLabels = new List<CompetitionLabel>();
@@ -126,61 +126,16 @@ namespace SkietbaanBE.Controllers
 
         private List<RankResults> sortAndRank(List<RankResults> rankResults)
         {
-           List<RankResults> results = rankResults.OrderByDescending(x => x.Best).ToList();
-            for(int i = 0; i < results.Count; i++)
+            List<RankResults> results = rankResults.OrderByDescending(x => x.Best).ToList();
+            for (int i = 0; i < results.Count; i++)
             {
                 results.ElementAt(i).Rank = i + 1;
-            }
-            return results;
-        }
-
-        //Get Users Scores stats for a specific competition
-        [HttpGet]
-        public IEnumerable<UserCompStats> GetUsersCompetitionsScores(int competitionID)
-        {
-            List<UserCompStats> userscompStats = new List<UserCompStats>();
-            var competitionScoresQuery = from cust in _context.UserCompStats
-                                         where cust.Competition.Id == competitionID
-                                         select cust;
-            userscompStats = competitionScoresQuery.ToList<UserCompStats>();
-            return userscompStats;
-        }
-        //helper methods
-        public void calculateTotalAverageCompetitionScore()
-        {
-            List<User> users = _context.Users.ToList<User>();
-            for (int u = 0; u < users.Count; u++)
-            {
-                //get current user's competition(where the user has scores)
-                var competitionIDsQuery = from cust in _context.Scores
-                                          where cust.User.Id == users.ElementAt(u).Id
-                                          select cust.Competition.Id;
-                List<int> competitionsIDs = competitionIDsQuery.ToList<int>();
-                for (int c = 0; c < competitionsIDs.Count; c++)
+                if(results.ElementAt(i).Best == 0)
                 {
-                    //get user competition total score
-                    var competitionScoresQuery = from cust in _context.Scores
-                                                 where (cust.User.Id == users.ElementAt(u).Id && cust.Competition.Id == competitionsIDs.ElementAt(c))
-                                                 select cust.UserScore;
-                    List<int> competitionScores = competitionScoresQuery.ToList<int>();
-                    //calculate average
-                    int total = competitionScores.Sum();
-                    //calculate average
-                    double average = (double)total / (double)competitionScores.Count;
-
-                    //get competition object
-                    Competition competition = _context.Competitions.Find(competitionsIDs.ElementAt(c));
-
-                    //update
-                    var userCompStats = _context.UserCompStats.Where(us => us.User.Id == users.ElementAt(u).Id && us.Competition.Id == competitionsIDs.ElementAt(c))
-                                                  .FirstOrDefault<UserCompStats>();
-                    //userCompStats.Total = total;
-                    userCompStats.User = users.ElementAt(u);
-                    //save
-                    _context.UserCompStats.Update(userCompStats);
-                    _context.SaveChanges();
+                    results.ElementAt(i).Rank = 0;
                 }
             }
+            return results;
         }
         private List<RankResults> individualRankings(int competitionID)
         {
@@ -191,7 +146,6 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
-                            User.Id,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
                             UserCompetitionTotalScore.Best
@@ -204,15 +158,19 @@ namespace SkietbaanBE.Controllers
             List<RankResults> ranklist = new List<RankResults>();
             foreach (var item in query)
             {
-                RankResults rankResult = new RankResults();
-                rankResult.Username = item.Username;
-                rankResult.Best = item.Best;
-                rankResult.Total = item.Total;
-                rankResult.Average = item.Average;
-                rankResult.Rank = 0;
-                ranklist.Add(rankResult);
-                //remove user from users without scores
-                users.Remove(item.Username);
+                if (item.Average > 0 && item.Best > 0)
+                {
+                    RankResults rankResult = new RankResults();
+                    rankResult.Username = item.Username;
+                    rankResult.Best = item.Best;
+                    rankResult.Total = item.Total;
+                    rankResult.Average = item.Average;
+                    rankResult.Rank = 0;
+                    ranklist.Add(rankResult);
+                    //remove user from users without scores
+                    users.RemoveAll(x => x.Equals(item.Username));
+                }
+
             }
             for (int i = 0; i < users.Count; i++)
             {
@@ -223,6 +181,8 @@ namespace SkietbaanBE.Controllers
                 tempRankResult.Average = 0;
                 tempRankResult.Rank = 0;
                 ranklist.Add(tempRankResult);
+                //remove user from users if there exist duplicates
+                users.RemoveAll(x => x.Equals(users.ElementAt(i)));
             }
             return ranklist;
         }
@@ -246,17 +206,21 @@ namespace SkietbaanBE.Controllers
             List<RankResults> ranklist = new List<RankResults>();
             foreach (var item in query)
             {
-                RankResults rankResult = new RankResults();
-                rankResult.Username = item.Username;
-                rankResult.Best = item.Best;
-                rankResult.Total = item.Total;
-                rankResult.Average = item.Average;
-                rankResult.Rank = rank;
-                ranklist.Add(rankResult);
-                rank++;
+                if (item.Average > 0 && item.Best > 0)
+                {
+                    RankResults rankResult = new RankResults();
+                    rankResult.Username = item.Username;
+                    rankResult.Best = item.Best;
+                    rankResult.Total = item.Total;
+                    rankResult.Average = item.Average;
+                    rankResult.Rank = rank;
+                    ranklist.Add(rankResult);
+                    rank++;
+                }
             }
             //rank and return results
             return ranklist;
         }
     }
 }
+
