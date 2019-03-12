@@ -27,7 +27,8 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<Group> GetGroups()
         {
-            return _context.Groups;
+            IEnumerable<Group> groups = _context.Groups.Where(g => g.IsActive.Equals(true));
+            return groups;
         }
         // GET: api/Groups/5
         [HttpGet("{id}")]
@@ -82,6 +83,7 @@ namespace SkietbaanBE.Controllers
             {
                 return BadRequest(ModelState);
             }
+            group.IsActive = true;
             _context.Groups.Add(@group);
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
@@ -89,34 +91,18 @@ namespace SkietbaanBE.Controllers
         // DELETE: api/Groups/5
         [HttpPost("{id}")]
         public async Task<IActionResult> DeleteGroup([FromRoute] int id)
-
-        {
-            var query = from Group in _context.Groups
-                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
-                        where (Group.Id == id)
-                        select new
-                        {
-                            UserGroup
-                        };
-            foreach(var item in query)
-            {
-                UserGroup usergroup = new UserGroup();
-                usergroup = item.UserGroup;
-                _context.UserGroups.Remove(usergroup);
-            };
-
+        {   
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             var group = await _context.Groups.SingleOrDefaultAsync(m => m.Id == id);
+            group.IsActive = false;
             if (group == null)
             {
                 return NotFound();
-            }
-            _context.Groups.Remove(group);
+            }        
             await _context.SaveChangesAsync();
-
             return Ok(group);
         }
 
@@ -126,17 +112,19 @@ namespace SkietbaanBE.Controllers
         }
         [HttpPost]
         [Route("add")]
-        public void AddListUsers([FromBody] List<User> users)
+        public void AddListUsers([FromBody] CreateGroup createobj)
         {
-            Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
-           
+            Group group = new Group();
+            group.Name = createobj.name;
+            group.IsActive = true;    
             List<UserGroup> userGroups = new List<UserGroup>();
-            for (int i = 0; i < users.Count; i++)
+            for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Username == users.ElementAt(i).Username);
+                User dbUser = _context.Users.FirstOrDefault(x => x.Username == createobj.users.ElementAt(i).Username);
                 userGroup.Group = group;
                 userGroup.User = dbUser;
+                userGroup.active = true;
                 userGroups.Add(userGroup);
                 _notificationMessages.GroupNotification(_context, group, dbUser);
             }
@@ -146,13 +134,13 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet]
         [Route("list")]
-        public List<User> getGroups(int id)
+        public List<User> getUsersThatAreNotInTheGroup(int id)
         {
             List<User> users = new List<User>();
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
-                        where (Group.Id == id)
+                        where (Group.Id == id && UserGroup.active.Equals(true))
                         select new
                         {
                             User
@@ -163,7 +151,8 @@ namespace SkietbaanBE.Controllers
                 foreach (var item in query)
                 {
                     User user = new User();
-                    user = item.User; users.Add(user);
+                    user = item.User;
+                    users.Add(user);
                 }
             }
             var result = (qry).Except(users);
@@ -177,7 +166,7 @@ namespace SkietbaanBE.Controllers
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
-                        where (Group.Id == id)
+                        where (Group.Id == id && UserGroup.active.Equals(true))
                         select new
                         {
                             User  
@@ -185,10 +174,8 @@ namespace SkietbaanBE.Controllers
             foreach (var item in query)
             {
                 User user = new User();
-                user = item.User; users.Add(user);
-                
+                user = item.User; users.Add(user);             
             }
-
             return users;
         }
 
@@ -204,7 +191,7 @@ namespace SkietbaanBE.Controllers
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
-                        where (Group.Id == usersobj.GroupIds)
+                        where (Group.Id == usersobj.GroupIds && UserGroup.active.Equals(true))
                         select new
                         {
                          UserGroup,
@@ -218,9 +205,7 @@ namespace SkietbaanBE.Controllers
                 {
                     if (userss.Contains(item.User.Token))
                     {
-                        UserGroup user = new UserGroup();
-                        user = item.UserGroup;
-                        _context.UserGroups.Remove(user);
+                        item.UserGroup.active=false;
                         _context.SaveChanges();
                     }
                 }
@@ -238,6 +223,7 @@ namespace SkietbaanBE.Controllers
                 UserGroup userGroup = new UserGroup();
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == usersobj.users.ElementAt(i).Token);
                 userGroup.Group = group;
+                userGroup.active = true;
                 userGroup.User = dbUser;
                 _context.UserGroups.Add(userGroup);
                 _context.SaveChanges();
