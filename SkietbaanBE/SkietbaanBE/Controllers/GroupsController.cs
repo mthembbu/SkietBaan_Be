@@ -113,20 +113,35 @@ namespace SkietbaanBE.Controllers
         {
             return _context.Groups.Any(e => e.Id == id);
         }
-        
+
         //creating groups and adding members to the groups
         [HttpPost]
         [Route("add")]
         public void AddListUsers([FromBody] CreateGroup createobj)
         {
-            Group group = (_context.Groups.ToArray())[_context.Groups.ToArray().Length - 1];
+            Group group = new Group();
+            group.Name = createobj.name;
+            group.IsActive = true;
+            Group tempGroup = _context.Groups.Where(g => g.Name.Equals(group.Name)).FirstOrDefault<Group>();
+            if (tempGroup == null)
+            {
+                _context.Groups.Add(group);
+                _context.SaveChanges();
+                group = _context.Groups.Where(g => g.Name.Equals(group.Name)).FirstOrDefault<Group>();
+            }
+            else
+            {
+                group = tempGroup;
+            }
+
             List<UserGroup> userGroups = new List<UserGroup>();
             for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
                 User dbUser = _context.Users.FirstOrDefault(x => x.Username == createobj.users.ElementAt(i).Username);
-                userGroup.Group = group;
-                userGroup.User = dbUser;
+
+                userGroup.GroupId = group.Id;
+                userGroup.UserId = dbUser.Id;
                 userGroups.Add(userGroup);
                 _notificationMessages.GroupNotification(_context, group, dbUser);
             }
@@ -143,7 +158,7 @@ namespace SkietbaanBE.Controllers
             var query = from Group in _context.Groups
                         join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
                         join User in _context.Users on UserGroup.User.Id equals User.Id
-                        where (Group.Id == id )
+                        where (Group.Id == id)
                         select new
                         {
                             User
@@ -210,6 +225,7 @@ namespace SkietbaanBE.Controllers
                 {
                     if (userss.Contains(item.User.Token))
                     {
+                        _context.UserGroups.Remove(item.UserGroup);
                         _context.SaveChanges();
                     }
                 }
@@ -226,7 +242,7 @@ namespace SkietbaanBE.Controllers
                 UserGroup userGroup = new UserGroup();
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == usersobj.users.ElementAt(i).Token);
                 userGroup.Group = group;
-      
+
                 userGroup.User = dbUser;
                 _context.UserGroups.Add(userGroup);
                 _context.SaveChanges();
