@@ -8,7 +8,7 @@ namespace SkietbaanBE.Lib {
         private static string awardRequirements = "Total:gold 90,silver 80,bronze 70\n" +
                                             "Hours:gold 100,silver 70,bronze 50\n" +
                                             "Accuracy:gold 95,silver 85,bronze 75";
-        public static TotalAward Total(int total, bool isLocked) {
+        public static TotalAward Total(double total, bool isLocked) {
             TotalAward totalAward = new TotalAward();
             if (!isLocked) {
                 var requirements = ReadAwardsRules()["Total"];
@@ -29,7 +29,7 @@ namespace SkietbaanBE.Lib {
             return totalAward;
         }
 
-        public static AccuracyAward Accuracy(int compAccuracy, bool isLocked) {
+        public static AccuracyAward Accuracy(double compAccuracy, bool isLocked) {
             AccuracyAward accuracyAward = new AccuracyAward();
             if (!isLocked) {
                 var requirements = ReadAwardsRules()["Accuracy"];
@@ -52,17 +52,6 @@ namespace SkietbaanBE.Lib {
         }
 
         public static HoursAward Hours() {
-            /*HoursAward hours = new HoursAward();
-            var requirements = ReadAwardsRules("award_rules.txt")["Hours"];
-            foreach (string req in requirements.Split(',')) {
-                if (req.Contains("gold")) {
-                    hours.gold = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                } else if (req.Contains("silver")) {
-                    hours.silver = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                } else {
-                    hours.bronze = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                }
-            }*/
             HoursAward hours = new HoursAward {
                 Gold = false,
                 Bronze = false,
