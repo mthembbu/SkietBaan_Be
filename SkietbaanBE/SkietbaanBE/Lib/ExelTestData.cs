@@ -21,7 +21,7 @@ namespace SkietbaanBE.Lib
         public List<ExelData> getExelData()
         {
             string testData = "";
-            string filePath = @"C:\Users\Sibusiso Malatji\source\repos\SkietBaan_Be\SkietbaanBE\SkietbaanBE\Lib\SkietbaanData.xlsx";
+            string filePath = @"SkietbaanTestData.xlsx";
             FileInfo file = new FileInfo(filePath);
             List<ExelData> exelDataList = new List<ExelData>();
             using(ExcelPackage package = new ExcelPackage(file))
@@ -84,7 +84,7 @@ namespace SkietbaanBE.Lib
                     competitions.Add(competition);
                 }
             }
-
+            
             _context.Competitions.AddRange(competitions);
             _context.SaveChanges();
             return competitions;
@@ -103,10 +103,13 @@ namespace SkietbaanBE.Lib
                     UserScore = listData.ElementAt(i).Score,
                     UploadDate = listData.ElementAt(i).ScoreEntryDate,
                 };
-                scores.Add(score);
+                //scores.Add(score);
+                _context.Scores.Add(score);
+                _context.SaveChanges();
+                Calculations calc = new Calculations(_context);
+                calc.performCalculations(score.User.Id, score.Competition.Id);
             }
-            _context.Scores.AddRange(scores);
-            _context.SaveChanges();
+
         }
         private bool UserExist(List<User> users,User user)
         {
@@ -152,10 +155,10 @@ namespace SkietbaanBE.Lib
                         return value;
                     }
                 }
-                else if (int.Parse(value) > 100)
+                /*else if (int.Parse(value) > 100)
                 {
                     return "100";
-                }
+                }*/
                 else
                 {
                     return value;

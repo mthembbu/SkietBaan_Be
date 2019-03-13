@@ -14,30 +14,43 @@ namespace SkietbaanBE.Lib
             _context = contex;
         }
 
-        private List<double> YearBestScores(int userID, int competitionID)
+        private YearScores GetYearScores(int userID, int competitionID)
         {
             List<double> listBestScores = new List<double>();
+            List<double> listYearAllScores = new List<double>();
+            int year = 0;
             for (int i = 1; i < 13; i++)
             {
                 var query = from Scores in _context.Scores
                             where (Scores.User.Id == userID && Scores.Competition.Id == competitionID && Scores.UploadDate.Value.Month == i)
                             select new
                             {
-                                Scores.UserScore
+                                Scores.UserScore,
+                               // Scores.UploadDate.Value.Year
                             };
                 List<double> listScores = new List<double>();
                 foreach (var item in query)
                 {
                     listScores.Add(item.UserScore);
+                   // year = item.Year;
                 }
                 if (listScores.Count > 0)
                 {
                     listScores.Sort();
                     listBestScores.Add(listScores.Last());
+                    listYearAllScores.AddRange(listScores);
                 }
 
+
             }
-            return listBestScores;
+
+            YearScores yearScores = new YearScores();
+            yearScores.listYearBest = listBestScores;
+            yearScores.listYearScores = listYearAllScores;
+            if(listBestScores.Count > 0 && listYearAllScores.Count > 0) {
+                yearScores.Year = year;
+            }
+            return yearScores;
         }
         public void performCalculations(int userID,int competitionID)
         {
@@ -45,12 +58,13 @@ namespace SkietbaanBE.Lib
             
             Competition competition = _context.Competitions.Where(c => c.Id == competitionID).FirstOrDefault<Competition>();
 
-            List<double> bestScores = YearBestScores(userID, competitionID).TakeLast(competition.BestScoresNumber).ToList<double>();
+            YearScores yearScores = GetYearScores(userID, competitionID);
+            List<double> bestScores= yearScores.listYearBest.TakeLast(competition.BestScoresNumber).ToList<double>();
             //calculate total
-            double total = bestScores.Sum();
-            double average = total / competition.BestScoresNumber;
-            double best = bestScores.Last();
-
+            double total = Math.Round(bestScores.Sum() / competition.BestScoresNumber,2);
+            double average = Math.Round(yearScores.listYearScores.Sum() / yearScores.listYearScores.Count,2);
+            double best = Math.Round(bestScores.Last(),2);
+            //int year = yearScores.Year;
             UserCompetitionTotalScore stats = _context.UserCompetitionTotalScores
                                                       .Where(u => u.UserId == userID && u.CompetitionId == competitionID)
                                                       .FirstOrDefault<UserCompetitionTotalScore>();
@@ -76,5 +90,6 @@ namespace SkietbaanBE.Lib
                 _context.SaveChanges();
             }
         }
+        
     }
 }
