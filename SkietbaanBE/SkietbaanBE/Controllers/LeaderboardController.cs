@@ -67,6 +67,18 @@ namespace SkietbaanBE.Controllers
             return leaderboardFilterData;
         }
         [HttpGet]
+        public string CalcAll() {
+
+            List<UserCompetitionTotalScore> stats = _context.UserCompetitionTotalScores.ToList<UserCompetitionTotalScore>();
+            for(int i = 0; i < stats.Count; i++) {
+
+                new Calculations(_context).
+                                    performCalculations(stats.ElementAt(i).UserId, stats.ElementAt(i).CompetitionId);
+
+            }
+            return "success";
+        }
+        [HttpGet]
         public LeaderboardResults GetLeaderboardRankings(int competitionID, int groupID, string userToken)
         {
             //from arry index to data base ID;
@@ -186,6 +198,7 @@ namespace SkietbaanBE.Controllers
             }
             return ranklist;
         }
+       
         private List<RankResults> groupRankings(int competitionID, int groupID)
         {
             var query = from Group in _context.Groups
