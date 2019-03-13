@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SkietbaanBE.Models {
     public class UserCompetitionTotalScore {
+
         [Key]
         public int CompetitionId { get; set; }
         [Key]
@@ -14,5 +16,6 @@ namespace SkietbaanBE.Models {
         public double Best { get; set; }
         public double Total { get; set; }
         public double Average { get; set; }
+        public int Year { get; set; }
     }
 }
