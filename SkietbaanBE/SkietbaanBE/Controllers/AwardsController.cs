@@ -43,7 +43,6 @@ namespace SkietbaanBE.Controllers
                 return awardCompetitions;
             }
 
-
             var competitionsUserPartakesIn = from UserCompetitionTotalScore in context.UserCompetitionTotalScores
                                              where (UserCompetitionTotalScore.User.Token == token)
                                              select new {
@@ -51,8 +50,8 @@ namespace SkietbaanBE.Controllers
                                                  UserCompetitionTotalScore.Average,
                                                  UserCompetitionTotalScore.Total
                                              };
-            foreach(var comp in context.Competitions) {
-                if(competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
+            foreach (var comp in context.Competitions) {
+                if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
                     AwardObject awardObject = new AwardObject {
                         CompetitionName = comp.Name,
                         IsCompetitionLocked = false,
@@ -68,7 +67,7 @@ namespace SkietbaanBE.Controllers
                         AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
                                         .Where(x => x.Competition.Id == comp.Id).First().Average), false)
                     };
-                    
+
                     awardCompetitions.Add(awardObject);
                 } else {
                     AwardObject awardObject = new AwardObject {
@@ -87,11 +86,6 @@ namespace SkietbaanBE.Controllers
             }
 
             return awardCompetitions;
-        }
-
-        [HttpGet("start-time")]
-        public void CountHours() {
-
         }
     }
 }

@@ -9,8 +9,8 @@ namespace SkietbaanBE.Lib
     {
         public int Rank { get; set; }
         public string Username { get; set; }
-        public int Best { get; set; }
-        public int Total { get; set; }
+        public double Best { get; set; }
+        public double Total { get; set; }
         public double Average { get; set; }
         public bool IsIncreasing { get; set; }
     }
