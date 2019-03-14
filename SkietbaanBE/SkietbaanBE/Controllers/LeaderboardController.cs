@@ -98,7 +98,7 @@ namespace SkietbaanBE.Controllers
             leaderboardResults.RankResults = sortAndRank(rankResults);
 
             //Current User's results
-            User currentUser = new FeaturesController(_context).GetUserByToken(userToken);
+            User currentUser = new FeaturesController(_context, null).GetUserByToken(userToken);
             //find current user in ranking results
             if (currentUser != null)
             {

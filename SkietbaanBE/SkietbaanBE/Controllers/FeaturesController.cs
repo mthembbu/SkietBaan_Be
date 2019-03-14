@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SkietbaanBE.Helper;
 using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 
@@ -14,9 +15,11 @@ namespace SkietbaanBE.Controllers
     public class FeaturesController : Controller
     {
         private ModelsContext _context;
-        public FeaturesController(ModelsContext db)
+        private NotificationMessages _notificationMessage;
+        public FeaturesController(ModelsContext db, NotificationMessages notificationMessage)
         {
             _context = db;
+            _notificationMessage = notificationMessage;
         }
         //api/features/getuserbytoken/{token}
         [HttpGet("{token}")]
@@ -131,6 +134,7 @@ namespace SkietbaanBE.Controllers
              dbUser.MemberExpiryDate = user.MemberExpiryDate;
              _context.Users.Update(dbUser);
              await _context.SaveChangesAsync();
+            _notificationMessage.ConfirmationNotification(_context, dbUser);
              return Ok("User update successful");
         }
         [HttpGet]

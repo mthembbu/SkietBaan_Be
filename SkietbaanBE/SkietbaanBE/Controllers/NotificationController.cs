@@ -10,7 +10,7 @@ using SkietbaanBE.Models;
 namespace SkietbaanBE.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Notification")]
+    [Route("api/[Controller]/[Action]")]
     public class NotificationController : Controller
     {
         private ModelsContext _context;
@@ -63,6 +63,7 @@ namespace SkietbaanBE.Controllers
             return await _context.Notifications.FindAsync(id);
         }
 
+
         public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
             var notifications = _context.Notifications.Where(x => x.User.Token == token);
@@ -74,9 +75,17 @@ namespace SkietbaanBE.Controllers
                 return null;
         }
 
+        [HttpGet]
+        public int GetNumberOfNotifications(string token)
+        {
+            var notificationsList = GetNotificationsByUser(token);  
+            var unReadNotifications = notificationsList.Where(x => x.IsRead == false);
+            return unReadNotifications.Count();
+        }
+
         [HttpPost("{id}")]
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteNotificationById(int id)
         {
             var notification = await GetNotificationById(id);
            _context.Notifications.Remove(notification);
