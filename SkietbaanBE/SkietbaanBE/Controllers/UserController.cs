@@ -24,12 +24,10 @@ namespace SkietbaanBE.Controllers
     {
         private ModelsContext _context;
         private IConfiguration _config;
-        private NotificationMessages _notificationMessages;
-        public UserController(ModelsContext db, IConfiguration config, NotificationMessages notificationMessages)
+        public UserController(ModelsContext db, IConfiguration config)
         {
             _context = db;
             _config = config;
-            _notificationMessages = notificationMessages;
         }
 
         // GET: api/User
@@ -71,9 +69,6 @@ namespace SkietbaanBE.Controllers
                 user.Token = tokenString;
                 //Save User
                  await _context.AddAsync(user);
-
-
-                _notificationMessages.ConfirmationNotification(_context, user);
 
                 new OkObjectResult("User saved successfully");
             }
