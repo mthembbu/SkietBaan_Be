@@ -69,6 +69,7 @@ namespace SkietbaanBE.Controllers
                 user.Token = tokenString;
                 //Save User
                  await _context.AddAsync(user);
+                _context.SaveChanges();
 
                 new OkObjectResult("User saved successfully");
             }
