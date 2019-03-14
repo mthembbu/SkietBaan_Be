@@ -1,205 +1,204 @@
-﻿<!-- saved from url=(0071)https://www.freecodecamp.org/certification/nadeemgorsi/legacy-front-end -->
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./legacy-front-end_files/bootstrap.min.css">
-    <style>
-        @font-face {
-            font-family: "Sax Mono";
-            src: url("/fonts/saxmono.ttf") format("truetype");
-        }
 
-        .row {
-            margin: 30px;
-        }
+<!-- saved from url=(0071)https://www.freecodecamp.org/certification/nadeemgorsi/legacy-front-end -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="./legacy-front-end_files/bootstrap.min.css"><style>@font-face {
+  font-family: "Sax Mono";
+  src: url("/fonts/saxmono.ttf") format("truetype");
+}
 
-        header {
-            width: 1500px;
-            height: 100px;
-            background-color: red;
-        }
+* {
+  margin: 0;
+  padding: 0;
+}
 
-        .logo {
-            display: flex;
-            align-items: center;
-            height: 140px;
-            margin-left: 100px;
-        }
+.container {
+  max-width: 1500px;
+  width: 100%;
+  padding: 30px;
+  border: darkgreen 15px solid;
+  border-radius: 3px;
+}
 
-            .logo img {
-                max-width: 500px;
-                width: 100%;
-            }
+.row {
+  margin: 0;
+}
 
-        .center-in-body {
-            align-content: center;
-            text-align: center;
-            height:1000px;
-            background-color: #efefef;
-        }
+.col-sm-12 {
+  padding: 0;
+}
 
-        .issue-date {
-            line-height: 140px;
-            font-size: 20px;
-            text-align: right;
-            margin-right: 100px;
-            color: #fff;
-        }
+.certificate-wrapper {
+  top: 0;
+  position: relative;
+  font-family: "Sax Mono", monospace;
+}
 
-        .information {
-            margin-top: -20px;
-            width: 1295px;
-            height: 380px;
-            text-align: center;
-            background-color: #efefef;
-        }
+header {
+  width: 100%;
+  height: 140px;
+  /*background-image: url('https://i.imgur.com/1FK6aaN.png');
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: cover;*/
+  background-color: darkgreen;
+}
 
-        .information-container {
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
-            margin: 0px 100px;
-        }
+.logo {
+  display: flex;
+  align-items: center;
+  height: 140px;
+  margin-left: 100px;
+}
 
-        h3 {
-            font-size: 30px;
-        }
+.logo img {
+  max-width: 500px;
+  width: 100%;
+}
 
-        h4 {
-            margin-top: 25px;
-            font-size: 20px;
-        }
+.issue-date {
+  line-height: 140px;
+  font-size: 20px;
+  text-align: right;
+  margin-right: 100px;
+  color: #fff;
+}
 
-        h1 {
-            font-size: 40px;
-            color: #006400;
-        }
+.information {
+  margin-top: -20px;
+  height: 380px;
+  text-align: center;
+  background-color: #efefef;
+}
 
-        .signatures {
-            text-align: center;
-            width: 1295px;
-            height: 300px;
-            background-color: #efefef;
-        }
+.information-container {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0px 100px;
+}
 
-            .signatures img {
-                max-width: 300px;
-                width: 100%;
-            }
+p {
+  margin: 0;
+}
 
-            .signatures p {
-                font-size: 18px;
-                padding-top: 10px;
-            }
+h3  {
+  font-size: 30px;
+}
 
-        .verify {
-            padding: 30px 0;
-            font-size: 15px;
-            text-align: center;
-            word-wrap: break-word;
-            background-color: #efefef;
-        }
+h4 {
+  margin-top: 25px;
+  font-size: 20px;
+}
 
-        .logo {
-            margin-left: 0;
-            padding: 20px;
-            justify-content: center;
-            height: 80px;
-        }
+h1 {
+  font-size: 40px;
+  color: #006400;
+}
 
-            .logo img {
-                margin-top: 20px;
-            }
+.signatures {
+  text-align: center;
+  margin: 0 auto;
+  background-color: #efefef;
+}
 
-        .issue-date {
-            margin-top: 10px;
-            margin-right: 0;
-            text-align: center;
-            line-height: 0px;
-            word-wrap: break-word;
-        }
+.signatures img {
+  max-width: 300px;
+  width: 100%;
+  margin: 0 auto;
+}
 
-            .issue-date strong {
-                display: block;
-                margin-top: 15px;
-                line-height: 25px;
-            }
+.signatures p {
+  font-size: 18px;
+  padding-top: 10px;
+}
 
-        .information {
-            height: 300px;
-        }
+.verify {
+  padding: 30px 0;
+  font-size: 15px;
+  text-align: center;
+  word-wrap: break-word;
+  background-color: #efefef;
+}
 
-        .information-container {
-            margin: 0px 15px;
-            text-align: center;
-            word-wrap: break-word;
-        }
+/*adds vertical alignment when the height is bigger than required to display everything*/
+@media screen and (min-height: 700px) {
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+  }
+}
 
-        .container {
-            padding-left: 230px;
-            padding-top: 40px;
-            padding-bottom: 40px;
-        }
+/*mobile media queries*/
+@media screen and (max-width: 992px) {
+  header {
+    height: 160px;
+  }
 
-        h3 {
-            font-size: 25px;
-        }
+  .logo {
+    margin-left: 0;
+    padding: 20px;
+    justify-content: center;
+    height: 80px;
+  }
 
-        h1 {
-            font-size: 28px;
-        }
+  .logo img {
+    margin-top: 20px;
+  }
 
-        }
+  .issue-date {
+    margin-top: 10px;
+    margin-right: 0;
+    text-align: center;
+    line-height: 0px;
+    word-wrap: break-word;
+  }
 
-        header {
-            height: 190px;
-        }
+  .issue-date strong {
+    display: block;
+    margin-top: 15px;
+    line-height: 25px;
+  }
 
-        h3 {
-            font-size: 15px;
-        }
+  .information {
+    height: 300px;
+  }
 
-        h1 {
-            font-size: 17px;
-        }
+  .information-container {
+    margin: 0px 15px;
+    text-align: center;
+    word-wrap: break-word;
+  }
 
-        h4 {
-            font-size: 15px;
-            margin-top: 20px;
-        }
-    </style>
+  h3 {
+    font-size: 25px;
+  }
 
-</head>
+  h1  {
+    font-size: 28px;
+  }
+}
 
-<body class="center-in-body">
-    <div>
-        <div>
-            <header>
-                <div class="col-md-5 col-sm-12">
+@media screen and (max-width: 675px) {
+  .container {
+    padding: 0;
+    border: 0;
+  }
 
-                </div>
-            </header>
+  header {
+    height: 190px;
+  }
 
-            <section class="information">
-                <div class="information-container">
-                    <h3>This certifies that</h3>
-                    <h1><strong>Nadeem</strong></h1>
-                    <h3>has successfully completed Skietbaan</h3>
-                    <h1><strong>Front End Development</strong></h1>
-                </div>
-            </section>
+  h3 {
+    font-size: 15px;
+  }
 
-            <footer>
-                <div class="signatures">
-                    <p><strong>Francious Scheffer</strong></p>
-                    <p>Executive Director, Skietbann</p>
-                    <br>
-                    <br>
-                    <br>
-                </div>
-            </footer>
-        </div>
-    </div>
-</body>
-</html>
+  h1  {
+    font-size: 17px;
+  }
+
+  h4 {
+    font-size: 15px;
+    margin-top: 20px;
+  }
+}</style></head><body><div class="certificate-wrapper container"><div class="row"><header><div class="col-md-5 col-sm-12"><div class="logo"><img src="./legacy-front-end_files/freecodecamp_logo.svg" alt="freeCodeCamp&#39;s Logo" class="img-responsive"></div></div><div class="col-md-7 col-sm-12"><div class="issue-date">Issued&nbsp;<strong>June 24, 2018</strong></div></div></header><section class="information"><div class="information-container"><h3>This certifies that</h3><h1><strong>Nadeem Gorsi</strong></h1><h3>has successfully completed freeCodeCamp's</h3><h1><strong>Front End Development</strong></h1><h4>Certification, representing approximately 400 hours of coursework</h4></div></section><footer><div class="row signatures"><img src="./legacy-front-end_files/OJFVJKg.png" alt="Quincy Larson&#39;s Signature" class="img-responsive"><p><strong>Quincy Larson</strong></p><p>Executive Director, freeCodeCamp.org</p></div><div class="row"><p class="verify">Verify this certification at: https://www.freecodecamp.org/certification/nadeemgorsi/legacy-front-end</p></div></footer></div></div></body></html>

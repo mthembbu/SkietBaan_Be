@@ -7,13 +7,9 @@ using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 using System.Net;
 using System.Net.Mail;
-using iTextSharp;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
+
 using System.IO;
-using iTextSharp.text.html.simpleparser;
-using Microsoft.AspNetCore.Http;
-using IronPdf;
+
 using System.Xml.Linq;
 using System.Xml;
 using System.Text.RegularExpressions;
@@ -45,7 +41,7 @@ namespace SkietbaanBE.Controllers
                 StreamReader streamReader;
                 MemoryStream memoryStream = new MemoryStream();
 
-                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() +"/Controllers/Documents/edit.htm");
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "/Controllers/Documents/Certificate.html");
 
                 if(streamReader != null)
                 {
@@ -58,7 +54,7 @@ namespace SkietbaanBE.Controllers
                     var content1 = content.Replace("Nadeem", Member.Username)
                         .Replace("Front End Development", "Letter Of Status");
 
-                    SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                    HtmlToPdf converter = new HtmlToPdf();
                     converter.Options.PdfPageSize = PdfPageSize.A4;
                     converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
                     converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
@@ -102,7 +98,7 @@ namespace SkietbaanBE.Controllers
 
             StreamReader streamReader;
 
-            streamReader = new StreamReader("./Controllers/Documents/edit.htm");
+            streamReader = new StreamReader("./Controllers/Documents/Certificate.html");
 
             string content = streamReader.ReadToEnd();
 
@@ -110,8 +106,9 @@ namespace SkietbaanBE.Controllers
 
             streamReader.Close();
 
-            var content1 = content.Replace("Nadeem", Member.Username)
-                .Replace("Front End Development", "Letter Of Good Standing"); ;
+            var content1 = content.Replace("Name", Member.Username)
+                .Replace("Type", "Letter Of Good Standing")
+                .Replace("Date", "December 2019"); 
 
             SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
             converter.Options.PdfPageSize = PdfPageSize.A4;
