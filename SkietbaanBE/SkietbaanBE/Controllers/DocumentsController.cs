@@ -59,8 +59,14 @@ namespace SkietbaanBE.Controllers
                         .Replace("Front End Development", "Letter Of Status");
 
                     SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                    converter.Options.PdfPageSize = PdfPageSize.A4;
+                    converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+                    converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                    converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit; ;
+
                     SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
 
+                
                     doc.Save(memoryStream);
 
                     byte[] bytes = memoryStream.ToArray();
@@ -109,10 +115,10 @@ namespace SkietbaanBE.Controllers
 
             SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
             converter.Options.PdfPageSize = PdfPageSize.A4;
-            converter.Options.MarginLeft = 10;
-            converter.Options.MarginRight = 10;
-            converter.Options.MarginTop = 20;
-            converter.Options.MarginBottom = 20;
+            converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+            converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+            converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
+  
             SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
 
             doc.Save(memoryStream);
@@ -123,7 +129,7 @@ namespace SkietbaanBE.Controllers
 
             
 
-            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "Prueba.pdf"));
+            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "LOGS.pdf"));
 
             doc.Close();
         }

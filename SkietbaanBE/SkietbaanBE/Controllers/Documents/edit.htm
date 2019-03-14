@@ -1,236 +1,205 @@
-﻿
-<!-- saved from url=(0071)https://www.freecodecamp.org/certification/nadeemgorsi/legacy-front-end -->
+﻿<!-- saved from url=(0071)https://www.freecodecamp.org/certification/nadeemgorsi/legacy-front-end -->
 <html>
-	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="./legacy-front-end_files/bootstrap.min.css"><style>@font-face {
-  font-family: "Sax Mono";
-  src: url("/fonts/saxmono.ttf") format("truetype");
-}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./legacy-front-end_files/bootstrap.min.css">
+    <style>
+        @font-face {
+            font-family: "Sax Mono";
+            src: url("/fonts/saxmono.ttf") format("truetype");
+        }
 
-* {
-  margin: 0;
-  padding: 0;
-}
+        .row {
+            margin: 30px;
+        }
 
-.container {
-  max-width: 1500px;
-  width: 100%;
-  padding: 30px;
-  border: darkgreen 15px solid;
-  border-radius: 3px;
-}
+        header {
+            width: 1500px;
+            height: 100px;
+            background-color: red;
+        }
 
-.row {
-  margin: 0;
-}
+        .logo {
+            display: flex;
+            align-items: center;
+            height: 140px;
+            margin-left: 100px;
+        }
 
-.col-sm-12 {
-  padding: 0;
-}
+            .logo img {
+                max-width: 500px;
+                width: 100%;
+            }
 
-.certificate-wrapper {
-  top: 0;
-  position: relative;
-  font-family: "Sax Mono", monospace;
-}
+        .center-in-body {
+            align-content: center;
+            text-align: center;
+            height:1000px;
+            background-color: #efefef;
+        }
 
-header {
-  width: 100%;
-  height: 140px;
-  /*background-image: url('https://i.imgur.com/1FK6aaN.png');
-  background-repeat: no-repeat;
-  background-position: top;
-  background-size: cover;*/
-  background-color: darkgreen;
-}
+        .issue-date {
+            line-height: 140px;
+            font-size: 20px;
+            text-align: right;
+            margin-right: 100px;
+            color: #fff;
+        }
 
-.logo {
-  display: flex;
-  align-items: center;
-  height: 140px;
-  margin-left: 100px;
-}
+        .information {
+            margin-top: -20px;
+            width: 1295px;
+            height: 380px;
+            text-align: center;
+            background-color: #efefef;
+        }
 
-.logo img {
-  max-width: 500px;
-  width: 100%;
-}
+        .information-container {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            margin: 0px 100px;
+        }
 
-.issue-date {
-  line-height: 140px;
-  font-size: 20px;
-  text-align: right;
-  margin-right: 100px;
-  color: #fff;
-}
+        h3 {
+            font-size: 30px;
+        }
 
-.information {
-  margin-top: -20px;
-  height: 380px;
-  text-align: center;
-  background-color: #efefef;
-}
+        h4 {
+            margin-top: 25px;
+            font-size: 20px;
+        }
 
-.information-container {
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  margin: 0px 100px;
-}
+        h1 {
+            font-size: 40px;
+            color: #006400;
+        }
 
-p {
-  margin: 0;
-}
+        .signatures {
+            text-align: center;
+            width: 1295px;
+            height: 300px;
+            background-color: #efefef;
+        }
 
-h3  {
-  font-size: 30px;
-}
+            .signatures img {
+                max-width: 300px;
+                width: 100%;
+            }
 
-h4 {
-  margin-top: 25px;
-  font-size: 20px;
-}
+            .signatures p {
+                font-size: 18px;
+                padding-top: 10px;
+            }
 
-h1 {
-  font-size: 40px;
-  color: #006400;
-}
+        .verify {
+            padding: 30px 0;
+            font-size: 15px;
+            text-align: center;
+            word-wrap: break-word;
+            background-color: #efefef;
+        }
 
-.signatures {
-  text-align: center;
-  margin: 0 auto;
-  background-color: #efefef;
-}
+        .logo {
+            margin-left: 0;
+            padding: 20px;
+            justify-content: center;
+            height: 80px;
+        }
 
-.signatures img {
-  max-width: 300px;
-  width: 100%;
-  margin: 0 auto;
-}
+            .logo img {
+                margin-top: 20px;
+            }
 
-.signatures p {
-  font-size: 18px;
-  padding-top: 10px;
-}
+        .issue-date {
+            margin-top: 10px;
+            margin-right: 0;
+            text-align: center;
+            line-height: 0px;
+            word-wrap: break-word;
+        }
 
-.verify {
-  padding: 30px 0;
-  font-size: 15px;
-  text-align: center;
-  word-wrap: break-word;
-  background-color: #efefef;
-}
+            .issue-date strong {
+                display: block;
+                margin-top: 15px;
+                line-height: 25px;
+            }
 
-/*adds vertical alignment when the height is bigger than required to display everything*/
-@media screen and (min-height: 700px) {
-  body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100vh;
-  }
-}
+        .information {
+            height: 300px;
+        }
 
-/*mobile media queries*/
-@media screen and (max-width: 992px) {
-  header {
-    height: 160px;
-  }
+        .information-container {
+            margin: 0px 15px;
+            text-align: center;
+            word-wrap: break-word;
+        }
 
-  .logo {
-    margin-left: 0;
-    padding: 20px;
-    justify-content: center;
-    height: 80px;
-  }
+        .container {
+            padding-left: 230px;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
 
-  .logo img {
-    margin-top: 20px;
-  }
+        h3 {
+            font-size: 25px;
+        }
 
-  .issue-date {
-    margin-top: 10px;
-    margin-right: 0;
-    text-align: center;
-    line-height: 0px;
-    word-wrap: break-word;
-  }
+        h1 {
+            font-size: 28px;
+        }
 
-  .issue-date strong {
-    display: block;
-    margin-top: 15px;
-    line-height: 25px;
-  }
+        }
 
-  .information {
-    height: 300px;
-  }
+        header {
+            height: 190px;
+        }
 
-  .information-container {
-    margin: 0px 15px;
-    text-align: center;
-    word-wrap: break-word;
-  }
+        h3 {
+            font-size: 15px;
+        }
 
-  h3 {
-    font-size: 25px;
-  }
+        h1 {
+            font-size: 17px;
+        }
 
-  h1  {
-    font-size: 28px;
-  }
-}
-
-@media screen and (max-width: 675px) {
-  .container {
-    padding: 0;
-    border: 0;
-  }
-
-  header {
-    height: 190px;
-  }
-
-  h3 {
-    font-size: 15px;
-  }
-
-  h1  {
-    font-size: 17px;
-  }
-
-  h4 {
-    font-size: 15px;
-    margin-top: 20px;
-  }
-}</style>
+        h4 {
+            font-size: 15px;
+            margin-top: 20px;
+        }
+    </style>
 
 </head>
 
-<body>
-	<div class="certificate-wrapper container">
-	<div class="row">
-	<header>
-		<div class="col-md-5 col-sm-12">
-		</div>
-	</header>
-	
-	<section class="information">
-	<div class="information-container">
-	<h3>This certifies that</h3>
-	<h1><strong>Nadeem</strong></h1>
-	<h3>has successfully completed Skietbaan</h3>
-	<h1><strong>Front End Development</strong></h1>
-	</div></section>
-	
-	<footer>
-		<div class="row signatures">
-		<p><strong>Francious Scheffer</strong></p>
-		<p>Executive Director, Skietbann</p></div>	
-	</footer>
-	</div>
-	</div>
+<body class="center-in-body">
+    <div>
+        <div>
+            <header>
+                <div class="col-md-5 col-sm-12">
+
+                </div>
+            </header>
+
+            <section class="information">
+                <div class="information-container">
+                    <h3>This certifies that</h3>
+                    <h1><strong>Nadeem</strong></h1>
+                    <h3>has successfully completed Skietbaan</h3>
+                    <h1><strong>Front End Development</strong></h1>
+                </div>
+            </section>
+
+            <footer>
+                <div class="signatures">
+                    <p><strong>Francious Scheffer</strong></p>
+                    <p>Executive Director, Skietbann</p>
+                    <br>
+                    <br>
+                    <br>
+                </div>
+            </footer>
+        </div>
+    </div>
 </body>
 </html>
