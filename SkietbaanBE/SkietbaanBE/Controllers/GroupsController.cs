@@ -138,7 +138,7 @@ namespace SkietbaanBE.Controllers
             for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Id == createobj.users.ElementAt(i).Id);
+                User dbUser = _context.Users.FirstOrDefault(x => x.Username == createobj.users.ElementAt(i).Username);
 
                 userGroup.GroupId = group.Id;
                 userGroup.UserId = dbUser.Id;
@@ -189,14 +189,18 @@ namespace SkietbaanBE.Controllers
                         where (Group.Id == id)
                         select new
                         {
-
                             User
                         };
-            foreach (var item in query)
+
+            if (query != null)
             {
-                User user = new User();
-                user = item.User; users.Add(user);
+                foreach (var item in query)
+                {
+                    User user = new User();
+                    user = item.User; users.Add(user);
+                }
             }
+            
             return users;
         }
         //delete members in a group
