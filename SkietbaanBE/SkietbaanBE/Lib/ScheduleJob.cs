@@ -11,15 +11,15 @@ namespace SkietbaanBE.Lib {
         private Timer awardTimer; //this timer runs only once at the end of every month
         private Timer updateAwardTimer; //this timer updates the awardTimer on how many days are in the current month
 
-        /*public ScheduleJob(ModelsContext context) {
+        public ScheduleJob(ModelsContext context) {
             _context = context;
             updateAwardTimer = new Timer(
                 callback: new TimerCallback(RunAwardUserJob),
                 state: "",
-                dueTime: (long)TimeSpan.FromDays(DateTime.Now.Day).TotalMilliseconds,
+                dueTime: 10000, //run RunAwardUserJob after 10s of this object creation
                 period: 0
             );
-        }*/
+        }
 
         private long GetMilliSecondsToNextMonth() {
             int daysInMonth = DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month);
@@ -30,59 +30,43 @@ namespace SkietbaanBE.Lib {
         }
 
         //Add a record in the database of the user who has been top ranked at the end of the month
-       /* private void AwardUserJob(Object source) {
-            //join all competitions where the user participates, but only the activate competitions
-            var query = from User in _context.Users
+        private void AwardUserJob(Object source) {
+            //join all competitions where the user participates, but only the active competitions
+
+            var query = (from User in _context.Users
                         join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id
                             equals UserCompetitionTotalScore.UserId
-                        join Competition in _context.Competitions on UserCompetitionTotalScore.CompetitionId
+                        join Competition in _context.Competitions on UserCompetitionTotalScore.CompetitionId 
                             equals Competition.Id
-                        where (Competition.Status == true && UserCompetitionTotalScore.Month == DateTime.Today.Month)
-                        select new {
+                        where (Competition.Status == true && UserCompetitionTotalScore.Year == DateTime.Today.Year)
+                        orderby Competition.Id, UserCompetitionTotalScore.Total descending
+                        select new{
                             User,
+                            Competition.Id,
                             Competition,
-                            UserCompStats.MonthBestScore
-                        };
-            //map a competition to all the users that participate in it
-            Dictionary<int, List<UserBest>> mapCompetitionIDToUserBest = new Dictionary<int, List<UserBest>>();
-            foreach (var i in query) {
-                int key = i.Competition.Id;
-                if (mapCompetitionIDToUserBest.ContainsKey(key)) {
-                    var list = mapCompetitionIDToUserBest.GetValueOrDefault(key);
-                    list.Add(new UserBest {
-                        Best = i.MonthBestScore,
-                        User = i.User,
-                        Competition = i.Competition
-                    });
-                    mapCompetitionIDToUserBest[key] = list;
-                } else {
-                    List<UserBest> list = new List<UserBest>();
-                    list.Add(new UserBest {
-                        Best = i.MonthBestScore,
-                        User = i.User,
-                        Competition = i.Competition
-                    });
-                    mapCompetitionIDToUserBest.Add(key, list);
-                }
-            }
+                            UserCompetitionTotalScore.Total
+                        }).Distinct();
 
-            //award the users who ranked first in their respect competitions
-            foreach (var key in mapCompetitionIDToUserBest.Keys) {
-                UserBest userBest = mapCompetitionIDToUserBest.GetValueOrDefault(key)
-                                    .OrderByDescending(x => x.Best).First();
+            //award the users who ranked first in their respective competitions
+            var allCompIds = query.Select(x => x.Id).Distinct();
+            foreach(var i in allCompIds){
+                var top = query.Where(x => x.Id == i).First();
+                var comp = _context.Competitions.Find(top.Id);
+                var user = _context.Users.Find(top.User.Id);
                 Award award = new Award {
-                    Competition = userBest.Competition,
-                    User = userBest.User,
+                    Competition = comp,
+                    User = user,
                     Description = $"Best shooter in {GetMonthNameByMonthNumber(DateTime.Today.Month)}" + " " +
-                                 $"{DateTime.Today.Year}"
+                                    $"{DateTime.Today.Year}"
                 };
                 _context.Awards.Add(award);
             }
 
             _context.SaveChanges();
+
             //run the updateAwardTimer once again after 20 days
             updateAwardTimer.Change((int)TimeSpan.FromDays(20).TotalMilliseconds, 0);
-        }
+        }   
 
         public void RunAwardUserJob(Object sender) {
             if (awardTimer == null) {
@@ -140,11 +124,5 @@ namespace SkietbaanBE.Lib {
 
             return strMonth;
         }
-
-        private class UserBest {
-            public User User { get; set; }
-            public int Best { get; set; }
-            public Competition Competition { get; set; }
-        }*/
     }
 }

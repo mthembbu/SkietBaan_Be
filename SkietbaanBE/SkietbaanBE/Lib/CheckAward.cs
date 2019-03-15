@@ -1,6 +1,6 @@
 ﻿using SkietbaanBE.Models;
 using SkietbaanBE.RequestModel;
-using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace SkietbaanBE.Lib {
@@ -61,14 +61,22 @@ namespace SkietbaanBE.Lib {
             return hours;
         }
 
-        private static Dictionary<string, string> ReadAwardsRules(string filename) {
-            string[] lines = System.IO.File.ReadAllLines("award_rules.txt");
-            Dictionary<string, string> awardsMap = new Dictionary<string, string>();
-            foreach (string line in lines) {
-                awardsMap.Add(line.Split(':')[0], line.Split(':')[1]);
-            }
+        public static void UpdateHoursSpent(ModelsContext context, Score score) {
+            var dbRecord = context.TimeSpents.FirstOrDefault(x => x.CompetitionId == score.Competition.Id
+                                                            && x.UserId == score.User.Id);
+            if(dbRecord == null) {
+                TimeSpent timeSpent = new TimeSpent {
+                    Competition = score.Competition,
+                    User = score.User,
+                    HoursSpent = score.Competition.Hours
+                };
 
-            return awardsMap;
+                context.TimeSpents.Add(timeSpent);
+            } else {
+                dbRecord.HoursSpent += score.Competition.Hours;
+                context.TimeSpents.Update(dbRecord);
+            }
+            context.SaveChanges();
         }
 
         private static Dictionary<string, string> ReadAwardsRules() {

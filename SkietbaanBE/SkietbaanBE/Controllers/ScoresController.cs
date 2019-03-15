@@ -44,6 +44,9 @@ namespace SkietbaanBE.Controllers
                 _context.Scores.Add(score);
                 _context.SaveChanges();
 
+                //update time spent at skietbaan
+                CheckAward.UpdateHoursSpent(_context, score);
+
                 //update User Competition Stats
                 Calculations calculations = new Calculations(_context);
                 calculations.performCalculations(user.Id, competition.Id);
