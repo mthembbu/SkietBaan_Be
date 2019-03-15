@@ -34,14 +34,13 @@ namespace SkietbaanBE.Controllers
         [HttpGet("{token}")]
         public List<AwardObject> GetAllAwards(string token) {
             List<AwardObject> awardCompetitions = new List<AwardObject>();
+            bool notValid = context.Users.Where(x => x.Token == token).FirstOrDefault() == null;
+            if (notValid) return awardCompetitions;
             string membershipID;
             string username;
-            try {
-                membershipID = context.Users.Where(x => x.Token == token).First().MemberID;
-                username = context.Users.Where(x => x.Token == token).First().Username;
-            } catch (Exception) {
-                return awardCompetitions;
-            }
+            
+            membershipID = context.Users.Where(x => x.Token == token).First().MemberID;
+            username = context.Users.Where(x => x.Token == token).First().Username;
 
             var competitionsUserPartakesIn = from UserCompetitionTotalScore in context.UserCompetitionTotalScores
                                              where (UserCompetitionTotalScore.User.Token == token)
