@@ -27,7 +27,7 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<Group> GetGroups()
         {
-            IEnumerable<Group> groups = _context.Groups.Where(g => g.IsActive.Equals(true));
+            IEnumerable<Group> groups = _context.Groups;
             return groups;
         }
         // GET: api/Groups/5
@@ -138,8 +138,8 @@ namespace SkietbaanBE.Controllers
             for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Username == createobj.users.ElementAt(i).Username);
-
+                User dbUser = _context.Users.FirstOrDefault(x => x.Id == createobj.users.ElementAt(i).Id);
+      
                 userGroup.GroupId = group.Id;
                 userGroup.UserId = dbUser.Id;
                 userGroups.Add(userGroup);
@@ -188,10 +188,9 @@ namespace SkietbaanBE.Controllers
                         join User in _context.Users on UserGroup.User.Id equals User.Id
                         where (Group.Id == id)
                         select new
-                        {
+                        {   
                             User
                         };
-
             if (query != null)
             {
                 foreach (var item in query)
