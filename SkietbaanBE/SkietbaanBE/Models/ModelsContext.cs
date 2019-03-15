@@ -13,6 +13,7 @@ namespace SkietbaanBE.Models {
             modelBuilder.Entity<Competition>().HasIndex(c=>c.Name).IsUnique();
             modelBuilder.Entity<Group>().HasIndex(c => c.Name).IsUnique();
             modelBuilder.Entity<OTP>().HasIndex(o => o.UserId).IsUnique();
+            modelBuilder.Entity<TimeSpent>().HasKey(t => new { t.CompetitionId, t.UserId });
         }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Competition> Competitions { get; set; }
@@ -23,5 +24,6 @@ namespace SkietbaanBE.Models {
         public virtual DbSet<Award> Awards { get; set; }
         public virtual DbSet<UserCompetitionTotalScore> UserCompetitionTotalScores { get; set; }
         public virtual DbSet<OTP> OTPs { get; set; }
+        public virtual DbSet<TimeSpent> TimeSpents { get; set; }
     }
 }

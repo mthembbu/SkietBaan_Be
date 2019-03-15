@@ -1,3 +1,0 @@
-Total:gold 90,silver 80,bronze 70
-Hours:gold 100,silver 70,bronze 50
-Accuracy:gold 95,silver 85,bronze 75
