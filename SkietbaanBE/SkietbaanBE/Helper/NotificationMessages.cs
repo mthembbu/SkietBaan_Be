@@ -49,7 +49,7 @@ namespace SkietbaanBE.Helper
                 notification.User = user;
                 notification.IsRead = false;
                 notification.TypeOfNotification = "Competition";
-                notification.NotificationMessage = "Check it out! Competition " + comp.Name + " has been created.";
+                notification.NotificationMessage = comp.Name + ", has been created. Check it out!";
                 _context.Notifications.Add(notification);
             }
             _context.SaveChanges();
@@ -62,7 +62,7 @@ namespace SkietbaanBE.Helper
                 User = user,
                 IsRead = false,
                 TypeOfNotification = "Group",
-                NotificationMessage = group.Name + " created. Check it out!"
+                NotificationMessage = group.Name + ", created. Check it out!"
             };
             string message = string.Empty;
             try
