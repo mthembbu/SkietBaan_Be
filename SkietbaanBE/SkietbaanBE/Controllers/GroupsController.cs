@@ -128,7 +128,7 @@ namespace SkietbaanBE.Controllers
             return _context.Groups.Any(e => e.Id == id);
         }
 
-        //creating groups and adding members to the groups
+        //creating groups and adding members to the groups for that
         [HttpPost]
         [Route("add")]
         public void AddListUsers([FromBody] CreateGroup createobj)
