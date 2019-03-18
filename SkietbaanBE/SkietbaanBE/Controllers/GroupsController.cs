@@ -100,7 +100,15 @@ namespace SkietbaanBE.Controllers
             }
 
             var group = await _context.Groups.SingleOrDefaultAsync(m => m.Id == id);
-            group.IsActive = false;
+            if (group.IsActive.Equals(true))
+            {
+                group.IsActive = false;
+            }
+            else
+            {
+                group.IsActive = true;
+            }
+            
             if (group == null)
             {
                 return NotFound();
@@ -138,12 +146,11 @@ namespace SkietbaanBE.Controllers
             for (int i = 0; i < createobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Id == createobj.users.ElementAt(i).Id);
-      
+                User dbUser = _context.Users.FirstOrDefault(x => x.Token == createobj.users.ElementAt(i).Token);
                 userGroup.GroupId = group.Id;
                 userGroup.UserId = dbUser.Id;
                 userGroups.Add(userGroup);
-                _notificationMessages.GroupNotification(_context, group, dbUser);
+                _notificationMessages.GroupNotification(_context, group,dbUser);
             }
             _context.UserGroups.AddRange(userGroups);
             _context.SaveChanges();
