@@ -10,10 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Helper\Documents\New Text Document.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -43,17 +39,11 @@
     <None Update="Controllers\Documents\Certificate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Controllers\Documents\edit.htm">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
     <None Update="Controllers\Documents\LOGS.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Controllers\Documents\LOS.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Helper\Documents\edit.htm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

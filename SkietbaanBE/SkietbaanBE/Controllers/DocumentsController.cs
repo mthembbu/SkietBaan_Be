@@ -24,13 +24,34 @@ namespace SkietbaanBE.Controllers
         private ModelsContext _context;
         private SendMail sendMail = new SendMail();
 
+        private static int numberShots = 0;
+        private static List<int> GroupList=new List<int>(); 
+
+
+
         public DocumentsController(ModelsContext db)
         {
             _context = db;
         }  
 
+        [HttpPost]
 
-        [HttpGet]
+        public void changeShots(int num)
+        {
+            numberShots = num;
+        }
+
+        [HttpPost]
+        public void getGroup([FromBody] List<Models.Competition> group)
+        {
+            GroupList.Clear();
+            for(int i = 0; i < group.Count; i++)
+            {
+                GroupList.Add(group.ElementAt(i).Id);
+            }
+        } 
+        
+        [HttpGet] 
         [Route("{Token}")]
         public string SendLOS(string Token)
         {
@@ -51,8 +72,9 @@ namespace SkietbaanBE.Controllers
 
                     streamReader.Close();
 
-                    var content1 = content.Replace("Nadeem", Member.Username)
-                        .Replace("Front End Development", "Letter Of Status");
+                    var content1 = content.Replace("Name", Member.Username)
+                           .Replace("Type", "Letter Of Status")
+                           .Replace("Date", "December 2019");
 
                     HtmlToPdf converter = new HtmlToPdf();
                     converter.Options.PdfPageSize = PdfPageSize.A4;
@@ -69,7 +91,7 @@ namespace SkietbaanBE.Controllers
 
                     memoryStream.Close();
 
-                    sendMail.SendEmail(Member.Email, "Letter Of Status", new Attachment(new MemoryStream(bytes),"LOS.pdf"));
+                    sendMail.SendEmail(Member.Email, "Letter of Status", new Attachment(new MemoryStream(bytes),"LOS.pdf"));
 
                     doc.Close();
 
@@ -131,6 +153,8 @@ namespace SkietbaanBE.Controllers
             doc.Close();
         }
 
+
+
         [HttpGet]
         [Route("{Token}")]
         public string UserLOGS(string Token)
@@ -158,19 +182,31 @@ namespace SkietbaanBE.Controllers
         [Route("{Token}")]
         public string UserLOS(string Token)
         {
+
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
             if (Member.MemberID != null)
             {
-                var comp = _context.UserCompetitionTotalScores.Count(x => x.User.MemberID == Member.MemberID);
+                int counts = 0;
+                foreach (var item in GroupList)
+                {
+                    var comp = from score in _context.Scores
+                               where (score.Competition.Id == item && score.User.Id == 5)
+                               select new
+                               {
+                                   score.UserScore
+                               };
+                    counts += comp.ToList().Count;
+                }
 
-                if (comp > 6)
+                if (counts > numberShots)
                 {
                     return ("Document");
                 }
                 return ("No Document");
-            }            
+            }
             return ("No Document");
+          
         }
 
 
