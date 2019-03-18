@@ -6,7 +6,6 @@ using System.Text;
 using System.Net;
 using System.Net.Mail;
 using System.IO;
-using IronPdf;
 
 namespace SkietbaanBE.Helper
 {

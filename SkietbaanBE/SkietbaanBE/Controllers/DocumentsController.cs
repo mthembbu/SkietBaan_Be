@@ -7,13 +7,9 @@ using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 using System.Net;
 using System.Net.Mail;
-using iTextSharp;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
+
 using System.IO;
-using iTextSharp.text.html.simpleparser;
-using Microsoft.AspNetCore.Http;
-using IronPdf;
+
 using System.Xml.Linq;
 using System.Xml;
 using System.Text.RegularExpressions;
@@ -28,13 +24,34 @@ namespace SkietbaanBE.Controllers
         private ModelsContext _context;
         private SendMail sendMail = new SendMail();
 
+        private static int numberShots = 0;
+        private static List<int> GroupList=new List<int>(); 
+
+
+
         public DocumentsController(ModelsContext db)
         {
             _context = db;
         }  
 
+        [HttpPost]
 
-        [HttpGet]
+        public void changeShots(int num)
+        {
+            numberShots = num;
+        }
+
+        [HttpPost]
+        public void getGroup([FromBody] List<Models.Competition> group)
+        {
+            GroupList.Clear();
+            for(int i = 0; i < group.Count; i++)
+            {
+                GroupList.Add(group.ElementAt(i).Id);
+            }
+        } 
+        
+        [HttpGet] 
         [Route("{Token}")]
         public string SendLOS(string Token)
         {
@@ -45,7 +62,7 @@ namespace SkietbaanBE.Controllers
                 StreamReader streamReader;
                 MemoryStream memoryStream = new MemoryStream();
 
-                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() +"/Controllers/Documents/edit.htm");
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "/Controllers/Documents/Certificate.html");
 
                 if(streamReader != null)
                 {
@@ -55,19 +72,26 @@ namespace SkietbaanBE.Controllers
 
                     streamReader.Close();
 
-                    var content1 = content.Replace("Nadeem", Member.Username)
-                        .Replace("Front End Development", "Letter Of Status");
+                    var content1 = content.Replace("Name", Member.Username)
+                           .Replace("Type", "Letter Of Status")
+                           .Replace("Date", "December 2019");
 
-                    SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                    HtmlToPdf converter = new HtmlToPdf();
+                    converter.Options.PdfPageSize = PdfPageSize.A4;
+                    converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+                    converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                    converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit; ;
+
                     SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
 
+                
                     doc.Save(memoryStream);
 
                     byte[] bytes = memoryStream.ToArray();
 
                     memoryStream.Close();
 
-                    sendMail.SendEmail(Member.Email, "Letter Of Status", new Attachment(new MemoryStream(bytes),"LOS.pdf"));
+                    sendMail.SendEmail(Member.Email, "Letter of Status", new Attachment(new MemoryStream(bytes),"LOS.pdf"));
 
                     doc.Close();
 
@@ -96,7 +120,7 @@ namespace SkietbaanBE.Controllers
 
             StreamReader streamReader;
 
-            streamReader = new StreamReader("./Controllers/Documents/edit.htm");
+            streamReader = new StreamReader("./Controllers/Documents/Certificate.html");
 
             string content = streamReader.ReadToEnd();
 
@@ -104,15 +128,16 @@ namespace SkietbaanBE.Controllers
 
             streamReader.Close();
 
-            var content1 = content.Replace("Nadeem", Member.Username)
-                .Replace("Front End Development", "Letter Of Good Standing"); ;
+            var content1 = content.Replace("Name", Member.Username)
+                .Replace("Type", "Letter Of Good Standing")
+                .Replace("Date", "December 2019"); 
 
             SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
             converter.Options.PdfPageSize = PdfPageSize.A4;
-            converter.Options.MarginLeft = 10;
-            converter.Options.MarginRight = 10;
-            converter.Options.MarginTop = 20;
-            converter.Options.MarginBottom = 20;
+            converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+            converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+            converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
+  
             SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
 
             doc.Save(memoryStream);
@@ -123,10 +148,12 @@ namespace SkietbaanBE.Controllers
 
             
 
-            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "Prueba.pdf"));
+            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "LOGS.pdf"));
 
             doc.Close();
         }
+
+
 
         [HttpGet]
         [Route("{Token}")]
@@ -155,19 +182,31 @@ namespace SkietbaanBE.Controllers
         [Route("{Token}")]
         public string UserLOS(string Token)
         {
+
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
             if (Member.MemberID != null)
             {
-                var comp = _context.UserCompetitionTotalScores.Count(x => x.User.MemberID == Member.MemberID);
+                int counts = 0;
+                foreach (var item in GroupList)
+                {
+                    var comp = from score in _context.Scores
+                               where (score.Competition.Id == item && score.User.Id == 5)
+                               select new
+                               {
+                                   score.UserScore
+                               };
+                    counts += comp.ToList().Count;
+                }
 
-                if (comp > 6)
+                if (counts > numberShots)
                 {
                     return ("Document");
                 }
                 return ("No Document");
-            }            
+            }
             return ("No Document");
+          
         }
 
 

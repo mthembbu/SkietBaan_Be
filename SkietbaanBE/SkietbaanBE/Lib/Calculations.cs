@@ -26,13 +26,13 @@ namespace SkietbaanBE.Lib
                             select new
                             {
                                 Scores.UserScore,
-                               // Scores.UploadDate.Value.Year
+                               Scores.UploadDate.Value.Year
                             };
                 List<double> listScores = new List<double>();
                 foreach (var item in query)
                 {
                     listScores.Add(item.UserScore);
-                   // year = item.Year;
+                    year = item.Year;
                 }
                 if (listScores.Count > 0)
                 {
@@ -64,7 +64,7 @@ namespace SkietbaanBE.Lib
             double total = Math.Round(bestScores.Sum() / competition.BestScoresNumber,2);
             double average = Math.Round(yearScores.listYearScores.Sum() / yearScores.listYearScores.Count,2);
             double best = Math.Round(bestScores.Last(),2);
-            //int year = yearScores.Year;
+            int year = yearScores.Year;
             UserCompetitionTotalScore stats = _context.UserCompetitionTotalScores
                                                       .Where(u => u.UserId == userID && u.CompetitionId == competitionID)
                                                       .FirstOrDefault<UserCompetitionTotalScore>();
@@ -76,7 +76,8 @@ namespace SkietbaanBE.Lib
                     UserId = userID,
                     Total = total,
                     Average = average,
-                    Best = best
+                    Best = best,
+                    Year = year
                 };
                 _context.UserCompetitionTotalScores.Add(stats);
                 _context.SaveChanges();
@@ -90,6 +91,5 @@ namespace SkietbaanBE.Lib
                 _context.SaveChanges();
             }
         }
-        
     }
 }

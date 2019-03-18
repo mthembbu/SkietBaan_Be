@@ -64,7 +64,7 @@ namespace SkietbaanBE
             var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var context = scope.ServiceProvider.GetService<ModelsContext>();
 
-            //new ScheduleJob(context);
+            new ScheduleJob(context);
 
             //if (!true) {
             //    context.Database.EnsureDeleted();
