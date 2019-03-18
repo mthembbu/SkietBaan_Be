@@ -22,7 +22,7 @@ namespace SkietbaanBE
         {
             services.AddMvc();
             services.AddDbContext<ModelsContext>
-            (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanTest")));
+            (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanDatabase")));
             services.AddScoped<NotificationMessages>();
             services.AddCors(options =>
             {
