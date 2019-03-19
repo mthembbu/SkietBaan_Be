@@ -10,22 +10,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Helper\Documents\New Text Document.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="4.5.3.1" />
     <PackageReference Include="ExcelPackage" Version="1.0.0" />
-    <PackageReference Include="IronPdf" Version="5.0.5.2" />
-    <PackageReference Include="iTextSharp" Version="5.5.13" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
     <PackageReference Include="Microsoft.Office.Interop.Word" Version="15.0.4797.1003" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.4" />
-    <PackageReference Include="Select.Pdf.NetCore" Version="18.4.0" />
+    <PackageReference Include="Select.HtmlToPdf" Version="18.3.1" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="18.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
 	
   </ItemGroup>
@@ -41,17 +36,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Controllers\Documents\edit.htm">
+    <None Update="Controllers\Documents\Certificate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Controllers\Documents\LOGS.pdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Controllers\Documents\LOS.pdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Helper\Documents\edit.htm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
