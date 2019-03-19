@@ -62,7 +62,7 @@ namespace SkietbaanBE.Controllers
                 StreamReader streamReader;
                 MemoryStream memoryStream = new MemoryStream();
 
-                streamReader = new StreamReader("C:\\inetpub\\wwwroot\\skietbaan\\Controllers\\Documents\\Certificate.html");
+                streamReader = new StreamReader(@"C:\inetpub\wwwroot\skietbaan\Controllers\Documents\Certificate.html");
 
                 if(streamReader != null)
                 {
@@ -95,7 +95,7 @@ namespace SkietbaanBE.Controllers
 
                     doc.Close();
 
-                    return (Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
+                    return ("yes");
 
                 }
 
@@ -121,7 +121,7 @@ namespace SkietbaanBE.Controllers
 
                 StreamReader streamReader;
 
-                streamReader = new StreamReader("C:\\inetpub\\wwwroot\\skietbaan\\Controllers\\Documents\\Certificate.html");
+                streamReader = new StreamReader(@"C:\inetpub\wwwroot\skietbaan\Controllers\Documents\Certificate.html");
 
                 if (streamReader != null)
                 {
