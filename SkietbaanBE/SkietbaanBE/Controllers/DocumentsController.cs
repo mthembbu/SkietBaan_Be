@@ -120,7 +120,7 @@ namespace SkietbaanBE.Controllers
 
             StreamReader streamReader;
 
-            streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "./Controllers/Documents/Certificate.html");
+            streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "/Controllers/Documents/Certificate.html");
 
             string content = streamReader.ReadToEnd();
 
