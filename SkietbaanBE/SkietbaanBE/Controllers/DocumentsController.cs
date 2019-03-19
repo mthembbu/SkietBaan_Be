@@ -62,7 +62,7 @@ namespace SkietbaanBE.Controllers
                 StreamReader streamReader;
                 MemoryStream memoryStream = new MemoryStream();
 
-                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "/Controllers/Documents/Certificate.html");
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
 
                 if(streamReader != null)
                 {
@@ -95,11 +95,11 @@ namespace SkietbaanBE.Controllers
 
                     doc.Close();
 
-                    return ("document saved");
+                    return (Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
 
                 }
 
-                return (Directory.GetCurrentDirectory().ToString());
+                return (Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
 
 
             }
@@ -111,46 +111,56 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet]
         [Route("{Token}")]
-        public void SendLOGS(string Token)
+        public string SendLOGS(string Token)
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            MemoryStream memoryStream = new MemoryStream();
+            if(Member != null)
+            {
+                MemoryStream memoryStream = new MemoryStream();
+
+                StreamReader streamReader;
+
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
+
+                if (streamReader != null)
+                {
+                    string content = streamReader.ReadToEnd();
+
+                    content.ToString();
+
+                    streamReader.Close();
+
+                    var content1 = content.Replace("Name", Member.Username)
+                        .Replace("Type", "Letter Of Good Standing")
+                        .Replace("Date", "December 2019");
+
+                    SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                    converter.Options.PdfPageSize = PdfPageSize.A4;
+                    converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+                    converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                    converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
+
+                    SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+
+                    doc.Save(memoryStream);
+
+                    byte[] bytes = memoryStream.ToArray();
+
+                    memoryStream.Close();
 
 
-            StreamReader streamReader;
 
-            streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "/Controllers/Documents/Certificate.html");
+                    sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "LOGS.pdf"));
 
-            string content = streamReader.ReadToEnd();
+                    doc.Close();
 
-            content.ToString();
+                    return (content);
 
-            streamReader.Close();
-
-            var content1 = content.Replace("Name", Member.Username)
-                .Replace("Type", "Letter Of Good Standing")
-                .Replace("Date", "December 2019"); 
-
-            SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-            converter.Options.PdfPageSize = PdfPageSize.A4;
-            converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
-            converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-            converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
-  
-            SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-
-            doc.Save(memoryStream);
-
-            byte[] bytes = memoryStream.ToArray();
-
-            memoryStream.Close();
-
-            
-
-            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "LOGS.pdf"));
-
-            doc.Close();
+                }
+                return (Directory.GetCurrentDirectory().ToString()+ streamReader.ToString());
+            }
+            return (Directory.GetCurrentDirectory().ToString());
         }
 
 
