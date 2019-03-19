@@ -51,22 +51,35 @@ namespace SkietbaanBE.Lib {
             return accuracyAward;
         }
 
-        public static HoursAward Hours() {
+        public static HoursAward Hours(string token, ModelsContext context) {
+            var hoursRecord = context.TimeSpents
+                            .FirstOrDefault(x => x.User.Token == token);
+
             HoursAward hours = new HoursAward {
                 Gold = false,
                 Bronze = false,
-                Silver = false
-            };
+                Silver = false,
+                Hours = 0,
+                MembershipNumber = context.Users.Where(x => x.Token == token).First().MemberID,
+                Username = context.Users.Where(x => x.Token == token).First().Username
+        };
+            //Has not added any score in skietbaan
+            if (hoursRecord == null) return hours;
+
+            hours.Hours = hoursRecord.HoursSpent;
+            //MAKE THIS DYNAMIC
+            if (hours.Hours >= 5) hours.Bronze = true;
+            if (hours.Hours >= 10) hours.Silver = true;
+            if (hours.Hours >= 15) hours.Gold = true;
 
             return hours;
         }
 
         public static void UpdateHoursSpent(ModelsContext context, Score score) {
-            var dbRecord = context.TimeSpents.FirstOrDefault(x => x.CompetitionId == score.Competition.Id
-                                                            && x.UserId == score.User.Id);
+            var dbRecord = context.TimeSpents.FirstOrDefault(x => x.UserId == score.User.Id);
+
             if(dbRecord == null) {
                 TimeSpent timeSpent = new TimeSpent {
-                    Competition = score.Competition,
                     User = score.User,
                     HoursSpent = score.Competition.Hours
                 };

@@ -36,11 +36,6 @@ namespace SkietbaanBE.Controllers
             List<AwardObject> awardCompetitions = new List<AwardObject>();
             bool notValid = context.Users.Where(x => x.Token == token).FirstOrDefault() == null;
             if (notValid) return awardCompetitions;
-            string membershipID;
-            string username;
-            
-            membershipID = context.Users.Where(x => x.Token == token).First().MemberID;
-            username = context.Users.Where(x => x.Token == token).First().Username;
 
             var competitionsUserPartakesIn = from UserCompetitionTotalScore in context.UserCompetitionTotalScores
                                              where (UserCompetitionTotalScore.User.Token == token)
@@ -58,9 +53,6 @@ namespace SkietbaanBE.Controllers
                         //REMOVE
                         Accuracy = (int)competitionsUserPartakesIn
                                         .Where(x => x.Competition.Id == comp.Id).First().Average,
-                        MembershipNumber = membershipID,
-                        Username = username,
-                        HoursAward = CheckAward.Hours(),
                         TotalAward = CheckAward.Total(competitionsUserPartakesIn
                                         .Where(x => x.Competition.Id == comp.Id).First().Total, false),
                         AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
@@ -74,9 +66,7 @@ namespace SkietbaanBE.Controllers
                         IsCompetitionLocked = true,
                         Total = "0",
                         Accuracy = 0,
-                        MembershipNumber = membershipID,
-                        Username = username,
-                        HoursAward = CheckAward.Hours(),
+
                         TotalAward = CheckAward.Total(0, true),
                         AccuracyAward = CheckAward.Accuracy(0, true)
                     };
@@ -85,6 +75,11 @@ namespace SkietbaanBE.Controllers
             }
 
             return awardCompetitions;
+        }
+
+        [HttpGet("hours/{token}")]
+        public HoursAward GetHours(string token) {
+            return CheckAward.Hours(token, context);
         }
     }
 }
