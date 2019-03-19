@@ -62,42 +62,55 @@ namespace SkietbaanBE.Controllers
                 StreamReader streamReader;
                 MemoryStream memoryStream = new MemoryStream();
 
-                streamReader = new StreamReader(@"C:\inetpub\wwwroot\skietbaan\Controllers\Documents\Certificate.html");
 
-                if(streamReader != null)
+                try
                 {
-                    string content = streamReader.ReadToEnd();
+                    streamReader = new StreamReader(@"C:\inetpub\wwwroot\skietbaan\Controllers\Documents\Certificate.html");
 
-                    content.ToString();
 
-                    streamReader.Close();
+                    if (streamReader != null)
+                    {
+                        string content = streamReader.ReadToEnd();
 
-                    var content1 = content.Replace("Name", Member.Username)
-                           .Replace("Type", "Letter Of Status")
-                           .Replace("Date", "December 2019");
+                        content.ToString();
 
-                    HtmlToPdf converter = new HtmlToPdf();
-                    converter.Options.PdfPageSize = PdfPageSize.A4;
-                    converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
-                    converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-                    converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit; ;
+                        streamReader.Close();
 
-                    SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+                        var content1 = content.Replace("Name", Member.Username)
+                               .Replace("Type", "Letter Of Status")
+                               .Replace("Date", "December 2019");
 
-                
-                    doc.Save(memoryStream);
+                        HtmlToPdf converter = new HtmlToPdf();
+                        converter.Options.PdfPageSize = PdfPageSize.A4;
+                        converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+                        converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                        converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit; ;
 
-                    byte[] bytes = memoryStream.ToArray();
+                        SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
 
-                    memoryStream.Close();
 
-                    sendMail.SendEmail(Member.Email, "Letter of Status", new Attachment(new MemoryStream(bytes),"LOS.pdf"));
+                        doc.Save(memoryStream);
 
-                    doc.Close();
+                        byte[] bytes = memoryStream.ToArray();
 
-                    return ("yes");
+                        memoryStream.Close();
+
+                        sendMail.SendEmail(Member.Email, "Letter of Status", new Attachment(new MemoryStream(bytes), "LOS.pdf"));
+
+                        doc.Close();
+
+                        return ("yes");
+
+                    }
 
                 }
+                catch (System.IO.DirectoryNotFoundException)
+                {
+
+                }
+
+
+               
 
                 return (Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
 
