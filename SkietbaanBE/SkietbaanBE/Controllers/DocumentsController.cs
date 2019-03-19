@@ -65,7 +65,7 @@ namespace SkietbaanBE.Controllers
 
                 try
                 {
-                    streamReader = new StreamReader(@"C:\inetpub\wwwroot\skietbaan\Controllers\Documents\Certificate.html");
+                    streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
 
 
                     if (streamReader != null)
@@ -107,13 +107,8 @@ namespace SkietbaanBE.Controllers
                 catch (System.IO.DirectoryNotFoundException)
                 {
 
-                }
-
-
-               
-
+                }    
                 return (Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
-
 
             }
 
@@ -134,7 +129,7 @@ namespace SkietbaanBE.Controllers
 
                 StreamReader streamReader;
 
-                streamReader = new StreamReader(@"C:\inetpub\wwwroot\skietbaan\Controllers\Documents\Certificate.html");
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
 
                 if (streamReader != null)
                 {
