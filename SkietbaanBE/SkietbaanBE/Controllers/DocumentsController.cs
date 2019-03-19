@@ -120,7 +120,7 @@ namespace SkietbaanBE.Controllers
 
             StreamReader streamReader;
 
-            streamReader = new StreamReader("./Controllers/Documents/Certificate.html");
+            streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "./Controllers/Documents/Certificate.html");
 
             string content = streamReader.ReadToEnd();
 
@@ -161,21 +161,26 @@ namespace SkietbaanBE.Controllers
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            if (Member.MemberID != null)
-            {
-                var comp = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.User.MemberID == Member.MemberID);
+            if (Member != null){
 
-                if(comp != null)
-                {
-                    return ("Document");
-                }
-                return ("No Document");
-            }
-            else
-            {
-                return ("No Document");
-            }
             
+                if (Member.MemberID != null)
+                {
+                    var comp = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.User.MemberID == Member.MemberID);
+
+                    if(comp != null)
+                    {
+                        return ("Document");
+                    }
+                    return ("No Document");
+                }
+                else
+                {
+                    return ("No Document");
+                }
+            }
+            return ("No Document");
+
         }
 
         [HttpGet]
@@ -185,28 +190,32 @@ namespace SkietbaanBE.Controllers
 
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            if (Member.MemberID != null)
+            if (Member != null)
             {
-                int counts = 0;
-                foreach (var item in GroupList)
-                {
-                    var comp = from score in _context.Scores
-                               where (score.Competition.Id == item && score.User.Id == 5)
-                               select new
-                               {
-                                   score.UserScore
-                               };
-                    counts += comp.ToList().Count;
-                }
+                if (Member.MemberID != null)
 
-                if (counts > numberShots)
                 {
-                    return ("Document");
+                    int counts = 0;
+                    foreach (var item in GroupList)
+                    {
+                        var comp = from score in _context.Scores
+                                   where (score.Competition.Id == item && score.User.Id == 5)
+                                   select new
+                                   {
+                                       score.UserScore
+                                   };
+                        counts += comp.ToList().Count;
+                    }
+
+                    if (counts > numberShots)
+                    {
+                        return ("Document");
+                    }
+                    return ("No Document");
                 }
-                return ("No Document");
             }
             return ("No Document");
-          
+
         }
 
 
