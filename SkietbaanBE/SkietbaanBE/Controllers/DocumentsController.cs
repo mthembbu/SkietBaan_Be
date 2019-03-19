@@ -127,33 +127,50 @@ namespace SkietbaanBE.Controllers
                 {
                     string content = streamReader.ReadToEnd();
 
-                    content.ToString();
+                    if (content != null)
+                    {
+                        content.ToString();
 
-                    streamReader.Close();
+                        streamReader.Close();
 
-                    var content1 = content.Replace("Name", Member.Username)
-                        .Replace("Type", "Letter Of Good Standing")
-                        .Replace("Date", "December 2019");
+                        var content1 = content.Replace("Name", Member.Username)
+                            .Replace("Type", "Letter Of Good Standing")
+                            .Replace("Date", "December 2019");
 
-                    SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-                    converter.Options.PdfPageSize = PdfPageSize.A4;
-                    converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
-                    converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-                    converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
+                        SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                        converter.Options.PdfPageSize = PdfPageSize.A4;
+                        converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+                        converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                        converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
 
-                    SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+                        SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
 
-                    doc.Save(memoryStream);
+                        if (doc != null)
+                        {
+                            doc.Save(memoryStream);
 
-                    byte[] bytes = memoryStream.ToArray();
+                            byte[] bytes = memoryStream.ToArray();
 
-                    memoryStream.Close();
+                            memoryStream.Close();
 
+                            if (bytes != null)
+                            {
+                                sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "LOGS.pdf"));
 
+                                doc.Close();
 
-                    sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "LOGS.pdf"));
+                                return (content);
 
-                    doc.Close();
+                            }
+
+                            return ("array fails");
+
+                           
+                        }
+
+                        return (content1);
+
+                    }
 
                     return (content);
 
