@@ -39,7 +39,7 @@ namespace SkietbaanBE.Controllers
         public IEnumerable<Competition> GetAllCompetitions()
        {
             //get the competitions where(Status == true / false)
-             return _context.Competitions.ToArray<Competition>();
+             return _context.Competitions.ToArray<Competition>().OrderBy(x=> (x.Status == false)).ThenBy(x =>(x.Name));
         }
         //Getting a competition by ID
         // GET: api/Competition/id
@@ -131,10 +131,10 @@ namespace SkietbaanBE.Controllers
             foreach (var comp in competitionsList)
             {
                 int count = (from score in _context.Scores
-                                where score.Competition.Id == comp.Id
-                                select score.User.Id).Distinct().ToList().Count();
+                             where score.Competition.Id == comp.Id
+                             select score.User.Id).Distinct().ToList().Count();
 
-                mapCompToNumUser.Add(comp.Id,count);
+                mapCompToNumUser.Add(comp.Id, count);
             }
 
             return mapCompToNumUser;
