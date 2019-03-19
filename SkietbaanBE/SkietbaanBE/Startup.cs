@@ -22,7 +22,7 @@ namespace SkietbaanBE
         {
             services.AddMvc();
             services.AddDbContext<ModelsContext>
-            (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanTest")));
+            (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanDatabase")));
             services.AddScoped<NotificationMessages>();
             services.AddCors(options =>
             {
@@ -63,13 +63,7 @@ namespace SkietbaanBE
 
             var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var context = scope.ServiceProvider.GetService<ModelsContext>();
-
             new ScheduleJob(context);
-
-            //if (!true) {
-            //    context.Database.EnsureDeleted();
-            //    context.Database.Migrate();
-            //}
         }
     }
 }
