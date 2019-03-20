@@ -2,9 +2,12 @@
 using SkietbaanBE.RequestModel;
 using System.Linq;
 using System.Collections.Generic;
+using SkietbaanBE.Helper;
 
 namespace SkietbaanBE.Lib {
     public class CheckAward {
+        private static ModelsContext _context;
+        private static NotificationMessages _notificationMessage = new NotificationMessages(_context);
         private static string awardRequirements = "Total:gold 90,silver 80,bronze 70\n" +
                                             "Hours:gold 100,silver 70,bronze 50\n" +
                                             "Accuracy:gold 95,silver 85,bronze 75";
@@ -15,10 +18,22 @@ namespace SkietbaanBE.Lib {
                 foreach (string req in requirements.Split(',')) {
                     if (req.Contains("gold")) {
                         totalAward.Gold = total >= int.Parse(req.Split(' ')[1].Trim());
+                        if (totalAward.Gold)
+                        {
+                            _notificationMessage.TotalAwardNotification("gold");
+                        }
                     } else if (req.Contains("silver")) {
                         totalAward.Silver = total >= int.Parse(req.Split(' ')[1].Trim());
+                        if (totalAward.Silver)
+                        {
+                            _notificationMessage.TotalAwardNotification("silver");
+                        }
                     } else {
                         totalAward.Bronze = total >= int.Parse(req.Split(' ')[1].Trim());
+                        if (totalAward.Bronze)
+                        {
+                            _notificationMessage.TotalAwardNotification("bronze");
+                        }
                     }
                 }
             } else {
@@ -36,10 +51,22 @@ namespace SkietbaanBE.Lib {
                 foreach (string req in requirements.Split(',')) {
                     if (req.Contains("gold")) {
                         accuracyAward.Gold = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
+                        if (accuracyAward.Gold)
+                        {
+                            _notificationMessage.AccuracyAwardNotification("gold");
+                        }
                     } else if (req.Contains("silver")) {
                         accuracyAward.Silver = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
+                        if (accuracyAward.Silver)
+                        {
+                            _notificationMessage.AccuracyAwardNotification("silver");
+                        }
                     } else {
                         accuracyAward.Bronze = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
+                        if (accuracyAward.Bronze)
+                        {
+                            _notificationMessage.AccuracyAwardNotification("bronze");
+                        }
                     }
                 }
             } else {
