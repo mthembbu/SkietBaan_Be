@@ -151,9 +151,9 @@ namespace SkietbaanBE.Controllers
                         converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
                         converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
 
-                        /*
+                        
                         SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
-
+                        /*
                         if (doc != null)
                         {
                             doc.Save(memoryStream);
