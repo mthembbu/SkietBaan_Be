@@ -51,7 +51,7 @@ namespace SkietbaanBE.Controllers
             }
         } 
         
-        [HttpGet] 
+        [HttpPost] 
         [Route("{Token}")]
         public string SendLOS(string Token)
         {
@@ -65,7 +65,7 @@ namespace SkietbaanBE.Controllers
 
                 try
                 {
-                    streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
+                    streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + @"\Controllers\Documents\Certificate.html");
 
 
                     if (streamReader != null)
@@ -117,7 +117,7 @@ namespace SkietbaanBE.Controllers
            
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{Token}")]
         public string SendLOGS(string Token)
         {
@@ -141,16 +141,16 @@ namespace SkietbaanBE.Controllers
 
                         streamReader.Close();
 
-                        var content1 = content.Replace("Name", Member.Username)
+                        /* var content1 = content.Replace("Name", Member.Username)
                             .Replace("Type", "Letter Of Good Standing")
                             .Replace("Date", "December 2019");
 
                         SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-                        converter.Options.PdfPageSize = PdfPageSize.A4;
+                       converter.Options.PdfPageSize = PdfPageSize.A4;
                         converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
                         converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
                         converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
-
+                        
                         SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
 
                         if (doc != null)
@@ -174,9 +174,9 @@ namespace SkietbaanBE.Controllers
                             return ("array fails");
 
                            
-                        }
+                        }*/
 
-                        return (content1);
+                        return (content);
 
                     }
 
