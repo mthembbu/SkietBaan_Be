@@ -34,7 +34,7 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<User> GetUsers()
         {
-            return _context.Users.ToArray<User>();
+            return (_context.Users.ToArray<User>()).OrderBy(x=>x.Username).ToArray<User>();
         }
 
         // GET: api/User/5

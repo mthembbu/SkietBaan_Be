@@ -150,9 +150,11 @@ namespace SkietbaanBE.Controllers
                 group.IsActive = true;
             }
 
+      
             List<UserGroup> userGroups = new List<UserGroup>();
             for (int i = 0; i < createobj.users.Length; i++)
             {
+                string standard = "";
                 UserGroup userGroup = new UserGroup();
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == createobj.users.ElementAt(i).Token);
                 userGroup.GroupId = group.Id;
@@ -188,7 +190,7 @@ namespace SkietbaanBE.Controllers
                     users.Add(user);
                 }
             }
-            var result = (qry).Except(users);
+            var result = ((qry).Except(users)).OrderBy(x=>x.Username);
             return result.ToList<User>();
         }
 
@@ -215,7 +217,7 @@ namespace SkietbaanBE.Controllers
                 }
             }
 
-            return users;
+            return users.OrderBy(x=>x.Username).ToList();
         }
         //delete members in a group
         [HttpPost]

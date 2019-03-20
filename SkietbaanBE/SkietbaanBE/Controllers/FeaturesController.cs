@@ -110,7 +110,7 @@ namespace SkietbaanBE.Controllers
         [ActionName("SearchMember")]
         public IEnumerable<User> SearchMember()
         {
-            return _context.Users.ToArray<User>().Where(u => u.MemberID != null && u.MemberID != "");
+            return (_context.Users.ToArray<User>().Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x=>x.Username);
         }
 
         //// POST: api/User/Update
