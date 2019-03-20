@@ -141,10 +141,10 @@ namespace SkietbaanBE.Controllers
 
                         streamReader.Close();
 
-                        /* var content1 = content.Replace("Name", Member.Username)
+                         var content1 = content.Replace("Name", Member.Username)
                             .Replace("Type", "Letter Of Good Standing")
                             .Replace("Date", "December 2019");
-
+                        /*
                         SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
                        converter.Options.PdfPageSize = PdfPageSize.A4;
                         converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
