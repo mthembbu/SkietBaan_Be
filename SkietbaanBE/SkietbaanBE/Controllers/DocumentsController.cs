@@ -149,7 +149,7 @@ namespace SkietbaanBE.Controllers
                         PdfDocument doc = new PdfDocument();
                         doc = converter.ConvertHtmlString(content1);
 
-                        /*
+           
                         if (doc != null)
                         {
                             doc.Save(memoryStream);
@@ -171,7 +171,7 @@ namespace SkietbaanBE.Controllers
                             return ("array fails");
 
                            
-                        }*/
+                        }
 
                         return (content1);
 
