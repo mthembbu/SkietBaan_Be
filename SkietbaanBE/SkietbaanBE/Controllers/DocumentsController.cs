@@ -7,12 +7,7 @@ using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 using System.Net;
 using System.Net.Mail;
-
 using System.IO;
-
-using System.Xml.Linq;
-using System.Xml;
-using System.Text.RegularExpressions;
 using SelectPdf;
 
 namespace SkietbaanBE.Controllers
@@ -151,8 +146,9 @@ namespace SkietbaanBE.Controllers
                         converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
                         converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
 
-                        
-                        SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+                        PdfDocument doc = new PdfDocument();
+                        doc = converter.ConvertHtmlString(content1);
+
                         /*
                         if (doc != null)
                         {
