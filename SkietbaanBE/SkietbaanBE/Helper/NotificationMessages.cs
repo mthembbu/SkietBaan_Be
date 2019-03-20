@@ -10,6 +10,15 @@ namespace SkietbaanBE.Helper
 {
     public class NotificationMessages
     {
+        enum TYPEOFNOTIFICATIONS
+        {
+            CONFIRMATION,
+            RENEWAL,
+            COMPETITION,
+            GROUP,
+            DOCUMENT,
+            AWARD
+        }
         ModelsContext _context;
         public NotificationMessages(ModelsContext context)
         {
@@ -117,6 +126,98 @@ namespace SkietbaanBE.Helper
                 NotificationMessage = "Hello " + user.Username + " Letter of Status and Letter of Good Standing received. Check your documents"
             };
             _context.Add(notification);
+            _context.SaveChanges();
+        }
+
+        public void TotalAwardNotification(string award)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var notification = new Notifications
+            {
+                User = user,
+                IsRead = false,
+                TypeOfNotification = "Award",
+                NotificationMessage = award + " award received in overall total"
+            };
+
+            string message;
+            try
+            {
+                _context.Add(notification);
+            }
+            catch (Exception e)
+            {
+                message = e.Message;
+            }
+            
+            _context.SaveChanges();
+        }
+
+        public void AccuracyAwardNotification(string award)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var notification = new Notifications
+            {
+                User = user,
+                IsRead = false,
+                TypeOfNotification = "Award",
+                NotificationMessage = award + " award received in accuracy"
+            };
+
+            string message;
+            try
+            {
+                _context.Add(notification);
+            }catch(Exception e)
+            {
+                message = e.Message;
+            }
+            _context.SaveChanges();
+        }
+
+        public void HoursAwardNotification(string award)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var notification = new Notifications
+            {
+                User = user,
+                IsRead = false,
+                TypeOfNotification = "Award",
+                NotificationMessage = award + " award received "
+            };
+
+            string message;
+            try
+            {
+                _context.Add(notification);
+            }
+            catch (Exception e)
+            {
+                message = e.Message;
+            }
+            _context.SaveChanges();
+        }
+
+        public void MonthAwardNotification(string description)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var notification = new Notifications
+            {
+                User = user,
+                IsRead = false,
+                TypeOfNotification = "Award",
+                NotificationMessage = description 
+            };
+
+            string message;
+            try
+            {
+                _context.Add(notification);
+            }
+            catch (Exception e)
+            {
+                message = e.Message;
+            }
             _context.SaveChanges();
         }
     }

@@ -1,4 +1,5 @@
-﻿using SkietbaanBE.Models;
+﻿using SkietbaanBE.Helper;
+using SkietbaanBE.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,11 @@ namespace SkietbaanBE.Lib {
         private ModelsContext _context;
         private Timer awardTimer; //this timer runs only once at the end of every month
         private Timer updateAwardTimer; //this timer updates the awardTimer on how many days are in the current month
+        private NotificationMessages _notificationMessage;
 
-        public ScheduleJob(ModelsContext context) {
+        public ScheduleJob(ModelsContext context, NotificationMessages notificationMessage) {
             _context = context;
+            _notificationMessage = notificationMessage;
             updateAwardTimer = new Timer(
                 callback: new TimerCallback(RunAwardUserJob),
                 state: "",
@@ -59,6 +62,7 @@ namespace SkietbaanBE.Lib {
                     Description = $"Best shooter in {GetMonthNameByMonthNumber(DateTime.Today.Month)}" + " " +
                                     $"{DateTime.Today.Year}"
                 };
+                _notificationMessage.MonthAwardNotification(award.Description);
                 _context.Awards.Add(award);
             }
 
