@@ -16,6 +16,9 @@ namespace SkietbaanBE.Controllers
     {
         private ModelsContext _context;
         private NotificationMessages _notificationMessage;
+
+        private SendMail sendMail = new SendMail();
+
         public FeaturesController(ModelsContext db, NotificationMessages notificationMessage)
         {
             _context = db;
@@ -26,10 +29,49 @@ namespace SkietbaanBE.Controllers
         public User GetUserByToken(string token)
         {
             var user = _context.Users.FirstOrDefault(x => x.Token == token);
-                if(user != null)
-                    return user;
+            if (user != null)
+                return user;
             else return null;
         }
+
+        [HttpPost]
+        public string forgotPassword(string user)
+        {
+            var username = _context.Users.FirstOrDefault(x => x.Username == user);
+
+            if (username == null)
+            {
+                var email = _context.Users.FirstOrDefault(x => x.Email == user);
+
+                if (email == null)
+                {
+                    return ("user not registered");
+                }
+
+                sendMail.SendPasswordEmail(user, "reset Password", email.Token);
+
+                return ("sent by email");
+            }
+
+            sendMail.SendPasswordEmail(username.Email, "reset Password", username.Token);
+
+            return ("sent by username");
+        }    
+        
+        [HttpPost]
+
+        public string resetpassword(string token, string password)
+        {
+
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
+
+            user.Password = Security.HashSensitiveData(password);
+            _context.Update(user);
+            _context.SaveChanges();
+            return ("changed");
+
+        }
+
 
         [HttpPost]
         public ActionResult Login ([FromBody]User user)

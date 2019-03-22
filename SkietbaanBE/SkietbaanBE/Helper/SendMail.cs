@@ -37,6 +37,25 @@ namespace SkietbaanBE.Helper
             return true;
         }
 
+        public bool SendPasswordEmail(string To, string Subject, string token)
+        {
+            try
+            {
+                using (MailMessage mail = new MailMessage())
+                {
+                    string url = "http://localhost:3000/resetPassword/";
+                    MailAssignment(mail, emailFromAddress, To, Subject, $"<a href='{url}{token}'>reset</a>");
+                    SmtpSend(mail);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+            return true;
+        }
+
         public void MailAssignment(MailMessage mailMessage, string From, string To, string Subject, string Body)
         {
             mailMessage.From = new MailAddress(From);
