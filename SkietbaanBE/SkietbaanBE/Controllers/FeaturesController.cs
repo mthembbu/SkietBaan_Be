@@ -34,7 +34,15 @@ namespace SkietbaanBE.Controllers
         [HttpPost]
         public ActionResult Login ([FromBody]User user)
         {
-            var dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+            User dbUser = null;
+            if(!String.IsNullOrEmpty(user.Username))
+            {
+                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+            }
+            else
+            {
+                dbUser = _context.Users.FirstOrDefault(x => x.Email == user.Email);
+            }
             if (dbUser == null)
             {
                 return new NotFoundObjectResult($"{user.Username} not found");
