@@ -10,19 +10,19 @@ namespace SkietbaanBE.Helper
 {
     public class NotificationMessages
     {
-        enum TYPEOFNOTIFICATIONS
-        {
-            CONFIRMATION,
-            RENEWAL,
-            COMPETITION,
-            GROUP,
-            DOCUMENT,
-            AWARD
-        }
         ModelsContext _context;
+        string response = string.Empty;
         public NotificationMessages(ModelsContext context)
         {
             _context = context;
+        }
+
+        public string GetTimeOfArrival()
+        {
+            var date = DateTime.Now;
+            var timeOfArrivalInMinutes = TimeSpan.FromMinutes(date.Minute);
+            var timeOfArrivalInHours = string.Format("{0:00}", (int)timeOfArrivalInMinutes.TotalHours, timeOfArrivalInMinutes.Minutes);
+            return timeOfArrivalInHours;
         }
 
         public void ConfirmationNotification(ModelsContext _context, User user)
@@ -32,20 +32,20 @@ namespace SkietbaanBE.Helper
                 User = user,
                 IsRead = false,
                 TypeOfNotification = "Confirmation",
+                TimeOfArrival = GetTimeOfArrival(),
                 NotificationMessage = "Welcome to the club " + user.Username + ". You are now a member."
             };
 
-            string message = string.Empty;
             try
             {
                 _context.Notifications.Add(notification);
                 _context.SaveChanges();
 
-                message = "successful";
+                response = "successful";
             }
             catch(Exception e)
             {
-                message = e.Message;
+                response = e.Message;
             }
         }
 
@@ -57,6 +57,7 @@ namespace SkietbaanBE.Helper
                 var notification = new Notifications();
                 notification.User = user;
                 notification.IsRead = false;
+                notification.TimeOfArrival = GetTimeOfArrival();
                 notification.TypeOfNotification = "Competition";
                 notification.NotificationMessage = comp.Name + ", has been created. Check it out!";
                 _context.Notifications.Add(notification);
@@ -70,21 +71,22 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
+                TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Group",
                 NotificationMessage = group.Name + ", created. Check it out!"
             };
-            string message = string.Empty;
+
             try
             {
                 _context.Notifications.Add(notification);
-                _context.SaveChanges();
-
-                message = "successful";
+                response = "successful";
             }
             catch (Exception e)
             {
-                message = e.Message;
+                response = e.Message;
             }
+
+            _context.SaveChanges();
         }
 
         public void LOS(string token)
@@ -94,10 +96,19 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
+                TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Status received. Check your documents"
             };
-            _context.Add(notification);
+
+            try
+            {
+                _context.Add(notification);
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+            }
             _context.SaveChanges();
         }
 
@@ -108,10 +119,19 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
+                TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Good Standing received. Check your documents"
             };
-            _context.Add(notification);
+
+            try
+            {
+                _context.Add(notification);
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+            }
             _context.SaveChanges();
         }
 
@@ -122,10 +142,18 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
+                TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Status and Letter of Good Standing received. Check your documents"
             };
-            _context.Add(notification);
+            try
+            {
+                _context.Add(notification);
+            }
+            catch (Exception ex)
+            {
+                response = ex.Message;
+            }
             _context.SaveChanges();
         }
 
@@ -136,18 +164,18 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
+                TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Award",
                 NotificationMessage = award + " award received in overall total"
             };
-
-            string message;
+            
             try
             {
                 _context.Add(notification);
             }
             catch (Exception e)
             {
-                message = e.Message;
+                response = e.Message;
             }
             
             _context.SaveChanges();
@@ -160,17 +188,17 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
+                TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Award",
                 NotificationMessage = award + " award received in accuracy"
             };
-
-            string message;
+            
             try
             {
                 _context.Add(notification);
             }catch(Exception e)
             {
-                message = e.Message;
+                response = e.Message;
             }
             _context.SaveChanges();
         }
@@ -182,18 +210,18 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
+                TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Award",
                 NotificationMessage = award + " award received "
             };
-
-            string message;
+            
             try
             {
                 _context.Add(notification);
             }
             catch (Exception e)
             {
-                message = e.Message;
+                response = e.Message;
             }
             _context.SaveChanges();
         }
@@ -205,18 +233,18 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
+                TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Award",
                 NotificationMessage = description 
             };
-
-            string message;
+            
             try
             {
                 _context.Add(notification);
             }
             catch (Exception e)
             {
-                message = e.Message;
+                response = e.Message;
             }
             _context.SaveChanges();
         }
