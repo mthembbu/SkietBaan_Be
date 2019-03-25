@@ -9,5 +9,7 @@ namespace SkietbaanBE.Models {
         public virtual User User { get; set; }
         public virtual Competition Competition { get; set; }
         public string Description { get; set; }
+        public int Month { get; set; }
+        public int Year { get; set; }
     }
 }

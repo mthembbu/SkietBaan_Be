@@ -2,6 +2,7 @@
 using SkietbaanBE.RequestModel;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace SkietbaanBE.Lib {
     public class CheckAward {
@@ -15,16 +16,32 @@ namespace SkietbaanBE.Lib {
                 foreach (string req in requirements.Split(',')) {
                     if (req.Contains("gold")) {
                         totalAward.Gold = total >= int.Parse(req.Split(' ')[1].Trim());
+                        if (totalAward.Gold)
+                            totalAward.GoldRequirementStatus = req.Split(' ')[1].Trim() + " REACHED";
+                        else
+                            totalAward.GoldRequirementStatus = "REACH " + req.Split(' ')[1].Trim();
                     } else if (req.Contains("silver")) {
                         totalAward.Silver = total >= int.Parse(req.Split(' ')[1].Trim());
+                        if (totalAward.Silver)
+                            totalAward.SilverRequirementStatus = req.Split(' ')[1].Trim() + " REACHED";
+                        else
+                            totalAward.SilverRequirementStatus = "REACH " + req.Split(' ')[1].Trim();
                     } else {
                         totalAward.Bronze = total >= int.Parse(req.Split(' ')[1].Trim());
+                        if (totalAward.Bronze)
+                            totalAward.BronzeRequirementStatus = req.Split(' ')[1].Trim() + " REACHED";
+                        else
+                            totalAward.BronzeRequirementStatus = "REACH " + req.Split(' ')[1].Trim();
                     }
                 }
             } else {
+                var requirements = ReadAwardsRules()["Total"];
                 totalAward.Gold = false;
+                totalAward.GoldRequirementStatus = "REACH " + requirements.Split(',')[0].Split(' ')[1];
                 totalAward.Silver = false;
+                totalAward.SilverRequirementStatus = "REACH " + requirements.Split(',')[1].Split(' ')[1];
                 totalAward.Bronze = false;
+                totalAward.BronzeRequirementStatus = "REACH " + requirements.Split(',')[2].Split(' ')[1];
             }
             return totalAward;
         }
@@ -36,16 +53,32 @@ namespace SkietbaanBE.Lib {
                 foreach (string req in requirements.Split(',')) {
                     if (req.Contains("gold")) {
                         accuracyAward.Gold = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
+                        if (accuracyAward.Gold)
+                            accuracyAward.GoldRequirementStatus = req.Split(' ')[1].Trim() + "% REACHED";
+                        else
+                            accuracyAward.GoldRequirementStatus = "REACH " + req.Split(' ')[1].Trim() + "%";
                     } else if (req.Contains("silver")) {
                         accuracyAward.Silver = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
+                        if (accuracyAward.Silver)
+                            accuracyAward.SilverRequirementStatus = req.Split(' ')[1].Trim() + "% REACHED";
+                        else
+                            accuracyAward.SilverRequirementStatus = "REACH " + req.Split(' ')[1].Trim() + "%";
                     } else {
                         accuracyAward.Bronze = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
+                        if (accuracyAward.Bronze)
+                            accuracyAward.BronzeRequirementStatus = req.Split(' ')[1].Trim() + "% REACHED";
+                        else
+                            accuracyAward.BronzeRequirementStatus = "REACH " + req.Split(' ')[1].Trim() + "%";
                     }
                 }
             } else {
+                var requirements = ReadAwardsRules()["Accuracy"];
                 accuracyAward.Gold = false;
+                accuracyAward.GoldRequirementStatus = "REACH " + requirements.Split(',')[0].Split(' ')[1] + "%";
                 accuracyAward.Silver = false;
+                accuracyAward.SilverRequirementStatus = "REACH " + requirements.Split(',')[1].Split(' ')[1] + "%";
                 accuracyAward.Bronze = false;
+                accuracyAward.BronzeRequirementStatus = "REACH " + requirements.Split(',')[2].Split(' ')[1] + "%";
             }
 
             return accuracyAward;
@@ -90,6 +123,13 @@ namespace SkietbaanBE.Lib {
                 context.TimeSpents.Update(dbRecord);
             }
             context.SaveChanges();
+        }
+
+        public static string MonthBest(int compId, string token, ModelsContext context) {
+            Award award = context.Awards.FirstOrDefault(x => x.Competition.Id == compId && x.User.Token == token
+                                                && x.Month == DateTime.Today.Month && x.Year == DateTime.Today.Year);
+            if (award != null) return award.Description;
+            return "No Award";
         }
 
         private static Dictionary<string, string> ReadAwardsRules() {
