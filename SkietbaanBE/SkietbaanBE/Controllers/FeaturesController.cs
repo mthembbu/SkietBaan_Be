@@ -35,7 +35,7 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpPost]
-        public string forgotPassword(string user)
+        public string ForgotPassword(string user)
         {
             var username = _context.Users.FirstOrDefault(x => x.Username == user);
 
@@ -60,7 +60,7 @@ namespace SkietbaanBE.Controllers
         
         [HttpPost]
 
-        public string resetpassword(string token, string password)
+        public string Resetpassword(string token, string password)
         {
 
             var user = _context.Users.FirstOrDefault(x => x.Token == token);

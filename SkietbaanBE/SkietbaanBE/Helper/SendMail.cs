@@ -43,7 +43,7 @@ namespace SkietbaanBE.Helper
             {
                 using (MailMessage mail = new MailMessage())
                 {
-                    string url = "http://localhost:3000/resetPassword/";
+                    string url = "https://skietbaan.retrotest.co.za/resetpassword/";
                     MailAssignment(mail, emailFromAddress, To, Subject, $"<a href='{url}{token}'>reset</a>");
                     SmtpSend(mail);
                 }
