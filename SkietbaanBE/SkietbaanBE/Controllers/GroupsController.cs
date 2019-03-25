@@ -27,8 +27,9 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<Group> GetGroups()
         {
-            IEnumerable<Group> groups = _context.Groups;
-            return groups;
+            
+            IEnumerable<Group> groups = (_context.Groups);
+            return (groups).OrderBy(x=>x.IsActive.Equals(false)).ThenBy(x=>x.Name);
         }
         // GET: api/Groups/5
         [HttpGet("{id}")]
@@ -149,9 +150,11 @@ namespace SkietbaanBE.Controllers
                 group.IsActive = true;
             }
 
+      
             List<UserGroup> userGroups = new List<UserGroup>();
             for (int i = 0; i < createobj.users.Length; i++)
             {
+                string standard = "";
                 UserGroup userGroup = new UserGroup();
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == createobj.users.ElementAt(i).Token);
                 userGroup.GroupId = group.Id;
@@ -187,7 +190,7 @@ namespace SkietbaanBE.Controllers
                     users.Add(user);
                 }
             }
-            var result = (qry).Except(users);
+            var result = ((qry).Except(users)).OrderBy(x=>x.Username);
             return result.ToList<User>();
         }
 
@@ -214,7 +217,7 @@ namespace SkietbaanBE.Controllers
                 }
             }
 
-            return users;
+            return users.OrderBy(x=>x.Username).ToList();
         }
         //delete members in a group
         [HttpPost]
@@ -265,6 +268,24 @@ namespace SkietbaanBE.Controllers
                 _context.UserGroups.Add(userGroup);
                 _context.SaveChanges();
             }
+        }
+
+        [HttpGet("participants")]
+        public Dictionary<int, int> getUsersPerGroup()
+        {
+            Dictionary<int, int> mapCompToNumUser = new Dictionary<int, int>();
+            var GroupList = this.GetGroups();
+
+            foreach (var groups in GroupList)
+            {
+                int count = (from usergroup in _context.UserGroups
+                             where usergroup.GroupId ==groups.Id 
+                             select usergroup.User.Id).Distinct().ToList().Count();
+
+                mapCompToNumUser.Add(groups.Id, count);
+            }
+
+            return mapCompToNumUser;
         }
     }
 }

@@ -26,10 +26,10 @@ namespace SkietbaanBE.Controllers
         public NotificationMessages AddNotification(string token)
         {
             var _document = new DocumentsController(_context);
-            var doccieLOS = _document.UserLOS(token); 
+            var doccieLOS = _document.UserLOS(token);
             var doccieLOGS = _document.UserLOGS(token);
 
-            if(doccieLOGS == "Document" && doccieLOS == "Document")
+            if (doccieLOGS == "Document" && doccieLOS == "Document")
             {
                 _notificationMessage.DocumenstNotification(token);
                 return _notificationMessage;
@@ -52,9 +52,9 @@ namespace SkietbaanBE.Controllers
         public async Task<Notifications> GetNotificationById(int id)
         {
             var notification = _context.Notifications.SingleOrDefault(x => x.Id == id);
-            if(notification == null)
+            if (notification == null)
             {
-               NotFound();
+                NotFound();
             }
             else
             {
@@ -67,9 +67,10 @@ namespace SkietbaanBE.Controllers
         public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
             var notifications = _context.Notifications.Where(x => x.User.Token == token);
-            if (notifications != null)
+            var notificationsList = notifications.OrderBy(x => x.IsRead == true);
+            if (notificationsList != null)
             {
-                return notifications.ToList();
+                return notificationsList.ToList();
             }
             else
                 return null;
@@ -78,18 +79,43 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public int GetNumberOfNotifications(string token)
         {
-            var notificationsList = GetNotificationsByUser(token);  
+            var notificationsList = GetNotificationsByUser(token);
             var unReadNotifications = notificationsList.Where(x => x.IsRead == false);
             return unReadNotifications.Count();
         }
 
         [HttpPost("{id}")]
-
         public async Task DeleteNotificationById(int id)
         {
             var notification = await GetNotificationById(id);
-           _context.Notifications.Remove(notification);
+            _context.Notifications.Remove(notification);
             await _context.SaveChangesAsync();
+        }
+
+        [HttpPost("{id}")]
+        public async Task<IActionResult> UpdateIsReadProperty(int id)
+        {
+            var notification = new Notifications();
+            if(id.Equals(""))
+            {
+                return new BadRequestObjectResult("Invaild type for Id");
+            }
+            else
+            {
+                notification = await GetNotificationById(id);
+            }
+
+            notification.IsRead = true;
+            try
+            {
+                _context.Notifications.Update(notification);
+            }
+            catch (Exception ex)
+            {
+                var result = ex.Message;
+            }
+            await _context.SaveChangesAsync();
+            return new OkObjectResult("IsRead Property Updated Successfully");
         }
     }
 }

@@ -79,7 +79,7 @@ namespace SkietbaanBE.Controllers
             return "success";
         }
         [HttpGet]
-        public LeaderboardResults GetLeaderboardRankings(int competitionID, int groupID, string userToken)
+        public LeaderboardResults GetLeaderboardRankings(int competitionID, int groupID, string userToken,string selectedRank)
         {
             //from arry index to data base ID;
             LeaderboardResults leaderboardResults = new LeaderboardResults();
@@ -95,7 +95,7 @@ namespace SkietbaanBE.Controllers
                 rankResults = this.groupRankings(competitionID, groupID);
             }
             //sort and rank results
-            leaderboardResults.RankResults = sortAndRank(rankResults);
+            leaderboardResults.RankResults = sortAndRank(rankResults, selectedRank);
 
             //Current User's results
             User currentUser = new FeaturesController(_context, null).GetUserByToken(userToken);
@@ -136,9 +136,24 @@ namespace SkietbaanBE.Controllers
             return leaderboardResults;
         }
 
-        private List<RankResults> sortAndRank(List<RankResults> rankResults)
+        private List<RankResults> sortAndRank(List<RankResults> rankResults,string ranking)
         {
-            List<RankResults> results = rankResults.OrderByDescending(x => x.Best).ToList();
+            List<RankResults> results = rankResults;
+            switch (ranking) {
+                case "total":
+                    results = rankResults.OrderByDescending(x => x.Total).ToList();
+                    break;
+                case "average":
+                    results = rankResults.OrderByDescending(x => x.Average).ToList();
+                    break;
+                case "best":
+                    results = rankResults.OrderByDescending(x => x.Best).ToList();
+                    break;
+                default:
+                    results = rankResults.OrderByDescending(x => x.Best).ToList();
+                    break;
+            }
+
             for (int i = 0; i < results.Count; i++)
             {
                 results.ElementAt(i).Rank = i + 1;

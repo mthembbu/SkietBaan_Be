@@ -5,17 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SkietbaanBE.Models
-{
-    public class Notifications
-    {
+namespace SkietbaanBE.Models {
+    public class Requirement {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public bool IsRead { get; set; }
-        public string TimeOfArrival { get; set; }
-        public string TypeOfNotification { get; set; }
-        public string NotificationMessage { get; set; }
-        public virtual User User { get; set; }
+        public virtual Competition Competition { get; set; }
+        public string Standard { get; set; }
+        public double Accuracy { get; set; }
+        public double Total { get; set; }
     }
 }
