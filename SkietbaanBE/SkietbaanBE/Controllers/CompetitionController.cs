@@ -37,16 +37,17 @@ namespace SkietbaanBE.Controllers
         public IEnumerable<Competition> GetAllCompetitions()
        {
             //get the competitions where(Status == true / false)
-            List<Competition> CompList = (from C in _context.Competitions
+            List<Competition> competitionsList = (from C in _context.Competitions
                                          select C).OrderBy(c => c.Status == false).ThenBy(x => x.Name).ToList<Competition>();
             //get the list of Requirements for Each Competition
-            foreach (Competition C in CompList){
-                List<Requirement> ReqList = (from R in _context.Requirements
+            foreach (Competition C in competitionsList)
+            {
+                List<Requirement> RequirementsList = (from R in _context.Requirements
                                             where R.CompID == C.Id
                                             select R).ToList<Requirement>();
-                C.RequirementsList = ReqList;
+                C.RequirementsList = RequirementsList;
             }
-            return CompList;
+            return competitionsList;
         }
         //Getting a competition by ID
         // GET: api/Competition/id
@@ -62,8 +63,8 @@ namespace SkietbaanBE.Controllers
         {
             if (ModelState.IsValid)
             {
-                Competition dbComp = _context.Competitions.FirstOrDefault(c => c.Name == comp.Name);
-                if (dbComp != null)
+                Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == comp.Name);
+                if (dbCompetition != null)
                     return new BadRequestObjectResult(comp.Name + " already exists");
                 _notificationMessages.CompetitionNotification(_context, comp);
                 await _context.AddAsync(comp);
@@ -88,18 +89,18 @@ namespace SkietbaanBE.Controllers
                 }
                 else
                 {
-                    Competition dbComp = null; //assume competition does not exist
+                    Competition dbCompetition = null; //assume competition does not exist
                     using (_context)
                     {
-                        dbComp = _context.Competitions
+                        dbCompetition = _context.Competitions
                                          .Where(u => u.Name == comp.Name && u.Id != comp.Id)
                                          .FirstOrDefault<Competition>();
-                        if (dbComp == null) {
+                        if (dbCompetition == null) {
                             return BadRequest("Cannot update competition, no such competition!");
                         }
                         //now updating status to either true / false
-                         dbComp.Status = comp.Status;
-                        _context.Competitions.Update(dbComp);
+                        dbCompetition.Status = comp.Status;
+                        _context.Competitions.Update(dbCompetition);
                         await _context.SaveChangesAsync();
                         return Ok("Status update successful");
                     }
@@ -120,20 +121,20 @@ namespace SkietbaanBE.Controllers
                     return new BadRequestObjectResult("competiton cannot be null");
                 }
                 else {
-                    Competition dbComp;//assume the competition does not exist
+                    Competition dbCompetition;//assume the competition does not exist
                     using (_context) {
-                        dbComp = _context.Competitions.Where(C => C.Id == Comp.Id).FirstOrDefault<Competition>();
-                        if (dbComp == null) {
+                        dbCompetition = _context.Competitions.Where(C => C.Id == Comp.Id).FirstOrDefault<Competition>();
+                        if (dbCompetition == null) {
                             return BadRequest("Cannot update competition, no such competition!");
                         }
                         foreach (Requirement R in Comp.RequirementsList){
-                            Requirement Temp = new Requirement {
+                            Requirement TempRequirement = new Requirement {
                                 CompID = R.CompID,
                                 Standard = R.Standard,
                                 Accuracy = R.Accuracy,
                                 Total = R.Total
                             };
-                            await _context.AddAsync(Temp);
+                            await _context.AddAsync(TempRequirement);
                         }
                         await _context.SaveChangesAsync();
                         return Ok("All Requirements for the "+Comp.Name+" have been added");
