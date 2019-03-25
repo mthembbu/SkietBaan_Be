@@ -7,12 +7,7 @@ using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 using System.Net;
 using System.Net.Mail;
-
 using System.IO;
-
-using System.Xml.Linq;
-using System.Xml;
-using System.Text.RegularExpressions;
 using SelectPdf;
 
 namespace SkietbaanBE.Controllers
@@ -51,73 +46,80 @@ namespace SkietbaanBE.Controllers
             }
         } 
         
-        [HttpGet] 
+        [HttpPost] 
         [Route("{Token}")]
         public string SendLOS(string Token)
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            if(Member != null)
+            if (Member != null)
             {
-                StreamReader streamReader;
                 MemoryStream memoryStream = new MemoryStream();
 
+                StreamReader streamReader;
 
-                try
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
+
+                if (streamReader != null)
                 {
-                    streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
+                    string content = streamReader.ReadToEnd();
 
-
-                    if (streamReader != null)
+                    if (content != null)
                     {
-                        string content = streamReader.ReadToEnd();
-
                         content.ToString();
 
                         streamReader.Close();
 
-                        var content1 = content.Replace("Name", Member.Username)
-                               .Replace("Type", "Letter Of Status")
-                               .Replace("Date", "December 2019");
+                        string content1 = content.Replace("Name", Member.Username)
+                           .Replace("Type", "Letter Of Dedicated Status")
+                           .Replace("Date", "December 2019");
 
-                        HtmlToPdf converter = new HtmlToPdf();
+                        SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
                         converter.Options.PdfPageSize = PdfPageSize.A4;
                         converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
                         converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-                        converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit; ;
+                        converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
 
-                        SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+                        PdfDocument doc = new PdfDocument();
+                        doc = converter.ConvertHtmlString(content1);
 
 
-                        doc.Save(memoryStream);
+                        if (doc != null)
+                        {
+                            doc.Save(memoryStream);
 
-                        byte[] bytes = memoryStream.ToArray();
+                            byte[] bytes = memoryStream.ToArray();
 
-                        memoryStream.Close();
+                            memoryStream.Close();
 
-                        sendMail.SendEmail(Member.Email, "Letter of Status", new Attachment(new MemoryStream(bytes), "LOS.pdf"));
+                            if (bytes != null)
+                            {
+                                sendMail.SendEmail(Member.Email, "Letter Of Dedicated Status", new Attachment(new MemoryStream(bytes), "LOS.pdf"));
 
-                        doc.Close();
+                                doc.Close();
 
-                        return ("yes");
+                                return ("Document Sent");
+
+                            }
+
+                            return ("Document Not Sent");
+
+
+                        }
+
+                        return ("Document Not Sent");
 
                     }
 
+                    return ("Document Not Sent");
+
                 }
-                catch (System.IO.DirectoryNotFoundException)
-                {
-
-                }    
-                return (Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
-
+                return ("Document Not Sent");
             }
-
-            return (Directory.GetCurrentDirectory().ToString());
-
-           
+            return ("Document Not Sent");
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{Token}")]
         public string SendLOGS(string Token)
         {
@@ -141,18 +143,20 @@ namespace SkietbaanBE.Controllers
 
                         streamReader.Close();
 
-                        var content1 = content.Replace("Name", Member.Username)
+                         string content1 = content.Replace("Name", Member.Username)
                             .Replace("Type", "Letter Of Good Standing")
                             .Replace("Date", "December 2019");
-
+                        
                         SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-                        converter.Options.PdfPageSize = PdfPageSize.A4;
+                       converter.Options.PdfPageSize = PdfPageSize.A4;
                         converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
                         converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
                         converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
 
-                        SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+                        PdfDocument doc = new PdfDocument();
+                        doc = converter.ConvertHtmlString(content1);
 
+           
                         if (doc != null)
                         {
                             doc.Save(memoryStream);
@@ -167,25 +171,25 @@ namespace SkietbaanBE.Controllers
 
                                 doc.Close();
 
-                                return (content);
+                                return ("Document Sent");
 
                             }
 
-                            return ("array fails");
+                            return ("Document Not Sent");
 
                            
                         }
 
-                        return (content1);
+                        return ("Document Not Sent");
 
                     }
 
-                    return (content);
+                    return ("Document Not Sent");
 
                 }
-                return (Directory.GetCurrentDirectory().ToString()+ streamReader.ToString());
+                return ("Document Not Sent");
             }
-            return (Directory.GetCurrentDirectory().ToString());
+            return ("Document Not Sent");
         }
 
 

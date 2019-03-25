@@ -16,6 +16,9 @@ namespace SkietbaanBE.Controllers
     {
         private ModelsContext _context;
         private NotificationMessages _notificationMessage;
+
+        private SendMail sendMail = new SendMail();
+
         public FeaturesController(ModelsContext db, NotificationMessages notificationMessage)
         {
             _context = db;
@@ -26,15 +29,62 @@ namespace SkietbaanBE.Controllers
         public User GetUserByToken(string token)
         {
             var user = _context.Users.FirstOrDefault(x => x.Token == token);
-                if(user != null)
-                    return user;
+            if (user != null)
+                return user;
             else return null;
         }
 
         [HttpPost]
+        public string ForgotPassword(string user)
+        {
+            var username = _context.Users.FirstOrDefault(x => x.Username == user);
+
+            if (username == null)
+            {
+                var email = _context.Users.FirstOrDefault(x => x.Email == user);
+
+                if (email == null)
+                {
+                    return ("user not registered");
+                }
+
+                sendMail.SendPasswordEmail(user, "reset Password", email.Token);
+
+                return ("sent by email");
+            }
+
+            sendMail.SendPasswordEmail(username.Email, "reset Password", username.Token);
+
+            return ("sent by username");
+        }    
+        
+        [HttpPost]
+
+        public string ResetPassword(string token, string password)
+        {
+
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
+
+            user.Password = Security.HashSensitiveData(password);
+            _context.Update(user);
+            _context.SaveChanges();
+            return ("changed");
+
+        }
+
+
+        [HttpPost]
         public ActionResult Login ([FromBody]User user)
         {
-            var dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+            User dbUser = null;
+            if(!String.IsNullOrEmpty(user.Username))
+            {
+                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+            }
+            else
+            {
+                dbUser = _context.Users.FirstOrDefault(x => x.Email == user.Email);
+            }
             if (dbUser == null)
             {
                 return new NotFoundObjectResult($"{user.Username} not found");
@@ -70,7 +120,7 @@ namespace SkietbaanBE.Controllers
         [ActionName("TimeLeft")]
         public IEnumerable<int> TimeLeft()
         {
-            var dbUsers = _context.Users.Where(u => u.MemberID != null && u.MemberID != "");
+            var dbUsers =( _context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x=>x.Username);
             DateTime current = DateTime.Now;
             var months = new List<int>();
             foreach (var user in dbUsers)
@@ -110,7 +160,7 @@ namespace SkietbaanBE.Controllers
         [ActionName("SearchMember")]
         public IEnumerable<User> SearchMember()
         {
-            return _context.Users.ToArray<User>().Where(u => u.MemberID != null && u.MemberID != "");
+            return (_context.Users.ToArray<User>().Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x=>x.Username);
         }
 
         //// POST: api/User/Update

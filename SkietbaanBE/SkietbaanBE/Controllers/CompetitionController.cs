@@ -15,7 +15,6 @@ namespace SkietbaanBE.Controllers
     {
         private ModelsContext _context;
         private NotificationMessages _notificationMessages;
-        
         public CompetitionController(ModelsContext db , NotificationMessages notificationMessages)
         {
             _context = db;
@@ -27,13 +26,12 @@ namespace SkietbaanBE.Controllers
         public IEnumerable<Competition> GetCompetitions()    
         {
             //get the competitions where(Status == true)
-            var competitionIDsQuery = from Comp in _context.Competitions
-                                      where Comp.Status == true
-                                      select Comp;
-            List<Competition> competitionsList = competitionIDsQuery.ToList<Competition>();     
+            List<Competition> competitionsList = (from Comp in _context.Competitions
+                                                  where Comp.Status == true
+                                                  select Comp).ToList<Competition>();     
             return competitionsList;
         }
-        /** The method that return an array of competition objects whether status is true or false*/
+        // The method that return an array of competition objects whether status is true or false
         // GET: api/Competition/all
         [HttpGet("all")]
         public IEnumerable<Competition> GetAllCompetitions()
@@ -65,14 +63,13 @@ namespace SkietbaanBE.Controllers
                 Competition dbComp = _context.Competitions.FirstOrDefault(c => c.Name == comp.Name);
                 if (dbComp != null)
                     return new BadRequestObjectResult(comp.Name + " already exists");
-
                 _notificationMessages.CompetitionNotification(_context, comp);
                 await _context.AddAsync(comp);
                 await _context.SaveChangesAsync();
-                return Ok("Competition Added!!!!!!!");
+                return Ok("Competition Added!");
             }
             else {
-                return new BadRequestObjectResult("competiton cannot be null");
+                return new BadRequestObjectResult("competition cannot be null");
             }
         }
         //A method that updates the status of the competition
@@ -97,12 +94,11 @@ namespace SkietbaanBE.Controllers
                                          .FirstOrDefault<Competition>();
                         if (dbComp != null)
                         {
-                            return BadRequest("Cannot update competition, already exists");
+                            return BadRequest("Cannot update competition, no such competition!");
                         }
                         dbComp = _context.Competitions
                                          .Where(u => u.Id == comp.Id)
                                          .FirstOrDefault<Competition>();
-
                         //now updating status to either true / false
                         dbComp.Status = comp.Status;
                         _context.Competitions.Update(dbComp);
@@ -116,10 +112,41 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("competition cannot be null");
             }
         }
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        //A method that updates the competition standards by {Id}
+        // POST: api/Competition/standard/5
+        [HttpPost("/standard/{id}")]
+        public void UpdateCompetitionRequirement(int compID, [FromBody] RequirementsFilter requirementFilter)
         {
+                Competition dbComp = _context.Competitions.FirstOrDefault(c => c.Id == compID);
+                List<Requirement> requirementsList = (from R in _context.Requirements
+                                        where R.Competition.Id == compID
+                                        select R).ToList<Requirement>();
+                    for(int i = 0; i < requirementsList.Count; i++)
+                    {
+                        Requirement temp = requirementsList.ElementAt(i);
+                        temp.Accuracy = requirementFilter.requirements[i].Accuracy;
+                        temp.Total = requirementFilter.requirements[i].Total;
+                        _context.Requirements.Update(temp);
+                        _context.SaveChangesAsync();
+                    }
+            }
+        //The method that adds a new competition  competition to the competition
+        // POST: api/Competition/Standard
+        [HttpPost("/standard")]
+        public void AddCompetitionRequirements([FromBody] RequirementsFilter requirementFilter)
+        {
+            Competition dbComp = _context.Competitions.Where(c=>c.Id==requirementFilter.compID).FirstOrDefault<Competition>();
+                String[] standard = { "Bronze", "Silver", "Gold" };
+                for (int i = 0; i < 3; i++)
+                { 
+                    Requirement newRequirement = new Requirement();
+                    newRequirement.Competition = dbComp;
+                    newRequirement.Standard = standard[i];
+                    newRequirement.Accuracy = requirementFilter.requirements[i].Accuracy;
+                    newRequirement.Total = requirementFilter.requirements[i].Total;
+                    _context.Requirements.AddAsync(newRequirement);
+                    _context.SaveChangesAsync();
+                }
         }
         //GET: api/competition/participants
         [HttpGet("participants")]
@@ -127,16 +154,13 @@ namespace SkietbaanBE.Controllers
         {
             Dictionary<int, int> mapCompToNumUser = new Dictionary<int, int>();
             var competitionsList = this.GetCompetitions();
-
             foreach (var comp in competitionsList)
             {
                 int count = (from score in _context.Scores
                              where score.Competition.Id == comp.Id
                              select score.User.Id).Distinct().ToList().Count();
-
                 mapCompToNumUser.Add(comp.Id, count);
             }
-
             return mapCompToNumUser;
         }
     }
