@@ -60,7 +60,7 @@ namespace SkietbaanBE.Controllers
         
         [HttpPost]
 
-        public string Resetpassword(string token, string password)
+        public string ResetPassword(string token, string password)
         {
 
             var user = _context.Users.FirstOrDefault(x => x.Token == token);
