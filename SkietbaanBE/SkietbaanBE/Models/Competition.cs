@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace SkietbaanBE.Models {
     public class Competition {
@@ -9,6 +10,8 @@ namespace SkietbaanBE.Models {
         public bool Status { get; set; }
         public int BestScoresNumber { get; set; }
         public int Hours { get; set; }
+        public virtual List<Requirement> RequirementsList { get; set; }
+
     }
 }
 
