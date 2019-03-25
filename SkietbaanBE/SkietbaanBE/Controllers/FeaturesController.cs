@@ -34,7 +34,15 @@ namespace SkietbaanBE.Controllers
         [HttpPost]
         public ActionResult Login ([FromBody]User user)
         {
-            var dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+            User dbUser = null;
+            if(!String.IsNullOrEmpty(user.Username))
+            {
+                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+            }
+            else
+            {
+                dbUser = _context.Users.FirstOrDefault(x => x.Email == user.Email);
+            }
             if (dbUser == null)
             {
                 return new NotFoundObjectResult($"{user.Username} not found");
@@ -70,7 +78,7 @@ namespace SkietbaanBE.Controllers
         [ActionName("TimeLeft")]
         public IEnumerable<int> TimeLeft()
         {
-            var dbUsers = _context.Users.Where(u => u.MemberID != null && u.MemberID != "");
+            var dbUsers =( _context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x=>x.Username);
             DateTime current = DateTime.Now;
             var months = new List<int>();
             foreach (var user in dbUsers)
