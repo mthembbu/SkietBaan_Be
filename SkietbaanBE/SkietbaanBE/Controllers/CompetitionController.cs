@@ -99,7 +99,6 @@ namespace SkietbaanBE.Controllers
                         dbComp = _context.Competitions
                                          .Where(u => u.Id == comp.Id)
                                          .FirstOrDefault<Competition>();
-
                         //now updating status to either true / false
                         dbComp.Status = comp.Status;
                         _context.Competitions.Update(dbComp);
