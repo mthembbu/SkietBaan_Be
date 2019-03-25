@@ -50,12 +50,12 @@ namespace SkietbaanBE.Controllers
 
                 sendMail.SendPasswordEmail(user, "reset Password", email.Token);
 
-                return ("sent by email");
+                return ("Email Sent To: "+ email.Email);
             }
 
             sendMail.SendPasswordEmail(username.Email, "reset Password", username.Token);
 
-            return ("sent by username");
+            return ("Email Sent To: " + username.Email);
         }    
         
         [HttpPost]
