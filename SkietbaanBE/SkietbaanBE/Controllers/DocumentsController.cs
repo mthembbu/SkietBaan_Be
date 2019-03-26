@@ -7,12 +7,7 @@ using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
 using System.Net;
 using System.Net.Mail;
-
 using System.IO;
-
-using System.Xml.Linq;
-using System.Xml;
-using System.Text.RegularExpressions;
 using SelectPdf;
 
 namespace SkietbaanBE.Controllers
@@ -51,106 +46,150 @@ namespace SkietbaanBE.Controllers
             }
         } 
         
-        [HttpGet] 
+        [HttpPost] 
         [Route("{Token}")]
         public string SendLOS(string Token)
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            if(Member != null)
+            if (Member != null)
             {
-                StreamReader streamReader;
                 MemoryStream memoryStream = new MemoryStream();
 
-                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "/Controllers/Documents/Certificate.html");
+                StreamReader streamReader;
 
-                if(streamReader != null)
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
+
+                if (streamReader != null)
                 {
                     string content = streamReader.ReadToEnd();
 
-                    content.ToString();
+                    if (content != null)
+                    {
+                        content.ToString();
 
-                    streamReader.Close();
+                        streamReader.Close();
 
-                    var content1 = content.Replace("Name", Member.Username)
-                           .Replace("Type", "Letter Of Status")
+                        string content1 = content.Replace("Name", Member.Username)
+                           .Replace("Type", "Letter Of Dedicated Status")
                            .Replace("Date", "December 2019");
 
-                    HtmlToPdf converter = new HtmlToPdf();
-                    converter.Options.PdfPageSize = PdfPageSize.A4;
-                    converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
-                    converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-                    converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit; ;
+                        SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                        converter.Options.PdfPageSize = PdfPageSize.A4;
+                        converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+                        converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                        converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
 
-                    SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+                        PdfDocument doc = new PdfDocument();
+                        doc = converter.ConvertHtmlString(content1);
 
-                
-                    doc.Save(memoryStream);
 
-                    byte[] bytes = memoryStream.ToArray();
+                        if (doc != null)
+                        {
+                            doc.Save(memoryStream);
 
-                    memoryStream.Close();
+                            byte[] bytes = memoryStream.ToArray();
 
-                    sendMail.SendEmail(Member.Email, "Letter of Status", new Attachment(new MemoryStream(bytes),"LOS.pdf"));
+                            memoryStream.Close();
 
-                    doc.Close();
+                            if (bytes != null)
+                            {
+                                sendMail.SendEmail(Member.Email, "Letter Of Dedicated Status", new Attachment(new MemoryStream(bytes), "LOS.pdf"));
 
-                    return ("document saved");
+                                doc.Close();
+
+                                return ("Document Sent");
+
+                            }
+
+                            return ("Document Not Sent");
+
+
+                        }
+
+                        return ("Document Not Sent");
+
+                    }
+
+                    return ("Document Not Sent");
 
                 }
-
-                return (Directory.GetCurrentDirectory().ToString());
-
-
+                return ("Document Not Sent");
             }
-
-            return (Directory.GetCurrentDirectory().ToString());
-
-           
+            return ("Document Not Sent");
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{Token}")]
-        public void SendLOGS(string Token)
+        public string SendLOGS(string Token)
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            MemoryStream memoryStream = new MemoryStream();
+            if(Member != null)
+            {
+                MemoryStream memoryStream = new MemoryStream();
 
+                StreamReader streamReader;
 
-            StreamReader streamReader;
+                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
 
-            streamReader = new StreamReader("./Controllers/Documents/Certificate.html");
+                if (streamReader != null)
+                {
+                    string content = streamReader.ReadToEnd();
 
-            string content = streamReader.ReadToEnd();
+                    if (content != null)
+                    {
+                        content.ToString();
 
-            content.ToString();
+                        streamReader.Close();
 
-            streamReader.Close();
+                         string content1 = content.Replace("Name", Member.Username)
+                            .Replace("Type", "Letter Of Good Standing")
+                            .Replace("Date", "December 2019");
+                        
+                        SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                       converter.Options.PdfPageSize = PdfPageSize.A4;
+                        converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+                        converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                        converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
 
-            var content1 = content.Replace("Name", Member.Username)
-                .Replace("Type", "Letter Of Good Standing")
-                .Replace("Date", "December 2019"); 
+                        PdfDocument doc = new PdfDocument();
+                        doc = converter.ConvertHtmlString(content1);
 
-            SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-            converter.Options.PdfPageSize = PdfPageSize.A4;
-            converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
-            converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-            converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
-  
-            SelectPdf.PdfDocument doc = converter.ConvertHtmlString(content1);
+           
+                        if (doc != null)
+                        {
+                            doc.Save(memoryStream);
 
-            doc.Save(memoryStream);
+                            byte[] bytes = memoryStream.ToArray();
 
-            byte[] bytes = memoryStream.ToArray();
+                            memoryStream.Close();
 
-            memoryStream.Close();
+                            if (bytes != null)
+                            {
+                                sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "LOGS.pdf"));
 
-            
+                                doc.Close();
 
-            sendMail.SendEmail(Member.Email, "Letter Of Good Standing", new Attachment(new MemoryStream(bytes), "LOGS.pdf"));
+                                return ("Document Sent");
 
-            doc.Close();
+                            }
+
+                            return ("Document Not Sent");
+
+                           
+                        }
+
+                        return ("Document Not Sent");
+
+                    }
+
+                    return ("Document Not Sent");
+
+                }
+                return ("Document Not Sent");
+            }
+            return ("Document Not Sent");
         }
 
 
@@ -161,21 +200,26 @@ namespace SkietbaanBE.Controllers
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            if (Member.MemberID != null)
-            {
-                var comp = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.User.MemberID == Member.MemberID);
+            if (Member != null){
 
-                if(comp != null)
-                {
-                    return ("Document");
-                }
-                return ("No Document");
-            }
-            else
-            {
-                return ("No Document");
-            }
             
+                if (Member.MemberID != null)
+                {
+                    var comp = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.User.MemberID == Member.MemberID);
+
+                    if(comp != null)
+                    {
+                        return ("Document");
+                    }
+                    return ("No Document");
+                }
+                else
+                {
+                    return ("No Document");
+                }
+            }
+            return ("No Document");
+
         }
 
         [HttpGet]
@@ -185,28 +229,32 @@ namespace SkietbaanBE.Controllers
 
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            if (Member.MemberID != null)
+            if (Member != null)
             {
-                int counts = 0;
-                foreach (var item in GroupList)
-                {
-                    var comp = from score in _context.Scores
-                               where (score.Competition.Id == item && score.User.Id == 5)
-                               select new
-                               {
-                                   score.UserScore
-                               };
-                    counts += comp.ToList().Count;
-                }
+                if (Member.MemberID != null)
 
-                if (counts > numberShots)
                 {
-                    return ("Document");
+                    int counts = 0;
+                    foreach (var item in GroupList)
+                    {
+                        var comp = from score in _context.Scores
+                                   where (score.Competition.Id == item && score.User.Id == 5)
+                                   select new
+                                   {
+                                       score.UserScore
+                                   };
+                        counts += comp.ToList().Count;
+                    }
+
+                    if (counts > numberShots)
+                    {
+                        return ("Document");
+                    }
+                    return ("No Document");
                 }
-                return ("No Document");
             }
             return ("No Document");
-          
+
         }
 
 
