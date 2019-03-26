@@ -219,7 +219,7 @@ namespace SkietbaanBE.Controllers
                 }
             }
 
-            return users.ToArray();
+            return users.ToArray<User>();
         }
 
         //// POST: api/User/Update
