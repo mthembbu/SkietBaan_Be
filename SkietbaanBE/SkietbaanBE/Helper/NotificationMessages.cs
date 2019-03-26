@@ -157,7 +157,7 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void TotalAwardNotification(string award)
+        public void TotalAwardNotification(string award, string competitionName)
         {
             var user = _context.Users.SingleOrDefault(x => x.Id == 1);
             var notification = new Notifications
@@ -166,7 +166,7 @@ namespace SkietbaanBE.Helper
                 IsRead = false,
                 TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Award",
-                NotificationMessage = award + " award received in overall total"
+                NotificationMessage = award + " award received in overall total for " + competitionName
             };
             
             try
@@ -181,16 +181,15 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void AccuracyAwardNotification(string award)
+        public void AccuracyAwardNotification(string award, string competitionName)
         {
             var user = _context.Users.SingleOrDefault(x => x.Id == 1);
-            var notification = new Notifications
-            {
+            var notification = new Notifications {
                 User = user,
                 IsRead = false,
                 TimeOfArrival = GetTimeOfArrival(),
                 TypeOfNotification = "Award",
-                NotificationMessage = award + " award received in accuracy"
+                NotificationMessage = award + " award received in accuracy for " + competitionName
             };
             
             try

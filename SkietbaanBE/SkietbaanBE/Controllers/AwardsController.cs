@@ -54,9 +54,9 @@ namespace SkietbaanBE.Controllers
                         Accuracy = (int)competitionsUserPartakesIn
                                         .Where(x => x.Competition.Id == comp.Id).First().Average,
                         TotalAward = CheckAward.Total(competitionsUserPartakesIn
-                                        .Where(x => x.Competition.Id == comp.Id).First().Total, false),
+                                        .Where(x => x.Competition.Id == comp.Id).First().Total, false, comp.Name, context),
                         AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
-                                        .Where(x => x.Competition.Id == comp.Id).First().Average), false),
+                                        .Where(x => x.Competition.Id == comp.Id).First().Average), false, comp.Name, context),
                         BestInMonth = CheckAward.MonthBest(comp.Id, token, context)
                     };
 
@@ -67,8 +67,8 @@ namespace SkietbaanBE.Controllers
                         IsCompetitionLocked = true,
                         Total = "0",
                         Accuracy = 0,
-                        TotalAward = CheckAward.Total(0, true),
-                        AccuracyAward = CheckAward.Accuracy(0, true),
+                        TotalAward = CheckAward.Total(0, true, comp.Name, context),
+                        AccuracyAward = CheckAward.Accuracy(0, true, comp.Name, context),
                         BestInMonth = "No Award"
                     };
                     awardCompetitions.Add(awardObject);
