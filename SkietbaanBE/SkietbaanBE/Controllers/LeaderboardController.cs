@@ -173,6 +173,7 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
+                            User.MemberID,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
                             UserCompetitionTotalScore.Best
@@ -193,6 +194,14 @@ namespace SkietbaanBE.Controllers
                     rankResult.Total = item.Total;
                     rankResult.Average = item.Average;
                     rankResult.Rank = 0;
+                    if (item.MemberID != null)
+                    {
+                        rankResult.isMember = true;
+                    }
+                    else
+                    {
+                        rankResult.isMember = false;
+                    }
                     ranklist.Add(rankResult);
                     //remove user from users without scores
                     users.RemoveAll(x => x.Equals(item.Username));
@@ -225,6 +234,7 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
+                            User.MemberID,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
                             UserCompetitionTotalScore.Best
@@ -242,6 +252,14 @@ namespace SkietbaanBE.Controllers
                     rankResult.Total = item.Total;
                     rankResult.Average = item.Average;
                     rankResult.Rank = rank;
+                    if (item.MemberID != null)
+                    {
+                        rankResult.isMember = true;
+                    }
+                    else
+                    {
+                        rankResult.isMember = false;
+                    }
                     ranklist.Add(rankResult);
                     rank++;
                 }
