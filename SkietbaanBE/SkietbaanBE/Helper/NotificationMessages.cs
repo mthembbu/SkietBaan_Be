@@ -17,14 +17,6 @@ namespace SkietbaanBE.Helper
             _context = context;
         }
 
-        public string GetTimeOfArrival()
-        {
-            var date = DateTime.Now;
-            var timeOfArrivalInMinutes = TimeSpan.FromMinutes(date.Minute);
-            var timeOfArrivalInHours = string.Format("{0:00}", (int)timeOfArrivalInMinutes.TotalHours, timeOfArrivalInMinutes.Minutes);
-            return timeOfArrivalInHours;
-        }
-
         public void ConfirmationNotification(ModelsContext _context, User user)
         {
             var notification = new Notifications
@@ -32,7 +24,7 @@ namespace SkietbaanBE.Helper
                 User = user,
                 IsRead = false,
                 TypeOfNotification = "Confirmation",
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 NotificationMessage = "Welcome to the club " + user.Username + ". You are now a member."
             };
 
@@ -57,7 +49,7 @@ namespace SkietbaanBE.Helper
                 var notification = new Notifications();
                 notification.User = user;
                 notification.IsRead = false;
-                notification.TimeOfArrival = GetTimeOfArrival();
+                notification.TimeOfArrival = DateTime.Now.ToString();
                 notification.TypeOfNotification = "Competition";
                 notification.NotificationMessage = comp.Name + ", has been created. Check it out!";
                 _context.Notifications.Add(notification);
@@ -71,7 +63,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Group",
                 NotificationMessage = group.Name + ", created. Check it out!"
             };
@@ -96,7 +88,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Status received. Check your documents"
             };
@@ -119,7 +111,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Good Standing received. Check your documents"
             };
@@ -142,7 +134,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Document",
                 NotificationMessage = "Hello " + user.Username + " Letter of Status and Letter of Good Standing received. Check your documents"
             };
@@ -157,16 +149,16 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void TotalAwardNotification(string award)
+        public void TotalAwardNotification(string award, string competitionName)
         {
             var user = _context.Users.SingleOrDefault(x => x.Id == 1);
             var notification = new Notifications
             {
                 User = user,
                 IsRead = false,
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Award",
-                NotificationMessage = award + " award received in overall total"
+                NotificationMessage = award + " award received in overall total for " + competitionName
             };
             
             try
@@ -181,16 +173,15 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void AccuracyAwardNotification(string award)
+        public void AccuracyAwardNotification(string award, string competitionName)
         {
             var user = _context.Users.SingleOrDefault(x => x.Id == 1);
-            var notification = new Notifications
-            {
+            var notification = new Notifications {
                 User = user,
                 IsRead = false,
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Award",
-                NotificationMessage = award + " award received in accuracy"
+                NotificationMessage = award + " award received in accuracy for " + competitionName
             };
             
             try
@@ -210,7 +201,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Award",
                 NotificationMessage = award + " award received "
             };
@@ -233,7 +224,7 @@ namespace SkietbaanBE.Helper
             {
                 User = user,
                 IsRead = false,
-                TimeOfArrival = GetTimeOfArrival(),
+                TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Award",
                 NotificationMessage = description 
             };

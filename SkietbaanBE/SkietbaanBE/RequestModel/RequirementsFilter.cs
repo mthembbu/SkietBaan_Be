@@ -9,6 +9,6 @@ namespace SkietbaanBE.RequestModel
     public class RequirementsFilter
     {
         public int compID { get; set; }
-        public Requirement [] requirements { get; set; }
+        public List<Requirement> GetRequirements { get; set; }
     }
 }

@@ -13,9 +13,9 @@ namespace SkietbaanBE.Lib {
         private Timer updateAwardTimer; //this timer updates the awardTimer on how many days are in the current month
         private NotificationMessages _notificationMessage;
 
-        public ScheduleJob(ModelsContext context, NotificationMessages notificationMessage) {
+        public ScheduleJob(ModelsContext context) {
             _context = context;
-            _notificationMessage = notificationMessage;
+            _notificationMessage = new NotificationMessages(context);
             updateAwardTimer = new Timer(
                 callback: new TimerCallback(RunAwardUserJob),
                 state: "",
