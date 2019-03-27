@@ -72,6 +72,17 @@ namespace SkietbaanBE.Controllers
 
         }
 
+        [HttpPost]
+        public string UpdateDetails([FromBody]User user)
+        {
+            var tempUser = _context.Users.FirstOrDefault(x => x.Token == user.Token);
+            tempUser.Email = user.Email;
+            tempUser.Username = user.Username;
+            _context.Update(tempUser);
+            _context.SaveChanges();
+            return ("updated");
+        }
+
 
         [HttpPost]
         public ActionResult Login ([FromBody]User user)
