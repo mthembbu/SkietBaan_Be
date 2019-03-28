@@ -334,6 +334,29 @@ namespace SkietbaanBE.Controllers
             _notificationMessage.ConfirmationNotification(_context, dbUser);
              return Ok("User update successful");
         }
+
+        //// POST: api/User/RenewMembership
+        [HttpPost]
+        [ActionName("RenewMembership")]
+        public async Task<IActionResult> RenewMembership([FromBody] User user)
+        {
+            if (user.Username == null)
+            {
+                return new BadRequestObjectResult("No empty fields allowed");
+            }
+            User dbUser = _context.Users.Where(u => u.Username == user.Username)
+                    .FirstOrDefault<User>();
+            if (dbUser == null)
+            {
+                return BadRequest("User is null");
+            }
+            dbUser.MemberExpiryDate = user.MemberExpiryDate;
+            _context.Users.Update(dbUser);
+            await _context.SaveChangesAsync();
+            _notificationMessage.ConfirmationNotification(_context, dbUser);
+            return Ok("User update successful");
+        }
+
         [HttpGet]
         public string TestExel()
         {
