@@ -350,7 +350,7 @@ namespace SkietbaanBE.Controllers
             {
                 return BadRequest("User is null");
             }
-            dbUser.MemberExpiryDate = user.MemberExpiryDate;
+            dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1); ;
             _context.Users.Update(dbUser);
             await _context.SaveChangesAsync();
             _notificationMessage.ConfirmationNotification(_context, dbUser);
