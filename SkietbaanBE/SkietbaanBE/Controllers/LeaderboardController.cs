@@ -173,6 +173,8 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
+                            User.Name,
+                            User.Surname,
                             User.MemberID,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
@@ -190,6 +192,7 @@ namespace SkietbaanBE.Controllers
                 {
                     RankResults rankResult = new RankResults();
                     rankResult.Username = item.Username;
+                    rankResult.DisplayName = getDisplayName(item.Name, item.Surname);
                     rankResult.Best = item.Best;
                     rankResult.Total = item.Total;
                     rankResult.Average = item.Average;
@@ -211,14 +214,16 @@ namespace SkietbaanBE.Controllers
             for (int i = 0; i < users.Count; i++)
             {
                 RankResults tempRankResult = new RankResults();
-                tempRankResult.Username = users.ElementAt(i);
+                User user = _context.Users.Where(u => u.Username.Equals(users.ElementAt(i))).FirstOrDefault<User>();
+                tempRankResult.Username = user.Username;
+                tempRankResult.DisplayName = getDisplayName(user.Name, user.Surname);
                 tempRankResult.Total = 0;
                 tempRankResult.Best = 0;
                 tempRankResult.Average = 0;
                 tempRankResult.Rank = 0;
                 ranklist.Add(tempRankResult);
                 //remove user from users if there exist duplicates
-                users.RemoveAll(x => x.Equals(users.ElementAt(i)));
+                //users.RemoveAll(x => x.Equals(users.ElementAt(i)));
             }
             return ranklist;
         }
@@ -234,6 +239,8 @@ namespace SkietbaanBE.Controllers
                         select new
                         {
                             User.Username,
+                            User.Name,
+                            User.Surname,
                             User.MemberID,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
@@ -248,6 +255,7 @@ namespace SkietbaanBE.Controllers
                 {
                     RankResults rankResult = new RankResults();
                     rankResult.Username = item.Username;
+                    rankResult.DisplayName = getDisplayName(item.Name, item.Surname);
                     rankResult.Best = item.Best;
                     rankResult.Total = item.Total;
                     rankResult.Average = item.Average;
@@ -266,6 +274,29 @@ namespace SkietbaanBE.Controllers
             }
             //rank and return results
             return ranklist;
+        }
+        private string getDisplayName(string name,string surname)
+        {
+            string displayName = "";
+            if(name != null && !name.Equals(""))
+            {
+                string[] names = name.Split(" "); //incase user has more than one name
+                displayName += names[0];
+                if (names.Count() > 1)
+                {
+                    displayName +=" "+ names[1]; ;
+                }
+            }
+            if (surname != null && !surname.Equals(""))
+            {
+                displayName += " "+ surname;
+            }
+            // if member does not have a name/surname or combination name and surname is less than 2 characters
+            if (displayName.Equals("") || displayName.Length< 2) 
+            {
+                displayName = null;
+            }
+            return displayName;
         }
     }
 }
