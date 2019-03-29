@@ -43,8 +43,9 @@ namespace SkietbaanBE.Helper
             {
                 using (MailMessage mail = new MailMessage())
                 {
+
                     string url = "https://skietbaan.retrotest.co.za/resetpassword/";
-                    MailAssignment(mail, emailFromAddress, To, Subject, $"<a href='{url}{token}'>reset</a>");
+                    MailAssignment(mail, emailFromAddress, To, Subject, $"<div style='text-align: center;'><img src='https://firebasestorage.googleapis.com/v0/b/skietbaan-351ab.appspot.com/o/password%20reset.png?alt=media&token=b989fdf4-b19b-4e64-82aa-cf2ba41cc7ef'></img><div><h2>Click here to reset your password: <a href='{url}{token}'>Reset Password</a></h2><div></div>");
                     SmtpSend(mail);
                 }
             }

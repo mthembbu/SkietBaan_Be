@@ -63,7 +63,7 @@ namespace SkietbaanBE.Controllers
             return await _context.Notifications.FindAsync(id);
         }
 
-
+        [HttpGet]
         public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
             var notifications = _context.Notifications.Where(x => x.User.Token == token);
@@ -84,11 +84,20 @@ namespace SkietbaanBE.Controllers
             return unReadNotifications.Count();
         }
 
-        [HttpPost("{id}")]
-        public async Task DeleteNotificationById(int id)
+        [HttpPost]
+        public async Task DeleteNotificationById([FromBody] List<Notifications> list)
         {
-            var notification = await GetNotificationById(id);
-            _context.Notifications.Remove(notification);
+            foreach (var element in list)
+            {
+                try
+                {
+                    _context.Notifications.Remove(element);
+                }catch(Exception ex)
+                {
+                    var message = ex.Message;
+                }
+                
+            }
             await _context.SaveChangesAsync();
         }
 
