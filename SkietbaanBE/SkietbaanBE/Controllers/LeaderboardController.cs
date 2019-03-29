@@ -222,8 +222,6 @@ namespace SkietbaanBE.Controllers
                 tempRankResult.Average = 0;
                 tempRankResult.Rank = 0;
                 ranklist.Add(tempRankResult);
-                //remove user from users if there exist duplicates
-                //users.RemoveAll(x => x.Equals(users.ElementAt(i)));
             }
             return ranklist;
         }
