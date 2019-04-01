@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 using SkietbaanBE.RequestModel;
@@ -16,6 +18,17 @@ namespace SkietbaanBE.Controllers
         {
             _context = context;
         }
+
+        // GET: api/Scores
+        [HttpGet("{token}")]
+        public Array GetScores(string token)
+        {
+            User userid = _context.Users.FirstOrDefault(x => x.Token.Equals(token));
+            var scoreList = _context.Scores.Where(x => x.User.Id == userid.Id);
+            return scoreList.ToArray();
+        }
+
+
         [HttpPost]
         public IActionResult ScoreCapture([FromBody]ScoreCapture scoreCapture)
         {
