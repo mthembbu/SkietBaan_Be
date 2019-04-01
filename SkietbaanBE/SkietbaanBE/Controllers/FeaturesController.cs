@@ -137,31 +137,11 @@ namespace SkietbaanBE.Controllers
             var months = new List<int>();
             foreach (var user in dbUsers)
             {
-                int expiryYear = user.MemberExpiryDate.Value.Year;
-                int yearLeft = expiryYear - current.Year;
-                if (yearLeft == 0)
+                if(user.MemberExpiryDate.HasValue)
                 {
-                    int monthsLeft = user.MemberExpiryDate.Value.Month - current.Month;
-                    months.Add(monthsLeft);
-                }
-                else
-                {
-                    if (user.MemberExpiryDate.Value.Month > current.Month)
-                    {
-                        int diff = user.MemberExpiryDate.Value.Month - current.Month;
-                        int monthsLeft = 12 - diff;
-                        months.Add(monthsLeft);
-                    }
-                    else if (current.Month > user.MemberExpiryDate.Value.Month)
-                    {
-                        int diff = current.Month - user.MemberExpiryDate.Value.Month;
-                        int monthsLeft = 12 - diff;
-                        months.Add(monthsLeft);
-                    }
-                    else
-                    {
-                        months.Add(12);
-                    }
+                    DateTime expiry = (DateTime) user.MemberExpiryDate;
+                    TimeSpan span = expiry.Subtract(current);
+                    months.Add((span.Days) / 30);
                 }
             }
             return months.ToArray();
@@ -193,32 +173,9 @@ namespace SkietbaanBE.Controllers
             var months = new List<int>();
             foreach (var user in dbUsers)
             {
-                int expiryYear = user.MemberExpiryDate.Value.Year;
-                int yearLeft = expiryYear - current.Year;
-                if (yearLeft == 0)
-                {
-                    int monthsLeft = user.MemberExpiryDate.Value.Month - current.Month;
-                    months.Add(monthsLeft);
-                }
-                else
-                {
-                    if (user.MemberExpiryDate.Value.Month > current.Month)
-                    {
-                        int diff = user.MemberExpiryDate.Value.Month - current.Month;
-                        int monthsLeft = 12 - diff;
-                        months.Add(monthsLeft);
-                    }
-                    else if (current.Month > user.MemberExpiryDate.Value.Month)
-                    {
-                        int diff = current.Month - user.MemberExpiryDate.Value.Month;
-                        int monthsLeft = 12 - diff;
-                        months.Add(monthsLeft);
-                    }
-                    else
-                    {
-                        months.Add(12);
-                    }
-                }
+                DateTime expiry = (DateTime)user.MemberExpiryDate;
+                TimeSpan span = expiry.Subtract(current);
+                months.Add((span.Days) / 30);
             }
 
             //Looks for Members with expiry time left that is <=2 months
