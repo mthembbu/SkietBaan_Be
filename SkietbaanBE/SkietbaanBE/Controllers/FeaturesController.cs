@@ -228,6 +228,7 @@ namespace SkietbaanBE.Controllers
                 if (months[i] <= 2)
                 {
                     users.Add(dbUsers.ToList().ElementAt(i));
+                    _notificationMessage.ExpiryNotification(users);
                 }
             }
 
@@ -331,7 +332,7 @@ namespace SkietbaanBE.Controllers
              dbUser.MemberExpiryDate = user.MemberExpiryDate;
              _context.Users.Update(dbUser);
              await _context.SaveChangesAsync();
-            _notificationMessage.ConfirmationNotification(_context, dbUser);
+            _notificationMessage.ConfirmationNotification(dbUser);
              return Ok("User update successful");
         }
 
@@ -353,7 +354,7 @@ namespace SkietbaanBE.Controllers
             dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1); ;
             _context.Users.Update(dbUser);
             await _context.SaveChangesAsync();
-            _notificationMessage.ConfirmationNotification(_context, dbUser);
+            _notificationMessage.RenewalNotification(dbUser);
             return Ok("User update successful");
         }
 

@@ -85,20 +85,19 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpPost]
-        public async Task DeleteNotificationById([FromBody] List<Notifications> list)
+        public void DeleteNotificationById([FromBody] List<Notifications> list)
         {
-            foreach (var element in list)
+ 
+            try
             {
-                try
-                {
-                    _context.Notifications.Remove(element);
-                }catch(Exception ex)
-                {
-                    var message = ex.Message;
-                }
-                
+                _context.Notifications.RemoveRange(list);
             }
-            await _context.SaveChangesAsync();
+            catch(Exception ex)
+            {
+                var message = ex.Message;
+            }
+                
+            _context.SaveChanges();
         }
 
         [HttpPost("{id}")]
