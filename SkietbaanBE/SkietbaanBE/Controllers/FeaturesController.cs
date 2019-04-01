@@ -79,6 +79,7 @@ namespace SkietbaanBE.Controllers
             tempUser.Email = user.Email;
             tempUser.PhoneNumber = user.PhoneNumber;
             tempUser.Name = user.Name;
+            tempUser.Surname = user.Surname;
             _context.Update(tempUser);
             _context.SaveChanges();
             return ("updated");
