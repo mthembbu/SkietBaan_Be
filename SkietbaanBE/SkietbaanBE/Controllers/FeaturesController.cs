@@ -76,9 +76,22 @@ namespace SkietbaanBE.Controllers
         public string UpdateDetails([FromBody]User user)
         {
             var tempUser = _context.Users.FirstOrDefault(x => x.Token == user.Token);
-            tempUser.Email = user.Email;
+            tempUser.Email = user.Email; 
+
+            if(user.PhoneNumber == "")
+            {
+                user.PhoneNumber = null;
+            }
             tempUser.PhoneNumber = user.PhoneNumber;
+            if (user.Name == "")
+            {
+                user.Name = null;
+            }
             tempUser.Name = user.Name;
+            if (user.PhoneNumber == "")
+            {
+                user.Surname = null;
+            }
             tempUser.Surname = user.Surname;
             _context.Update(tempUser);
             _context.SaveChanges();
