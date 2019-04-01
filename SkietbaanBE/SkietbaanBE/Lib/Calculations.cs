@@ -54,8 +54,7 @@ namespace SkietbaanBE.Lib
         }
         public void performCalculations(int userID,int competitionID)
         {
-            
-            
+
             Competition competition = _context.Competitions.Where(c => c.Id == competitionID).FirstOrDefault<Competition>();
 
             YearScores yearScores = GetYearScores(userID, competitionID);
@@ -77,13 +76,15 @@ namespace SkietbaanBE.Lib
                     Total = total,
                     Average = average,
                     Best = best,
-                    Year = year
+                    Year = year,
+                    PreviousTotal = 0
                 };
                 _context.UserCompetitionTotalScores.Add(stats);
                 _context.SaveChanges();
             }
             else
             {
+                stats.PreviousTotal = stats.Average; //save the old average as previous average
                 stats.Average = average;
                 stats.Best = best;
                 stats.Total = total;

@@ -117,7 +117,8 @@ namespace SkietbaanBE.Controllers
                         Best = 0,
                         Total = 0,
                         Average = 0,
-                        Rank = 0
+                        Rank = 0,
+                        RankStatus = "equal",
                     };
                 }
             }
@@ -129,6 +130,7 @@ namespace SkietbaanBE.Controllers
                 rankResult.Best = 0;
                 rankResult.Total = 0;
                 rankResult.Average = 0;
+                rankResult.RankStatus = "equal";
                 leaderboardResults.UserResults = rankResult;
 
             }
@@ -178,7 +180,8 @@ namespace SkietbaanBE.Controllers
                             User.MemberID,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
-                            UserCompetitionTotalScore.Best
+                            UserCompetitionTotalScore.Best,
+                            UserCompetitionTotalScore.PreviousTotal
                         };
             var queryAllCustomers = from user in _context.Users
                                     select user.Username;
@@ -197,6 +200,7 @@ namespace SkietbaanBE.Controllers
                     rankResult.Total = item.Total;
                     rankResult.Average = item.Average;
                     rankResult.Rank = 0;
+                    rankResult.RankStatus = getRankStatus(item.Average, item.PreviousTotal);
                     if (item.MemberID != null)
                     {
                         rankResult.isMember = true;
@@ -221,6 +225,7 @@ namespace SkietbaanBE.Controllers
                 tempRankResult.Best = 0;
                 tempRankResult.Average = 0;
                 tempRankResult.Rank = 0;
+                tempRankResult.RankStatus = "equal";
                 ranklist.Add(tempRankResult);
             }
             return ranklist;
@@ -242,7 +247,8 @@ namespace SkietbaanBE.Controllers
                             User.MemberID,
                             UserCompetitionTotalScore.Average,
                             UserCompetitionTotalScore.Total,
-                            UserCompetitionTotalScore.Best
+                            UserCompetitionTotalScore.Best,
+                            UserCompetitionTotalScore.PreviousTotal
                         };
             //saving results in an List which will make sorting easier(ArrayList)
             int rank = 1;
@@ -258,6 +264,7 @@ namespace SkietbaanBE.Controllers
                     rankResult.Total = item.Total;
                     rankResult.Average = item.Average;
                     rankResult.Rank = rank;
+                    rankResult.RankStatus = getRankStatus(item.Average, item.PreviousTotal);
                     if (item.MemberID != null)
                     {
                         rankResult.isMember = true;
@@ -295,6 +302,20 @@ namespace SkietbaanBE.Controllers
                 displayName = null;
             }
             return displayName;
+        }
+        private string getRankStatus(double average,double preAverage) // funtion to check if member's total increased,decreased or still the same(equal or 0)
+        {
+            if(average > preAverage && preAverage > 0)
+            {
+                return "up";
+            }else if(average < preAverage)
+            {
+                return "down";
+            }
+            else
+            {
+                return "equal";
+            }
         }
     }
 }
