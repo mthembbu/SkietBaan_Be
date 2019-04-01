@@ -126,8 +126,8 @@ namespace SkietbaanBE.Controllers
             return new OkObjectResult("IsRead Property Updated Successfully");
         }
 
-        [HttpPost("{message}")]
-        public void Announcements(string message)
+        [HttpPost]
+        public void Announcements([FromBody] string message)
         {
             _notificationMessage.MakeAnnouncement(message);
         }
