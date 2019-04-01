@@ -62,13 +62,29 @@ namespace SkietbaanBE.Controllers
 
         public string ResetPassword(string token, string password)
         {
+            try{
+                var user = _context.Users.FirstOrDefault(x => x.Token == token);
 
-            var user = _context.Users.FirstOrDefault(x => x.Token == token);
+                if (user == null)
+                {
+                    return ("forgot password link has already been used");
+                }
 
-            user.Password = Security.HashSensitiveData(password);
-            _context.Update(user);
-            _context.SaveChanges();
-            return ("changed");
+                user.Password = Security.HashSensitiveData(password);
+                string guid = Guid.NewGuid().ToString();
+                int index = guid.LastIndexOf("-");
+                string tokenString = guid.Substring(index + 1);
+                user.Token = tokenString;
+                _context.Update(user);
+                _context.SaveChanges();
+                return ("changed");
+            }
+            catch (System.Data.SqlClient.SqlException)
+            {
+                return ("forgot password link has already been used");
+            }
+
+           
 
         }
 
@@ -88,7 +104,7 @@ namespace SkietbaanBE.Controllers
                 user.Name = null;
             }
             tempUser.Name = user.Name;
-            if (user.PhoneNumber == "")
+            if (user.Surname == "")
             {
                 user.Surname = null;
             }
