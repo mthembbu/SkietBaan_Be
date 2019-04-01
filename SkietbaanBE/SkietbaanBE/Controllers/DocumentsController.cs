@@ -205,7 +205,7 @@ namespace SkietbaanBE.Controllers
             
                 if (Member.MemberID != null)
                 {
-                    var comp = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.User.MemberID == Member.MemberID);
+                    var comp = _context.Scores.FirstOrDefault(x => x.User.Id == Member.Id);
 
                     if(comp != null)
                     {

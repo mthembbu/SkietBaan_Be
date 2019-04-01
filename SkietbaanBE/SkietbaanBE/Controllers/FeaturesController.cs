@@ -62,13 +62,29 @@ namespace SkietbaanBE.Controllers
 
         public string ResetPassword(string token, string password)
         {
+            try{
+                var user = _context.Users.FirstOrDefault(x => x.Token == token);
 
-            var user = _context.Users.FirstOrDefault(x => x.Token == token);
+                if (user == null)
+                {
+                    return ("forgot password link has already been used");
+                }
 
-            user.Password = Security.HashSensitiveData(password);
-            _context.Update(user);
-            _context.SaveChanges();
-            return ("changed");
+                user.Password = Security.HashSensitiveData(password);
+                string guid = Guid.NewGuid().ToString();
+                int index = guid.LastIndexOf("-");
+                string tokenString = guid.Substring(index + 1);
+                user.Token = tokenString;
+                _context.Update(user);
+                _context.SaveChanges();
+                return ("changed");
+            }
+            catch (System.Data.SqlClient.SqlException)
+            {
+                return ("forgot password link has already been used");
+            }
+
+           
 
         }
 
@@ -76,9 +92,23 @@ namespace SkietbaanBE.Controllers
         public string UpdateDetails([FromBody]User user)
         {
             var tempUser = _context.Users.FirstOrDefault(x => x.Token == user.Token);
-            tempUser.Email = user.Email;
+            tempUser.Email = user.Email; 
+
+            if(user.PhoneNumber == "")
+            {
+                user.PhoneNumber = null;
+            }
             tempUser.PhoneNumber = user.PhoneNumber;
+            if (user.Name == "")
+            {
+                user.Name = null;
+            }
             tempUser.Name = user.Name;
+            if (user.Surname == "")
+            {
+                user.Surname = null;
+            }
+            tempUser.Surname = user.Surname;
             _context.Update(tempUser);
             _context.SaveChanges();
             return ("updated");
@@ -228,6 +258,7 @@ namespace SkietbaanBE.Controllers
                 if (months[i] <= 2)
                 {
                     users.Add(dbUsers.ToList().ElementAt(i));
+                    _notificationMessage.ExpiryNotification(users);
                 }
             }
 
@@ -331,7 +362,7 @@ namespace SkietbaanBE.Controllers
              dbUser.MemberExpiryDate = user.MemberExpiryDate;
              _context.Users.Update(dbUser);
              await _context.SaveChangesAsync();
-            _notificationMessage.ConfirmationNotification(_context, dbUser);
+            _notificationMessage.ConfirmationNotification(dbUser);
              return Ok("User update successful");
         }
 
@@ -353,7 +384,7 @@ namespace SkietbaanBE.Controllers
             dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1); ;
             _context.Users.Update(dbUser);
             await _context.SaveChangesAsync();
-            _notificationMessage.ConfirmationNotification(_context, dbUser);
+            _notificationMessage.RenewalNotification(dbUser);
             return Ok("User update successful");
         }
 

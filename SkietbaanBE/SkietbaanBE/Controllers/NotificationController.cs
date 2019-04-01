@@ -85,27 +85,26 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpPost]
-        public async Task DeleteNotificationById([FromBody] List<Notifications> list)
+        public void DeleteNotificationById([FromBody] List<Notifications> list)
         {
-            foreach (var element in list)
+
+            try
             {
-                try
-                {
-                    _context.Notifications.Remove(element);
-                }catch(Exception ex)
-                {
-                    var message = ex.Message;
-                }
-                
+                _context.Notifications.RemoveRange(list);
             }
-            await _context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                var message = ex.Message;
+            }
+
+            _context.SaveChanges();
         }
 
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateIsReadProperty(int id)
         {
             var notification = new Notifications();
-            if(id.Equals(""))
+            if (id.Equals(""))
             {
                 return new BadRequestObjectResult("Invaild type for Id");
             }
@@ -125,6 +124,12 @@ namespace SkietbaanBE.Controllers
             }
             await _context.SaveChangesAsync();
             return new OkObjectResult("IsRead Property Updated Successfully");
+        }
+
+        [HttpPost]
+        public void Announcements([FromBody] string message)
+        {
+            _notificationMessage.MakeAnnouncement(message);
         }
     }
 }

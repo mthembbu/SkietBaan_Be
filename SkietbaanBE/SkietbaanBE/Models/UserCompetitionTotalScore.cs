@@ -15,6 +15,7 @@ namespace SkietbaanBE.Models {
         public virtual User User { get; set; }
         public double Best { get; set; }
         public double Total { get; set; }
+        public double PreviousTotal { get; set; }
         public double Average { get; set; }
         public int Year { get; set; }
     }
