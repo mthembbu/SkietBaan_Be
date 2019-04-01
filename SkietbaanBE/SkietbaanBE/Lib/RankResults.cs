@@ -15,6 +15,6 @@ namespace SkietbaanBE.Lib
         public double Average { get; set; }
         public bool isMember { get; set; }
         public bool isCompetitiveShooter { get; set; }
-        public bool IsIncreasing { get; set; }
+        public string RankStatus { get; set; }
     }
 }
