@@ -289,6 +289,23 @@ namespace SkietbaanBE.Helper
             }
             _context.SaveChanges();
         }
+
+        public void MakeAnnouncement(string message)
+        {
+            List<User> userList = _context.Users.ToList();
+           
+            foreach (User user in userList)
+            {
+                var notification = new Notifications();
+                notification.User = user;
+                notification.IsRead = false;
+                notification.TimeOfArrival = DateTime.Now.ToString();
+                notification.TypeOfNotification = "Announcement";
+                notification.NotificationMessage = message;
+                _context.Add(notification);
+            }
+            _context.SaveChanges();
+        }
     }
 }
 
