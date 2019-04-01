@@ -160,7 +160,7 @@ namespace SkietbaanBE.Controllers
                 userGroup.GroupId = group.Id;
                 userGroup.UserId = dbUser.Id;
                 userGroups.Add(userGroup);
-                _notificationMessages.GroupNotification(_context, group, dbUser);
+                _notificationMessages.GroupNotification(group, dbUser);
             }
             _context.UserGroups.AddRange(userGroups);
             _context.SaveChanges();

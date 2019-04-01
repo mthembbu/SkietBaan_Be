@@ -66,7 +66,7 @@ namespace SkietbaanBE.Controllers
                 Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == comp.Name);
                 if (dbCompetition != null)
                     return new BadRequestObjectResult(comp.Name + " already exists");
-                _notificationMessages.CompetitionNotification(_context, comp);
+                _notificationMessages.CompetitionNotification(comp);
                 await _context.AddAsync(comp);
                 await _context.SaveChangesAsync();
                 return Ok("Competition Added!");

@@ -17,7 +17,7 @@ namespace SkietbaanBE.Helper
             _context = context;
         }
 
-        public void ConfirmationNotification(ModelsContext _context, User user)
+        public void ConfirmationNotification(User user)
         {
             var notification = new Notifications
             {
@@ -35,13 +35,63 @@ namespace SkietbaanBE.Helper
 
                 response = "successful";
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 response = e.Message;
             }
         }
 
-        public void CompetitionNotification(ModelsContext _context, Competition comp)
+        public void RenewalNotification(User user)
+        {
+            var notification = new Notifications
+            {
+                User = user,
+                IsRead = false,
+                TypeOfNotification = "Renewal",
+                TimeOfArrival = DateTime.Now.ToString(),
+                NotificationMessage = "Hello " + user.Username + ". Your membership has been renewed."
+            };
+
+            try
+            {
+                _context.Notifications.Add(notification);
+                _context.SaveChanges();
+
+                response = "successful";
+            }
+            catch (Exception e)
+            {
+                response = e.Message;
+            }
+        }
+
+        public void ExpiryNotification(List<User> users){
+            var notification = new Notifications();
+            string expiryDate;
+            foreach(User user in users)
+            {
+                expiryDate = user.MemberExpiryDate.Value.ToString("DD/MM/YYYY");
+                notification.User = user;
+                notification.IsRead = false;
+                notification.TypeOfNotification = "Expiry";
+                notification.TimeOfArrival = DateTime.Now.ToString();
+                notification.NotificationMessage = "Hello " + user.Username + ". You're membership expires on ." + user.MemberExpiryDate;
+            }
+
+            try
+            {
+                _context.Notifications.Add(notification);
+                _context.SaveChanges();
+
+                response = "successful";
+            }
+            catch (Exception e)
+            {
+                response = e.Message;
+            }
+        }
+
+        public void CompetitionNotification(Competition comp)
         {
             var userlist = _context.Users.ToList();
             foreach (var user in userlist)
@@ -57,7 +107,7 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void GroupNotification(ModelsContext _context, Group group, User user)
+        public void GroupNotification(Group group, User user)
         {
             var notification = new Notifications
             {
