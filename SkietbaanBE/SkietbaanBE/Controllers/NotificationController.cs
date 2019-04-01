@@ -63,7 +63,7 @@ namespace SkietbaanBE.Controllers
             return await _context.Notifications.FindAsync(id);
         }
 
-
+        [HttpGet]
         public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
             var notifications = _context.Notifications.Where(x => x.User.Token == token);
@@ -84,19 +84,27 @@ namespace SkietbaanBE.Controllers
             return unReadNotifications.Count();
         }
 
-        [HttpPost("{id}")]
-        public async Task DeleteNotificationById(int id)
+        [HttpPost]
+        public void DeleteNotificationById([FromBody] List<Notifications> list)
         {
-            var notification = await GetNotificationById(id);
-            _context.Notifications.Remove(notification);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                _context.Notifications.RemoveRange(list);
+            }
+            catch (Exception ex)
+            {
+                var message = ex.Message;
+            }
+
+            _context.SaveChanges();
         }
 
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateIsReadProperty(int id)
         {
             var notification = new Notifications();
-            if(id.Equals(""))
+            if (id.Equals(""))
             {
                 return new BadRequestObjectResult("Invaild type for Id");
             }
@@ -116,6 +124,12 @@ namespace SkietbaanBE.Controllers
             }
             await _context.SaveChangesAsync();
             return new OkObjectResult("IsRead Property Updated Successfully");
+        }
+
+        [HttpPost]
+        public void Announcements([FromBody] string message)
+        {
+            _notificationMessage.MakeAnnouncement(message);
         }
     }
 }

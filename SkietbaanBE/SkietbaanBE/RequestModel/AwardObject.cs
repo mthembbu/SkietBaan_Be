@@ -7,5 +7,6 @@ namespace SkietbaanBE.RequestModel {
         public bool IsCompetitionLocked { get; set; }
         public AccuracyAward AccuracyAward { get; set; }
         public TotalAward TotalAward { get; set; }
+        public string BestInMonth { get; set; }
     }
 }

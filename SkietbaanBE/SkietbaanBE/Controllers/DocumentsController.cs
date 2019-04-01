@@ -205,7 +205,7 @@ namespace SkietbaanBE.Controllers
             
                 if (Member.MemberID != null)
                 {
-                    var comp = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.User.MemberID == Member.MemberID);
+                    var comp = _context.Scores.FirstOrDefault(x => x.User.Id == Member.Id);
 
                     if(comp != null)
                     {
@@ -238,7 +238,7 @@ namespace SkietbaanBE.Controllers
                     foreach (var item in GroupList)
                     {
                         var comp = from score in _context.Scores
-                                   where (score.Competition.Id == item && score.User.Id == 5)
+                                   where (score.Competition.Id == item && score.User.Id == Member.Id)
                                    select new
                                    {
                                        score.UserScore
@@ -250,10 +250,10 @@ namespace SkietbaanBE.Controllers
                     {
                         return ("Document");
                     }
-                    return ("No Document");
+                    return ("requirements"+ numberShots.ToString()+ GroupList.ToList());
                 }
             }
-            return ("No Document");
+            return ("requirements" + numberShots.ToString() + GroupList.ToList().ToString());
 
         }
 
