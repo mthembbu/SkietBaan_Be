@@ -10,8 +10,6 @@ namespace SkietbaanBE.Models {
         public bool Status { get; set; }
         public int BestScoresNumber { get; set; }
         public int Hours { get; set; }
-        public virtual List<Requirement> RequirementsList { get; set; }
-
-    }
+ }
 }
 

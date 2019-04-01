@@ -38,62 +38,61 @@ namespace SkietbaanBE.Controllers
        {
             //get the competitions where(Status == true / false)
             List<Competition> competitionsList = (from C in _context.Competitions
-                                         select C).OrderBy(c => c.Status == false).ThenBy(x => x.Name).ToList<Competition>();
-            //get the list of Requirements for Each Competition
-            foreach (Competition C in competitionsList)
-            {
-                List<Requirement> RequirementsList = (from R in _context.Requirements
-                                            where R.CompID == C.Id
-                                            select R).ToList<Requirement>();
-                C.RequirementsList = RequirementsList;
-            }
+                                                  select C).OrderBy(c => c.Status == false).ThenBy(x => x.Name).ToList<Competition>();
             return competitionsList;
-        }
-        //Getting a competition by ID
-        // GET: api/Competition/id
-        [HttpGet("{id}")]
-        public async Task<Competition> CompetitionGetById(int id)
-        {
-            return await _context.Competitions.FindAsync(id);
         }
         //posting the competition to the competition table
         // POST: api/Competition
         [HttpPost]
-        public async Task<IActionResult> AddCompetition([FromBody]Competition comp)
+        public async Task<IActionResult> AddCompetition([FromBody]Competition Comp)
         {
             if (ModelState.IsValid)
             {
-                Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == comp.Name);
-                if (dbCompetition != null)
-                    return new BadRequestObjectResult(comp.Name + " already exists");
-                _notificationMessages.CompetitionNotification(comp);
-                await _context.AddAsync(comp);
-                await _context.SaveChangesAsync();
-                return Ok("Competition Added!");
-            }
-            else {
+                //error handling, check if client provided valid data
+                if (Comp == null)
+                {
+                    return new BadRequestObjectResult("competition cannot be null");
+                }
+                else{
+                        Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == Comp.Name);
+                        if (dbCompetition != null)
+                            return new BadRequestObjectResult(Comp.Name + " already exists");
+                    _notificationMessages.CompetitionNotification(_context, Comp);
+                     _context.Competitions.Add(Comp);
+                    _context.SaveChanges();
+                    dbCompetition = _context.Competitions.Last <Competition>();
+                   for (int i =0; i < 3;i++)
+                    {
+                        Requirement R = new Requirement {
+                            Competition = dbCompetition  
+                        };
+                        _context.Requirements.Add(R);
+                    }
+                    await _context.SaveChangesAsync();
+                    return Ok("Competition"+Comp.Name+" Added!");
+                    }
+                }  
+                else {
                 return new BadRequestObjectResult("competition cannot be null");
             }
         }
         //A method that updates the status of the competition
         // PUT: api/Competition/5
         [HttpPost("{id}")]
-        public async Task<IActionResult> UpdateCompetition(int id, [FromBody]Competition comp)
+        public async Task<IActionResult> UpdateCompetitionByStatus(int id, [FromBody]Competition comp)
         {
             if (ModelState.IsValid)
             {
                 //error handling, check if client provided valid data
-                if (comp == null)
-                {
-                    return new BadRequestObjectResult("competiton cannot be null");
+                if (comp == null) {
+                    return new BadRequestObjectResult("competition cannot be null");
                 }
                 else
                 {
                     Competition dbCompetition = null; //assume competition does not exist
-                    using (_context)
-                    {
+                   
                         dbCompetition = _context.Competitions
-                                         .Where(u => u.Name == comp.Name && u.Id != comp.Id)
+                                         .Where(C => C.Name == comp.Name && C.Id == comp.Id)
                                          .FirstOrDefault<Competition>();
                         if (dbCompetition == null) {
                             return BadRequest("Cannot update competition, no such competition!");
@@ -102,8 +101,7 @@ namespace SkietbaanBE.Controllers
                         dbCompetition.Status = comp.Status;
                         _context.Competitions.Update(dbCompetition);
                         await _context.SaveChangesAsync();
-                        return Ok("Status update successful");
-                    }
+                        return Ok("Status update successful");   
                 }
             }
             else{
@@ -112,43 +110,66 @@ namespace SkietbaanBE.Controllers
         }
         //A method that updates the competition standards / requirements by {Id}
         // POST: api/Competition/standard/5
-        [HttpPost("/standard/{id}")]
-        public async Task<IActionResult> UpdateCompetitionByRequirements(int compID, [FromBody] Competition Comp)
-        { 
-            if (ModelState.IsValid){
-                //error handling, check if client provided valid data
-                if (Comp == null){
-                    return new BadRequestObjectResult("competiton cannot be null");
-                }
-                else {
-                    Competition dbCompetition;//assume the competition does not exist
-                    using (_context) {
-                        dbCompetition = _context.Competitions.Where(C => C.Id == Comp.Id).FirstOrDefault<Competition>();
-                        if (dbCompetition == null) {
-                            return BadRequest("Cannot update competition, no such competition!");
-                        }
-                        foreach (Requirement R in Comp.RequirementsList){
-                            Requirement TempRequirement = new Requirement {
-                                CompID = R.CompID,
-                                Standard = R.Standard,
-                                Accuracy = R.Accuracy,
-                                Total = R.Total
-                            };
-                            await _context.AddAsync(TempRequirement);
-                        }
-                        await _context.SaveChangesAsync();
-                        return Ok("All Requirements for the "+Comp.Name+" have been added");
-                    }
-                }
-            }
-            else {
-                return new BadRequestObjectResult("Invalid competition model!");
-            }
-        }
-        public IEnumerable<Requirement> GetAllRequirementsByCompID(int CompID)
+        [HttpPost("/Requirements/{CompID}")]
+        public async Task<IActionResult> UpdateRequirementsByCompID(int CompID, [FromBody] Requirement [] requirements)
         {
-            return _context.Requirements.Where(R => R.CompID == CompID).ToList<Requirement>();
+            if (ModelState.IsValid)
+            {
+                //error handling, check if client provided valid data
+                if (requirements == null)
+                    return new BadRequestObjectResult("requirements cannot be null");
+                else
+                {
+                    //assume the competition does not exist
+                    Competition dbCompetition = _context.Competitions.Where(C => C.Id == CompID).FirstOrDefault<Competition>();
+                    if (dbCompetition == null)
+                    {
+                        return BadRequest("Cannot update requirements, competition does not exist!");
+                    }
+                    List<Requirement> requirementsList = GetRequirementsByID(CompID).ToList<Requirement>();
+                    for (int i =0; i < requirements.Length; i++)
+                    {
+                        Requirement R = requirementsList.ElementAt(i);
+                        R.Standard = requirements[i].Standard;
+                        R.Accuracy = requirements[i].Accuracy;
+                        R.Total = requirements[i].Total;
+                        _context.Requirements.Update(R);   
+                    }
+                    await _context.SaveChangesAsync();
+                    return Ok("All Requirements for the " + dbCompetition.Name + " have been updated");
+                }
+            }
+            else
+            {
+                return new BadRequestObjectResult("Invalid requirements model!");
+            }
         }
+ //##########################################################################################################
+        //GET: api/Competition/Requirements/{id}
+        /**returning an array of requirements for a given competition Id
+         * The newly selected object contains only the Competition.ID and 
+         * a Requirement object which will be converted in a front-end.
+        */
+        [HttpGet("/Requirements/{CompID}")]
+        public IEnumerable<Object> GetRequirementsByCompID(int CompID)
+        {
+            var comp = from R in _context.Requirements
+                        where (R.Competition.Id == CompID)
+                        select new{
+                            R.Competition.Id, R 
+                        };
+            List<Object> RList = comp.ToList<Object>();
+            return RList;
+        }
+        //GET: /R/{CompID}
+        /**Returns an array of requirements together with a null competition
+         */
+        [HttpGet("/R/{CompID}")]
+        public IEnumerable<Requirement> GetRequirementsByID(int CompID)
+        {
+            return _context.Requirements.Where(R => R.Competition.Id == CompID).ToList<Requirement>();
+        }
+//##########################################################################################################
         //GET: api/competition/participants
         [HttpGet("participants")]
         public Dictionary<int, int> getUsersPerCompetition()
