@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 using SkietbaanBE.RequestModel;
+using System.Threading.Tasks;
 
 namespace SkietbaanBE.Controllers
 {
@@ -28,7 +29,7 @@ namespace SkietbaanBE.Controllers
 
         // GET: api/Scores
         [HttpGet("{token}")]
-        public async System.Threading.Tasks.Task<List<Score>> GetScores(string token)
+        public async Task<List<Score>> GetScores(string token)
         {
             User userid = _context.Users.FirstOrDefault(x => x.Token.Equals(token));
             var scoreList = _context.Scores.Where(x => x.User.Id == userid.Id);
@@ -53,7 +54,7 @@ namespace SkietbaanBE.Controllers
 
 
         [HttpPost]
-        public async System.Threading.Tasks.Task<IActionResult> ScoreCapture([FromBody]ScoreCapture scoreCapture)
+        public async Task<IActionResult> ScoreCapture([FromBody]ScoreCapture scoreCapture)
         {
             if (ModelState.IsValid)
             {
