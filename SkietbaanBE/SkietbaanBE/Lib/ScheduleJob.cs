@@ -79,7 +79,7 @@ namespace SkietbaanBE.Lib {
                 awardTimer = new Timer(
                     callback: new TimerCallback(AwardUserJob),
                     state: "",
-                    dueTime: /*GetMilliSecondsToNextMonth()*/0,
+                    dueTime: GetMilliSecondsToNextMonth(),
                     period: 0
                 );
             } else {
