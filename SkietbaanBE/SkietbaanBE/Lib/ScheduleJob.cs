@@ -60,7 +60,9 @@ namespace SkietbaanBE.Lib {
                     Competition = comp,
                     User = user,
                     Description = $"Best shooter in {GetMonthNameByMonthNumber(DateTime.Today.Month)}" + " " +
-                                    $"{DateTime.Today.Year}"
+                                    $"{DateTime.Today.Year}",
+                    Month = DateTime.Today.Month,
+                    Year = DateTime.Today.Year
                 };
                 _notificationMessage.MonthAwardNotification(award.Description);
                 _context.Awards.Add(award);
@@ -77,7 +79,7 @@ namespace SkietbaanBE.Lib {
                 awardTimer = new Timer(
                     callback: new TimerCallback(AwardUserJob),
                     state: "",
-                    dueTime: GetMilliSecondsToNextMonth(),
+                    dueTime: /*GetMilliSecondsToNextMonth()*/0,
                     period: 0
                 );
             } else {
