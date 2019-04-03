@@ -67,7 +67,8 @@ namespace SkietbaanBE.Controllers
         public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
             var notifications = _context.Notifications.Where(x => x.User.Token == token);
-            var notificationsList = notifications.OrderBy(x => x.IsRead == true);
+            var query = notifications.OrderBy(x => x.IsRead == true);
+            var notificationsList = notifications.OrderByDescending(x => x.TimeOfArrival);
             if (notificationsList != null)
             {
                 return notificationsList.ToList();
@@ -87,7 +88,6 @@ namespace SkietbaanBE.Controllers
         [HttpPost]
         public void DeleteNotificationById([FromBody] List<Notifications> list)
         {
-
             try
             {
                 _context.Notifications.RemoveRange(list);
