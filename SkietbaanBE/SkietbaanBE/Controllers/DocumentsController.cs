@@ -43,7 +43,10 @@ namespace SkietbaanBE.Controllers
                 competitionID = 0;
                 numberShots = 0;
             }
-            competitionID = ID;
+            else {
+                competitionID = ID;
+            }
+            
         }
         
         [HttpGet]
