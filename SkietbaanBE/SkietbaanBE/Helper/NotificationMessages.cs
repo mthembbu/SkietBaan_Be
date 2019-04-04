@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SkietbaanBE.Controllers;
 using SkietbaanBE.Models;
+using SkietbaanBE.RequestModel;
 
 namespace SkietbaanBE.Helper
 {
@@ -208,7 +209,7 @@ namespace SkietbaanBE.Helper
                 IsRead = false,
                 TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Award",
-                NotificationMessage = award + " award received in overall total for " + competitionName
+                NotificationMessage = award + " award received in overall total for: " + competitionName
             };
             
             try
@@ -231,7 +232,7 @@ namespace SkietbaanBE.Helper
                 IsRead = false,
                 TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Award",
-                NotificationMessage = award + " award received in accuracy for " + competitionName
+                NotificationMessage = award + " award received in accuracy for: " + competitionName
             };
             
             try
@@ -244,7 +245,7 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void HoursAwardNotification(string award)
+        public void HoursAwardNotification(string award, HoursAward hours)
         {
             var user = _context.Users.SingleOrDefault(x => x.Id == 1);
             var notification = new Notifications
@@ -253,7 +254,7 @@ namespace SkietbaanBE.Helper
                 IsRead = false,
                 TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Award",
-                NotificationMessage = award + " award received "
+                NotificationMessage = award + " award received for " + hours.Hours + " hours"
             };
             
             try
