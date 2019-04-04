@@ -129,15 +129,15 @@ namespace SkietbaanBE.Lib {
             //MAKE THIS DYNAMIC
             if (hours.Hours >= 5) {
                 hours.Bronze = true;
-                notificationMessages.HoursAwardNotification("bronze");
+                notificationMessages.HoursAwardNotification("bronze", hours);
             }
             if (hours.Hours >= 10) {
                 hours.Silver = true;
-                notificationMessages.HoursAwardNotification("silver");
+                notificationMessages.HoursAwardNotification("silver", hours);
             }
             if (hours.Hours >= 15) {
                 hours.Gold = true;
-                notificationMessages.HoursAwardNotification("gold");
+                notificationMessages.HoursAwardNotification("gold", hours);
             }
 
             return hours;
