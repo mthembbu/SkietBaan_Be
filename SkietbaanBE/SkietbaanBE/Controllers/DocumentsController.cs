@@ -20,32 +20,44 @@ namespace SkietbaanBE.Controllers
         private SendMail sendMail = new SendMail();
 
         private static int numberShots = 0;
-        private static List<int> GroupList=new List<int>(); 
+        private static int competitionID = 0;
 
 
 
         public DocumentsController(ModelsContext db)
         {
             _context = db;
-        }  
-
-        [HttpPost]
-
-        public void changeShots(int num)
-        {
-            numberShots = num;
         }
 
         [HttpPost]
-        public void getGroup([FromBody] List<Models.Competition> group)
+        public void changeShots(int shots)
         {
-            GroupList.Clear();
-            for(int i = 0; i < group.Count; i++)
+            numberShots = shots;
+        }
+
+        [HttpPost]
+        public void getGroup(int ID)
+        {
+            if (competitionID == ID)
             {
-                GroupList.Add(group.ElementAt(i).Id);
+                competitionID = 0;
+                numberShots = 0;
             }
-        } 
+            competitionID = ID;
+        }
         
+        [HttpGet]
+        public int StatusCompetition()
+        {
+            return competitionID;
+        }
+
+        [HttpGet]
+        public int NumberOFShots()
+        {
+            return numberShots;
+        }
+
         [HttpPost] 
         [Route("{Token}")]
         public string SendLOS(string Token)
@@ -228,32 +240,37 @@ namespace SkietbaanBE.Controllers
         {
 
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
+            int counts = 0;
+
+            Competition compSelected = _context.Competitions.FirstOrDefault(x => x.Id == competitionID);
+
+            string compName = compSelected.Name;
+
 
             if (Member != null)
             {
                 if (Member.MemberID != null)
 
                 {
-                    int counts = 0;
-                    foreach (var item in GroupList)
-                    {
-                        var comp = from score in _context.Scores
-                                   where (score.Competition.Id == item && score.User.Id == Member.Id)
-                                   select new
-                                   {
-                                       score.UserScore
-                                   };
-                        counts += comp.ToList().Count;
-                    }
+                 
+
+                    var comp = from score in _context.Scores
+                            where (score.Competition.Id == competitionID && score.User.Id == Member.Id)
+                            select new
+                            {
+                                score.UserScore
+                            };
+                    counts += comp.ToList().Count;
+                   
 
                     if (counts > numberShots)
                     {
                         return ("Document");
                     }
-                    return ("requirements"+ numberShots.ToString()+ GroupList.ToList());
+                    return ("requirements"+ numberShots.ToString()+" "+ compName);
                 }
             }
-            return ("requirements" + numberShots.ToString() + GroupList.ToList().ToString());
+            return ("requirements" + numberShots.ToString() + " "+compName );
 
         }
 
