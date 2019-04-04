@@ -41,6 +41,14 @@ namespace SkietbaanBE.Controllers
                                                   select C).OrderBy(c => c.Status == false).ThenBy(x => x.Name).ToList<Competition>();
             return competitionsList;
         }
+        //A method that returns a last competitions ID
+        //GET: api/Competition/getCompId
+        [HttpGet("getCompID")]
+        public int GetLastCompetitionID() { 
+
+                return _context.Competitions.Last<Competition>().Id;
+                
+                }
         //posting the competition to the competition table
         // POST: api/Competition
         [HttpPost]
