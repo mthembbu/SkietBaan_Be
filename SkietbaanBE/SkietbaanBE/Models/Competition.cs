@@ -10,6 +10,7 @@ namespace SkietbaanBE.Models {
         public bool Status { get; set; }
         public int BestScoresNumber { get; set; }
         public int Hours { get; set; }
- }
+        public int MaximumScore { get; set; }
+    }
 }
 
