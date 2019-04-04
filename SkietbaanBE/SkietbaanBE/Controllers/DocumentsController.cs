@@ -19,8 +19,8 @@ namespace SkietbaanBE.Controllers
         private ModelsContext _context;
         private SendMail sendMail = new SendMail();
 
-        private static int? numberShots = null;
-        private static int? competitionID = null;
+        private static int numberShots = 0;
+        private static int competitionID = 0;
 
 
 
@@ -40,20 +40,20 @@ namespace SkietbaanBE.Controllers
         {
             if (competitionID == ID)
             {
-                competitionID = null;
-                numberShots = null;
+                competitionID = 0;
+                numberShots = 0;
             }
             competitionID = ID;
         }
         
         [HttpGet]
-        public int? StatusCompetition()
+        public int StatusCompetition()
         {
             return competitionID;
         }
 
         [HttpGet]
-        public int? NumberOFShots()
+        public int NumberOFShots()
         {
             return numberShots;
         }
