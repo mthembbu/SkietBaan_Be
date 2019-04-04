@@ -20,32 +20,47 @@ namespace SkietbaanBE.Controllers
         private SendMail sendMail = new SendMail();
 
         private static int numberShots = 0;
-        private static List<int> GroupList=new List<int>(); 
+        private static int competitionID = 0;
 
 
 
         public DocumentsController(ModelsContext db)
         {
             _context = db;
-        }  
-
-        [HttpPost]
-
-        public void changeShots(int num)
-        {
-            numberShots = num;
         }
 
         [HttpPost]
-        public void getGroup([FromBody] List<Models.Competition> group)
+        public void changeShots(int shots)
         {
-            GroupList.Clear();
-            for(int i = 0; i < group.Count; i++)
+            numberShots = shots;
+        }
+
+        [HttpPost]
+        public void getGroup(int ID)
+        {
+            if (competitionID == ID)
             {
-                GroupList.Add(group.ElementAt(i).Id);
+                competitionID = 0;
+                numberShots = 0;
             }
-        } 
+            else {
+                competitionID = ID;
+            }
+            
+        }
         
+        [HttpGet]
+        public int StatusCompetition()
+        {
+            return competitionID;
+        }
+
+        [HttpGet]
+        public int NumberOFShots()
+        {
+            return numberShots;
+        }
+
         [HttpPost] 
         [Route("{Token}")]
         public string SendLOS(string Token)
@@ -228,35 +243,41 @@ namespace SkietbaanBE.Controllers
         {
 
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
+            int counts = 0;
 
-            if (Member != null)
+            Competition compSelected = _context.Competitions.FirstOrDefault(x => x.Id == competitionID);
+
+            if(compSelected != null)
             {
-                if (Member.MemberID != null)
+                string compName = compSelected.Name;
 
+
+                if (Member != null)
                 {
-                    int counts = 0;
-                    foreach (var item in GroupList)
+                    if (Member.MemberID != null)
+
                     {
+
+
                         var comp = from score in _context.Scores
-                                   where (score.Competition.Id == item && score.User.Id == Member.Id)
+                                   where (score.Competition.Id == competitionID && score.User.Id == Member.Id)
                                    select new
                                    {
                                        score.UserScore
                                    };
                         counts += comp.ToList().Count;
-                    }
 
-                    if (counts > numberShots)
-                    {
-                        return ("Document");
+
+                        if (counts > numberShots)
+                        {
+                            return ("Document");
+                        }
+                        return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
                     }
-                    return ("requirements"+ numberShots.ToString()+ GroupList.ToList());
                 }
+                return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
             }
-            return ("requirements" + numberShots.ToString() + GroupList.ToList().ToString());
-
+            return ("Admin has not set requirements for letter of dedicated status");
         }
-
-
     }
 }
