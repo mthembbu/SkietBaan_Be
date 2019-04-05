@@ -50,9 +50,7 @@ namespace SkietbaanBE.Controllers
                         CompetitionName = comp.Name,
                         IsCompetitionLocked = false,
                         Total = GetTotalScore(token, comp.Name),
-                        //REMOVE
-                        Accuracy = (int)competitionsUserPartakesIn
-                                        .Where(x => x.Competition.Id == comp.Id).First().Average,
+                        Accuracy = context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore,
                         TotalAward = CheckAward.Total(competitionsUserPartakesIn
                                         .Where(x => x.Competition.Id == comp.Id).First().Total, false, comp.Name, context),
                         AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
