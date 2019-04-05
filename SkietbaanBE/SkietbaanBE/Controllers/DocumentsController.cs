@@ -43,7 +43,10 @@ namespace SkietbaanBE.Controllers
                 competitionID = 0;
                 numberShots = 0;
             }
-            competitionID = ID;
+            else {
+                competitionID = ID;
+            }
+            
         }
         
         [HttpGet]
@@ -244,36 +247,37 @@ namespace SkietbaanBE.Controllers
 
             Competition compSelected = _context.Competitions.FirstOrDefault(x => x.Id == competitionID);
 
-            string compName = compSelected.Name;
-
-
-            if (Member != null)
+            if(compSelected != null)
             {
-                if (Member.MemberID != null)
+                string compName = compSelected.Name;
 
+
+                if (Member != null)
                 {
-                 
+                    if (Member.MemberID != null)
 
-                    var comp = from score in _context.Scores
-                            where (score.Competition.Id == competitionID && score.User.Id == Member.Id)
-                            select new
-                            {
-                                score.UserScore
-                            };
-                    counts += comp.ToList().Count;
-                   
-
-                    if (counts > numberShots)
                     {
-                        return ("Document");
+
+
+                        var comp = from score in _context.Scores
+                                   where (score.Competition.Id == competitionID && score.User.Id == Member.Id)
+                                   select new
+                                   {
+                                       score.UserScore
+                                   };
+                        counts += comp.ToList().Count;
+
+
+                        if (counts > numberShots)
+                        {
+                            return ("Document");
+                        }
+                        return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
                     }
-                    return ("requirements"+ numberShots.ToString()+" "+ compName);
                 }
+                return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
             }
-            return ("requirements" + numberShots.ToString() + " "+compName );
-
+            return ("Admin has not set requirements for letter of dedicated status");
         }
-
-
     }
 }
