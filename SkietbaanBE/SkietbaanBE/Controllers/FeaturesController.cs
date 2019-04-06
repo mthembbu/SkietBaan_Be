@@ -28,10 +28,15 @@ namespace SkietbaanBE.Controllers
         [HttpGet("{token}")]
         public User GetUserByToken(string token)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Token == token);
-            if (user != null)
+            try
+            {
+                User user = _context.Users.FirstOrDefault(x => x.Token == token);
                 return user;
-            else return null;
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
         }
 
         [HttpPost]
