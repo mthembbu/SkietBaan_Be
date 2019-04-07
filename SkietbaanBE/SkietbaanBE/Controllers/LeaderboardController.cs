@@ -23,23 +23,67 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<Group> GetGroups()
         {
-            return _context.Groups.ToArray<Group>();
+            try
+            {
+                return _context.Groups.ToArray<Group>();
+            }
+            catch(Exception e)
+            {
+                return new List<Group>();
+            }
         }
         // GET: api/Leaderboard/
         [HttpGet]
         public IEnumerable<Competition> GetCompetitions()
         {
-            return _context.Competitions.ToArray<Competition>();
+            try
+            {
+                return _context.Competitions.ToArray<Competition>();
+            }catch(Exception e)
+            {
+                return new List<Competition>();
+            }
         }
 
 
         [HttpGet]
-        public LeaderboardFilterData GetLeaderboardFilterData(int userID)
+        public LeaderboardFilterData GetLeaderboardFilterData(string token)
         {
+            if(token == null)
+            {
+                token = "";
+            }
             LeaderboardFilterData leaderboardFilterData = new LeaderboardFilterData();
-            List<Competition> competitions = _context.Competitions.Where(c=>c.Status == true).ToList<Competition>();
-            List<Group> groups = _context.Groups.Where(c => c.IsActive == true).ToList<Group>();
-            User user = _context.Users.Find(userID);
+            List<Competition> competitions = null;
+            List<Group> groups = null;
+            User user = null;
+            try
+            {
+                competitions = _context.Competitions.Where(c => c.Status == true).ToList<Competition>();
+                groups = _context.Groups.Where(c => c.IsActive == true).ToList<Group>();
+            }
+            catch(Exception e)
+            {
+                if(competitions == null) { competitions = new List<Competition>(); }
+                if (groups == null) { groups = new List<Group>(); }
+            }
+            finally
+            {
+                try
+                {
+                    user = _context.Users.Where(u => u.Token.Equals(token)).FirstOrDefault<User>();
+                    if(user == null)
+                    {
+                        user = new User();
+                        user.Username = "Invalid Tokken";
+                    }
+                }
+                catch(Exception e)
+                {
+                    user = new User();
+                    user.Username = "Invalid Tokken";
+                }
+            }
 
             List<CompetitionLabel> competitionsLabels = new List<CompetitionLabel>();
             List<GroupLabel> groupsLabels = new List<GroupLabel>();
@@ -63,6 +107,27 @@ namespace SkietbaanBE.Controllers
             leaderboardFilterData.competitions1 = competitionsLabels;
             leaderboardFilterData.groups1 = groupsLabels;
             leaderboardFilterData.user = user;
+            leaderboardFilterData.rankResult = new RankResults() {
+                Rank = 0,
+                Username = user.Username,
+                DisplayName = getDisplayName(user.Name,user.Surname),
+                Best = 0,
+                Total = 0,
+                Average = 0,
+                RankStatus = "equal",
+                isCompetitiveShooter = false
+            };
+            if (!user.Username.Equals("Invalid Tokken"))
+            {
+                if(user.MemberID != null)
+                {
+                    if(user.MemberID.Length > 0)
+                    {
+                        leaderboardFilterData.rankResult.isMember = true;
+
+                    }
+                }
+            }
 
             return leaderboardFilterData;
         }
@@ -83,6 +148,33 @@ namespace SkietbaanBE.Controllers
         {
             //from arry index to data base ID;
             LeaderboardResults leaderboardResults = new LeaderboardResults();
+            try
+            {
+                List<Competition> competitions = _context.Competitions.Where(c => c.Status == true).ToList<Competition>();
+                if(competitions != null)
+                {
+                    if(competitions.Count == 0)
+                    {
+                        leaderboardResults.RankResults = new List<RankResults>();
+                        leaderboardResults.UserResults = new RankResults() {
+                            Rank = 0,
+                            Username = "",
+                            DisplayName = "",
+                            Best = 0,
+                            Total = 0,
+                            Average = 0,
+                            RankStatus = "equal",
+                            isCompetitiveShooter = false,
+                            isMember = false,
+                        };
+                        return leaderboardResults;
+                    }
+                }
+            }catch(Exception e)
+            {
+                leaderboardResults.RankResults = new List<RankResults>();
+                return leaderboardResults;
+            }
 
             //ranking results for specific group's specific compentition
             List<RankResults> rankResults = new List<RankResults>();
@@ -122,18 +214,6 @@ namespace SkietbaanBE.Controllers
                     };
                 }
             }
-            else
-            {
-                RankResults rankResult = new RankResults();
-                rankResult.Username = "Not logged in";
-                rankResult.Rank = 0;
-                rankResult.Best = 0;
-                rankResult.Total = 0;
-                rankResult.Average = 0;
-                rankResult.RankStatus = "equal";
-                leaderboardResults.UserResults = rankResult;
-
-            }
             //final results*/
             return leaderboardResults;
         }
@@ -169,116 +249,129 @@ namespace SkietbaanBE.Controllers
         private List<RankResults> individualRankings(int competitionID)
         {
             //need to update with Outer join query
-            var query = from User in _context.Users
-                        join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
-                        where (UserCompetitionTotalScore.Competition.Id == competitionID)
-                        select new
-                        {
-                            User.Username,
-                            User.Name,
-                            User.Surname,
-                            User.MemberID,
-                            UserCompetitionTotalScore.Average,
-                            UserCompetitionTotalScore.Total,
-                            UserCompetitionTotalScore.Best,
-                            UserCompetitionTotalScore.PreviousTotal
-                        };
-            var queryAllCustomers = from user in _context.Users
-                                    select user.Username;
-            List<string> users = queryAllCustomers.ToList<string>();
-
-            //saving results in an List which will make sorting easier(ArrayList)
-            List<RankResults> ranklist = new List<RankResults>();
-            foreach (var item in query)
+            try
             {
-                if (item.Average > 0 && item.Best > 0)
+                var query = from User in _context.Users
+                            join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
+                            where (UserCompetitionTotalScore.Competition.Id == competitionID)
+                            select new
+                            {
+                                User.Username,
+                                User.Name,
+                                User.Surname,
+                                User.MemberID,
+                                UserCompetitionTotalScore.Average,
+                                UserCompetitionTotalScore.Total,
+                                UserCompetitionTotalScore.Best,
+                                UserCompetitionTotalScore.PreviousTotal
+                            };
+                var queryAllCustomers = from user in _context.Users
+                                        select user.Username;
+                List<string> users = queryAllCustomers.ToList<string>();
+
+                //saving results in an List which will make sorting easier(ArrayList)
+                List<RankResults> ranklist = new List<RankResults>();
+                foreach (var item in query)
                 {
-                    RankResults rankResult = new RankResults();
-                    rankResult.Username = item.Username;
-                    rankResult.DisplayName = getDisplayName(item.Name, item.Surname);
-                    rankResult.Best = item.Best;
-                    rankResult.Total = item.Total;
-                    rankResult.Average = item.Average;
-                    rankResult.Rank = 0;
-                    rankResult.RankStatus = getRankStatus(item.Average, item.PreviousTotal);
-                    if (item.MemberID != null)
+                    if (item.Average > 0 && item.Best > 0)
                     {
-                        rankResult.isMember = true;
+                        RankResults rankResult = new RankResults();
+                        rankResult.Username = item.Username;
+                        rankResult.DisplayName = getDisplayName(item.Name, item.Surname);
+                        rankResult.Best = item.Best;
+                        rankResult.Total = item.Total;
+                        rankResult.Average = item.Average;
+                        rankResult.Rank = 0;
+                        rankResult.RankStatus = getRankStatus(item.Average, item.PreviousTotal);
+                        if (item.MemberID != null)
+                        {
+                            rankResult.isMember = true;
+                        }
+                        else
+                        {
+                            rankResult.isMember = false;
+                        }
+                        ranklist.Add(rankResult);
+                        //remove user from users without scores
+                        users.RemoveAll(x => x.Equals(item.Username));
                     }
-                    else
-                    {
-                        rankResult.isMember = false;
-                    }
-                    ranklist.Add(rankResult);
-                    //remove user from users without scores
-                    users.RemoveAll(x => x.Equals(item.Username));
-                }
 
+                }
+                for (int i = 0; i < users.Count; i++)
+                {
+                    RankResults tempRankResult = new RankResults();
+                    User user = _context.Users.Where(u => u.Username.Equals(users.ElementAt(i))).FirstOrDefault<User>();
+                    tempRankResult.Username = user.Username;
+                    tempRankResult.DisplayName = getDisplayName(user.Name, user.Surname);
+                    tempRankResult.Total = 0;
+                    tempRankResult.Best = 0;
+                    tempRankResult.Average = 0;
+                    tempRankResult.Rank = 0;
+                    tempRankResult.RankStatus = "equal";
+                    ranklist.Add(tempRankResult);
+                }
+                return ranklist;
             }
-            for (int i = 0; i < users.Count; i++)
+            catch(Exception e)
             {
-                RankResults tempRankResult = new RankResults();
-                User user = _context.Users.Where(u => u.Username.Equals(users.ElementAt(i))).FirstOrDefault<User>();
-                tempRankResult.Username = user.Username;
-                tempRankResult.DisplayName = getDisplayName(user.Name, user.Surname);
-                tempRankResult.Total = 0;
-                tempRankResult.Best = 0;
-                tempRankResult.Average = 0;
-                tempRankResult.Rank = 0;
-                tempRankResult.RankStatus = "equal";
-                ranklist.Add(tempRankResult);
+                return new List<RankResults>();
             }
-            return ranklist;
         }
        
         private List<RankResults> groupRankings(int competitionID, int groupID)
         {
-            var query = from Group in _context.Groups
-                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
-                        join User in _context.Users on UserGroup.User.Id equals User.Id
-                        join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
-                        join Competition in _context.Competitions on UserCompetitionTotalScore.Competition.Id equals Competition.Id
-                        where (UserCompetitionTotalScore.Competition.Id == competitionID && Group.Id == groupID)
-                        select new
-                        {
-                            User.Username,
-                            User.Name,
-                            User.Surname,
-                            User.MemberID,
-                            UserCompetitionTotalScore.Average,
-                            UserCompetitionTotalScore.Total,
-                            UserCompetitionTotalScore.Best,
-                            UserCompetitionTotalScore.PreviousTotal
-                        };
-            //saving results in an List which will make sorting easier(ArrayList)
-            int rank = 1;
-            List<RankResults> ranklist = new List<RankResults>();
-            foreach (var item in query)
+            try
             {
-                if (item.Average > 0 && item.Best > 0)
+                var query = from Group in _context.Groups
+                            join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                            join User in _context.Users on UserGroup.User.Id equals User.Id
+                            join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id equals UserCompetitionTotalScore.User.Id
+                            join Competition in _context.Competitions on UserCompetitionTotalScore.Competition.Id equals Competition.Id
+                            where (UserCompetitionTotalScore.Competition.Id == competitionID && Group.Id == groupID)
+                            select new
+                            {
+                                User.Username,
+                                User.Name,
+                                User.Surname,
+                                User.MemberID,
+                                UserCompetitionTotalScore.Average,
+                                UserCompetitionTotalScore.Total,
+                                UserCompetitionTotalScore.Best,
+                                UserCompetitionTotalScore.PreviousTotal
+                            };
+                //saving results in an List which will make sorting easier(ArrayList)
+                int rank = 1;
+                List<RankResults> ranklist = new List<RankResults>();
+                foreach (var item in query)
                 {
-                    RankResults rankResult = new RankResults();
-                    rankResult.Username = item.Username;
-                    rankResult.DisplayName = getDisplayName(item.Name, item.Surname);
-                    rankResult.Best = item.Best;
-                    rankResult.Total = item.Total;
-                    rankResult.Average = item.Average;
-                    rankResult.Rank = rank;
-                    rankResult.RankStatus = getRankStatus(item.Average, item.PreviousTotal);
-                    if (item.MemberID != null)
+                    if (item.Average > 0 && item.Best > 0)
                     {
-                        rankResult.isMember = true;
+                        RankResults rankResult = new RankResults();
+                        rankResult.Username = item.Username;
+                        rankResult.DisplayName = getDisplayName(item.Name, item.Surname);
+                        rankResult.Best = item.Best;
+                        rankResult.Total = item.Total;
+                        rankResult.Average = item.Average;
+                        rankResult.Rank = rank;
+                        rankResult.RankStatus = getRankStatus(item.Average, item.PreviousTotal);
+                        if (item.MemberID != null)
+                        {
+                            rankResult.isMember = true;
+                        }
+                        else
+                        {
+                            rankResult.isMember = false;
+                        }
+                        ranklist.Add(rankResult);
+                        rank++;
                     }
-                    else
-                    {
-                        rankResult.isMember = false;
-                    }
-                    ranklist.Add(rankResult);
-                    rank++;
                 }
+                //rank and return results
+                return ranklist;
+            }catch(Exception e)
+            {
+                return new List<RankResults>();
             }
-            //rank and return results
-            return ranklist;
         }
         private string getDisplayName(string name,string surname)
         {
