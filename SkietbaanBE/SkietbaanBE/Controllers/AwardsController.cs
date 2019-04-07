@@ -49,15 +49,15 @@ namespace SkietbaanBE.Controllers
             foreach (var comp in context.Competitions) {
                 try {
                     if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
+                        double accuracy = Math.Round(context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore, 1);
                         AwardObject awardObject = new AwardObject {
                             CompetitionName = comp.Name,
                             IsCompetitionLocked = false,
                             Total = GetTotalScore(token, comp.Name),
-                            Accuracy = Math.Round(context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore, 1),
+                            Accuracy = accuracy,
                             TotalAward = CheckAward.Total(competitionsUserPartakesIn
                                             .Where(x => x.Competition.Id == comp.Id).First().Total, false, comp.Name, context),
-                            AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
-                                            .Where(x => x.Competition.Id == comp.Id).First().Average), false, comp.Name, context),
+                            AccuracyAward = CheckAward.Accuracy(accuracy, false, comp.Name, context),
                             BestInMonth = CheckAward.MonthBest(comp.Id, token, context).ToString()
                         };
 
