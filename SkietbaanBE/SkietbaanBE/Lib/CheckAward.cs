@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using SkietbaanBE.Helper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SkietbaanBE.Lib {
     public class CheckAward {
@@ -113,15 +114,19 @@ namespace SkietbaanBE.Lib {
             var hoursRecord = context.TimeSpents
                             .FirstOrDefault(x => x.User.Token == token);
             NotificationMessages notificationMessages = new NotificationMessages(context);
-
-            HoursAward hours = new HoursAward {
-                Gold = false,
-                Bronze = false,
-                Silver = false,
-                Hours = 0,
-                MembershipNumber = context.Users.Where(x => x.Token == token).First().MemberID,
-                Username = context.Users.Where(x => x.Token == token).First().Username
-            };
+            HoursAward hours = null;
+            try {
+                hours = new HoursAward {
+                    Gold = false,
+                    Bronze = false,
+                    Silver = false,
+                    Hours = 0,
+                    MembershipNumber = context.Users.Where(x => x.Token == token).First().MemberID,
+                    Username = context.Users.Where(x => x.Token == token).First().Username
+                };
+            }catch(Exception) {
+                return hours;
+            }
             //Has not added any score in skietbaan
             if (hoursRecord == null) return hours;
 
@@ -143,8 +148,14 @@ namespace SkietbaanBE.Lib {
             return hours;
         }
 
-        public static void UpdateHoursSpent(ModelsContext context, Score score) {
-            var dbRecord = context.TimeSpents.FirstOrDefault(x => x.UserId == score.User.Id);
+        public static IActionResult UpdateHoursSpent(ModelsContext context, Score score) {
+            TimeSpent dbRecord = null;
+            try {
+                dbRecord = context.TimeSpents.FirstOrDefault(x => x.UserId == score.User.Id);
+            } catch(Exception) {
+                return new BadRequestObjectResult("Something went wrong");
+
+            }
 
             if(dbRecord == null) {
                 TimeSpent timeSpent = new TimeSpent {
@@ -158,13 +169,19 @@ namespace SkietbaanBE.Lib {
                 context.TimeSpents.Update(dbRecord);
             }
             context.SaveChanges();
+            return new OkObjectResult("Updated succesfully");
         }
 
-        public static string MonthBest(int compId, string token, ModelsContext context) {
-            Award award = context.Awards.FirstOrDefault(x => x.Competition.Id == compId && x.User.Token == token
-                                                && x.Month == DateTime.Today.Month && x.Year == DateTime.Today.Year);
-            if (award != null) return award.Description;
-            return "No Award";
+        public static IActionResult MonthBest(int compId, string token, ModelsContext context) {
+            Award award = null;
+            try {
+                award = context.Awards.FirstOrDefault(x => x.Competition.Id == compId && x.User.Token == token
+                                                    && x.Month == DateTime.Today.Month && x.Year == DateTime.Today.Year);
+            } catch {
+                return new BadRequestObjectResult("Something went wrong");
+            }
+            if (award != null) return new OkObjectResult(award.Description);
+            return new OkObjectResult("No award");
         }
 
         private static Dictionary<string, string> ReadAwardsRules() {
