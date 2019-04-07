@@ -20,6 +20,7 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet("total")]
         public string GetTotalScore(string token, string competitionName) {
+            if (!ModelState.IsValid) return null;
             string total;
             try {
                 total = Convert.ToString(context.UserCompetitionTotalScores
@@ -33,17 +34,18 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet("{token}")]
         public List<AwardObject> GetAllAwards(string token) {
+            if (!ModelState.IsValid) return null;
             List<AwardObject> awardCompetitions = new List<AwardObject>();
             bool notValid = context.Users.Where(x => x.Token == token).FirstOrDefault() == null;
             if (notValid) return awardCompetitions;
 
             var competitionsUserPartakesIn = from UserCompetitionTotalScore in context.UserCompetitionTotalScores
-                                             where (UserCompetitionTotalScore.User.Token == token)
-                                             select new {
-                                                 UserCompetitionTotalScore.Competition,
-                                                 UserCompetitionTotalScore.Average,
-                                                 UserCompetitionTotalScore.Total
-                                             };
+                                                where (UserCompetitionTotalScore.User.Token == token)
+                                                select new {
+                                                    UserCompetitionTotalScore.Competition,
+                                                    UserCompetitionTotalScore.Average,
+                                                    UserCompetitionTotalScore.Total
+                                                };
             foreach (var comp in context.Competitions) {
                 try {
                     if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
@@ -51,7 +53,7 @@ namespace SkietbaanBE.Controllers
                             CompetitionName = comp.Name,
                             IsCompetitionLocked = false,
                             Total = GetTotalScore(token, comp.Name),
-                            Accuracy = context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore,
+                            Accuracy = Math.Round(context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore, 1),
                             TotalAward = CheckAward.Total(competitionsUserPartakesIn
                                             .Where(x => x.Competition.Id == comp.Id).First().Total, false, comp.Name, context),
                             AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
@@ -76,13 +78,15 @@ namespace SkietbaanBE.Controllers
                     return null;
                 }
             }
-
             return awardCompetitions;
+
         }
 
         [HttpGet("hours/{token}")]
         public HoursAward GetHours(string token) {
+            if (!ModelState.IsValid) return null;
             return CheckAward.Hours(token, context);
+
         }
     }
 }
