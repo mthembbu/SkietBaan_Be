@@ -172,26 +172,33 @@ namespace SkietbaanBE.Controllers
         public List<User> getUsersThatAreNotInTheGroup(int id)
         {
             List<User> users = new List<User>();
-            var query = from Group in _context.Groups
-                        join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
-                        join User in _context.Users on UserGroup.User.Id equals User.Id
-                        where (Group.Id == id)
-                        select new
-                        {
-                            User
-                        };
-            var qry = _context.Users.Select(x => x).ToList();
-            if (qry != null)
+            try
             {
-                foreach (var item in query)
+                var query = from Group in _context.Groups
+                            join UserGroup in _context.UserGroups on Group.Id equals UserGroup.Group.Id
+                            join User in _context.Users on UserGroup.User.Id equals User.Id
+                            where (Group.Id == id)
+                            select new
+                            {
+                                User
+                            };
+                var qry = _context.Users.Select(x => x).ToList();
+                if (qry != null)
                 {
-                    User user = new User();
-                    user = item.User;
-                    users.Add(user);
+                    foreach (var item in query)
+                    {
+                        User user = new User();
+                        user = item.User;
+                        users.Add(user);
+                    }
                 }
+                var result = ((qry).Except(users)).OrderBy(x => x.Username);
+                return result.ToList<User>();
             }
-            var result = ((qry).Except(users)).OrderBy(x=>x.Username);
-            return result.ToList<User>();
+            catch(Exception e)
+            {
+                return new List<User>();
+            }
         }
 
         //get existing members in a group
@@ -276,16 +283,24 @@ namespace SkietbaanBE.Controllers
             Dictionary<int, int> mapCompToNumUser = new Dictionary<int, int>();
             var GroupList = this.GetGroups();
 
-            foreach (var groups in GroupList)
+            try
             {
-                int count = (from usergroup in _context.UserGroups
-                             where usergroup.GroupId ==groups.Id 
-                             select usergroup.User.Id).Distinct().ToList().Count();
+                foreach (var groups in GroupList)
+                {
+                    int count = (from usergroup in _context.UserGroups
+                                 where usergroup.GroupId == groups.Id
+                                 select usergroup.User.Id).Distinct().ToList().Count();
 
-                mapCompToNumUser.Add(groups.Id, count);
+                    mapCompToNumUser.Add(groups.Id, count);
+                }
+                return mapCompToNumUser;
+            }
+            catch(Exception e)
+            {
+                return new Dictionary<int, int>();
             }
 
-            return mapCompToNumUser;
+            
         }
     }
 }

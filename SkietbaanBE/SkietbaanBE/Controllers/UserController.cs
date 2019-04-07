@@ -34,14 +34,29 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<User> GetUsers()
         {
-            return (_context.Users.ToArray<User>()).OrderBy(x=>x.Username).ToArray<User>();
+            try
+            {
+                return (_context.Users.ToArray<User>()).OrderBy(x => x.Username).ToArray<User>();
+            }
+            catch(Exception e)
+            {
+                return new List<User>();
+            }
+           
         }
 
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
         public async Task<User> GetUser(int id)
         {
-            return await _context.Users.FindAsync(id);
+            try
+            {
+                return await _context.Users.FindAsync(id);
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
         }
 
         
@@ -51,33 +66,40 @@ namespace SkietbaanBE.Controllers
         {
             if (ModelState.IsValid)
             {
-                User dbUser = null; //assume user does not exist
-
-                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
-
-                //if user aready exist return
-                if (dbUser != null)
+                try
                 {
-                    return new BadRequestObjectResult("User already exists");
-                }
-                //get today's date and save it under user entry date
-                user.EntryDate = DateTime.Now;
-                //encrypt password
-                user.Password = Security.HashSensitiveData(user.Password);
-                //generate token
-                string tokenString = BuildToken();
-                user.Token = tokenString;
-                //Save User
-                 await _context.AddAsync(user);
-                _context.SaveChanges();
+                    User dbUser = null; //assume user does not exist
 
-                new OkObjectResult("User saved successfully");
+                    dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+
+                    //if user aready exist return
+                    if (dbUser != null)
+                    {
+                        return new BadRequestObjectResult("User already exists");
+                    }
+                    //get today's date and save it under user entry date
+                    user.EntryDate = DateTime.Now;
+                    //encrypt password
+                    user.Password = Security.HashSensitiveData(user.Password);
+                    //generate token
+                    string tokenString = BuildToken();
+                    user.Token = tokenString;
+                    //Save User
+                    await _context.AddAsync(user);
+                    _context.SaveChanges();
+
+                    return new OkObjectResult(user);
+                }
+                catch(Exception e)
+                {
+                    return  new BadRequestObjectResult(e.Message);
+                }
             }
             else
             {
                  return new BadRequestObjectResult("user cannot be null");
             }
-            return Ok(user);
+            
         }
 
         private string BuildToken()
@@ -103,22 +125,29 @@ namespace SkietbaanBE.Controllers
                     User dbUser = null; //assume user does not exist
                     using (_context)
                     {
-                        dbUser = _context.Users
-                        .Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
-                        .FirstOrDefault<User>();
-                        if (dbUser != null)
+                        try
                         {
-                            return BadRequest("Cannot update user, Username already exists");
-                        }
-                        dbUser = _context.Users
-                        .Where(u => u.Id == user.Id)
-                        .FirstOrDefault<User>();
+                            dbUser = _context.Users
+                       .Where(u => u.Username == user.Username && u.Id != user.Id) //check if a different user with the new username already exists
+                       .FirstOrDefault<User>();
+                            if (dbUser != null)
+                            {
+                                return BadRequest("Cannot update user, Username already exists");
+                            }
+                            dbUser = _context.Users
+                            .Where(u => u.Id == user.Id)
+                            .FirstOrDefault<User>();
 
-                        //now updating user details
-                        dbUser.Username = user.Username;
-                        _context.Users.Update(dbUser);
-                        await _context.SaveChangesAsync();
-                        return Ok("User update successful");
+                            //now updating user details
+                            dbUser.Username = user.Username;
+                            _context.Users.Update(dbUser);
+                            await _context.SaveChangesAsync();
+                            return Ok("User update successful");
+                        }
+                        catch(Exception e)
+                        {
+                            return new BadRequestObjectResult(e.Message);
+                        }
                     }
 
                 }
