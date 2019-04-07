@@ -45,31 +45,35 @@ namespace SkietbaanBE.Controllers
                                                  UserCompetitionTotalScore.Total
                                              };
             foreach (var comp in context.Competitions) {
-                if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
-                    AwardObject awardObject = new AwardObject {
-                        CompetitionName = comp.Name,
-                        IsCompetitionLocked = false,
-                        Total = GetTotalScore(token, comp.Name),
-                        Accuracy = context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore,
-                        TotalAward = CheckAward.Total(competitionsUserPartakesIn
-                                        .Where(x => x.Competition.Id == comp.Id).First().Total, false, comp.Name, context),
-                        AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
-                                        .Where(x => x.Competition.Id == comp.Id).First().Average), false, comp.Name, context),
-                        BestInMonth = CheckAward.MonthBest(comp.Id, token, context)
-                    };
+                try {
+                    if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
+                        AwardObject awardObject = new AwardObject {
+                            CompetitionName = comp.Name,
+                            IsCompetitionLocked = false,
+                            Total = GetTotalScore(token, comp.Name),
+                            Accuracy = context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore,
+                            TotalAward = CheckAward.Total(competitionsUserPartakesIn
+                                            .Where(x => x.Competition.Id == comp.Id).First().Total, false, comp.Name, context),
+                            AccuracyAward = CheckAward.Accuracy(((int)competitionsUserPartakesIn
+                                            .Where(x => x.Competition.Id == comp.Id).First().Average), false, comp.Name, context),
+                            BestInMonth = CheckAward.MonthBest(comp.Id, token, context).ToString()
+                        };
 
-                    awardCompetitions.Add(awardObject);
-                } else {
-                    AwardObject awardObject = new AwardObject {
-                        CompetitionName = comp.Name,
-                        IsCompetitionLocked = true,
-                        Total = "0",
-                        Accuracy = 0,
-                        TotalAward = CheckAward.Total(0, true, comp.Name, context),
-                        AccuracyAward = CheckAward.Accuracy(0, true, comp.Name, context),
-                        BestInMonth = "No Award"
-                    };
-                    awardCompetitions.Add(awardObject);
+                        awardCompetitions.Add(awardObject);
+                    } else {
+                        AwardObject awardObject = new AwardObject {
+                            CompetitionName = comp.Name,
+                            IsCompetitionLocked = true,
+                            Total = "0",
+                            Accuracy = 0,
+                            TotalAward = CheckAward.Total(0, true, comp.Name, context),
+                            AccuracyAward = CheckAward.Accuracy(0, true, comp.Name, context),
+                            BestInMonth = "No Award"
+                        };
+                        awardCompetitions.Add(awardObject);
+                    }
+                } catch {
+                    return null;
                 }
             }
 
