@@ -150,7 +150,7 @@ namespace SkietbaanBE.Controllers
             LeaderboardResults leaderboardResults = new LeaderboardResults();
             try
             {
-                List<Competition> competitions = _context.Competitions.ToList<Competition>();
+                List<Competition> competitions = _context.Competitions.Where(c => c.Status == true).ToList<Competition>();
                 if(competitions != null)
                 {
                     if(competitions.Count == 0)
