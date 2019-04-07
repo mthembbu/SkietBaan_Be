@@ -96,27 +96,34 @@ namespace SkietbaanBE.Controllers
         [HttpPost]
         public string UpdateDetails([FromBody]User user)
         {
-            var tempUser = _context.Users.FirstOrDefault(x => x.Token == user.Token);
-            tempUser.Email = user.Email; 
+            try
+            {
+                var tempUser = _context.Users.FirstOrDefault(x => x.Token == user.Token);
+                tempUser.Email = user.Email;
 
-            if(user.PhoneNumber == "")
-            {
-                user.PhoneNumber = null;
+                if (user.PhoneNumber == "")
+                {
+                    user.PhoneNumber = null;
+                }
+                tempUser.PhoneNumber = user.PhoneNumber;
+                if (user.Name == "")
+                {
+                    user.Name = null;
+                }
+                tempUser.Name = user.Name;
+                if (user.Surname == "")
+                {
+                    user.Surname = null;
+                }
+                tempUser.Surname = user.Surname;
+                _context.Update(tempUser);
+                _context.SaveChanges();
+                return ("updated");
             }
-            tempUser.PhoneNumber = user.PhoneNumber;
-            if (user.Name == "")
+            catch(Exception e)
             {
-                user.Name = null;
+                return "Update failed: "+e.Message;
             }
-            tempUser.Name = user.Name;
-            if (user.Surname == "")
-            {
-                user.Surname = null;
-            }
-            tempUser.Surname = user.Surname;
-            _context.Update(tempUser);
-            _context.SaveChanges();
-            return ("updated");
         }
 
 
@@ -124,25 +131,31 @@ namespace SkietbaanBE.Controllers
         public ActionResult Login ([FromBody]User user)
         {
             User dbUser = null;
-            if(!String.IsNullOrEmpty(user.Username))
+            try
             {
-                dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
-            }
-            else
+                if (!String.IsNullOrEmpty(user.Username))
+                {
+                    dbUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+                }
+                else
+                {
+                    dbUser = _context.Users.FirstOrDefault(x => x.Email == user.Email);
+                }
+                if (dbUser == null)
+                {
+                    return new NotFoundObjectResult($"{user.Username} not found");
+                }
+                if (Security.HashSensitiveData(user.Password) == dbUser.Password)
+                {
+                    return Ok(dbUser);
+                }
+                else
+                {
+                    return new BadRequestObjectResult("Invalid Password");
+                }
+            }catch(Exception e)
             {
-                dbUser = _context.Users.FirstOrDefault(x => x.Email == user.Email);
-            }
-            if (dbUser == null)
-            {
-                return new NotFoundObjectResult($"{user.Username} not found");
-            }
-            if (Security.HashSensitiveData(user.Password) == dbUser.Password)
-            {
-                return Ok(dbUser);
-            }
-            else
-            {
-                return new BadRequestObjectResult("Invalid Password");
+                return new BadRequestObjectResult(e.Message);
             }
         }
 
