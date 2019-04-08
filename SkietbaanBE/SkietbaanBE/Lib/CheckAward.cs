@@ -111,11 +111,11 @@ namespace SkietbaanBE.Lib {
         }
 
         public static HoursAward Hours(string token, ModelsContext context) {
-            var hoursRecord = context.TimeSpents
-                            .FirstOrDefault(x => x.User.Token == token);
             NotificationMessages notificationMessages = new NotificationMessages(context);
             HoursAward hours = null;
             try {
+                var hoursRecord = context.TimeSpents
+                            .FirstOrDefault(x => x.User.Token == token);
                 hours = new HoursAward {
                     Gold = false,
                     Bronze = false,
@@ -124,9 +124,7 @@ namespace SkietbaanBE.Lib {
                     MembershipNumber = context.Users.Where(x => x.Token == token).First().MemberID,
                     Username = context.Users.Where(x => x.Token == token).First().Username
                 };
-            }catch(Exception) {
-                return hours;
-            }
+            
             //Has not added any score in skietbaan
             if (hoursRecord == null) return hours;
 
@@ -145,6 +143,9 @@ namespace SkietbaanBE.Lib {
                 notificationMessages.HoursAwardNotification("gold", hours);
             }
 
+            } catch (Exception) {
+                return hours;
+            }
             return hours;
         }
 
