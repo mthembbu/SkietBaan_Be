@@ -125,22 +125,22 @@ namespace SkietbaanBE.Lib {
                     Username = context.Users.Where(x => x.Token == token).First().Username
                 };
             
-            //Has not added any score in skietbaan
-            if (hoursRecord == null) return hours;
+                //Has not added any score in skietbaan
+                if (hoursRecord == null) return hours;
 
-            hours.Hours = hoursRecord.HoursSpent;
-            //MAKE THIS DYNAMIC
-            if (hours.Hours >= 5) {
-                hours.Bronze = true;
-                notificationMessages.HoursAwardNotification("bronze", hours);
-            }
-            if (hours.Hours >= 10) {
-                hours.Silver = true;
-                notificationMessages.HoursAwardNotification("silver", hours);
-            }
-            if (hours.Hours >= 15) {
-                hours.Gold = true;
-                notificationMessages.HoursAwardNotification("gold", hours);
+                hours.Hours = hoursRecord.HoursSpent;
+                //MAKE THIS DYNAMIC
+                if (hours.Hours >= 5) {
+                    hours.Bronze = true;
+                    notificationMessages.HoursAwardNotification("bronze", hours);
+                }
+                if (hours.Hours >= 10) {
+                    hours.Silver = true;
+                    notificationMessages.HoursAwardNotification("silver", hours);
+                }
+                if (hours.Hours >= 15) {
+                    hours.Gold = true;
+                    notificationMessages.HoursAwardNotification("gold", hours);
             }
 
             } catch (Exception) {
