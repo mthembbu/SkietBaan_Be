@@ -51,7 +51,8 @@ namespace SkietbaanBE.Controllers
                 try {
                     if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
                         double sum = context.Scores.Sum(x => x.UserScore);
-                        double accuracy = Math.Round(sum / (double)(comp.MaximumScore * context.Scores.Count()) * 100, 1);
+                        int numberOfScores = context.Scores.Where(x => x.Competition.Id == comp.Id).Count();
+                        double accuracy = Math.Round((sum / (numberOfScores * comp.MaximumScore)) * 100, 1);
                         AwardObject awardObject = new AwardObject {
                             CompetitionName = comp.Name,
                             IsCompetitionLocked = false,
