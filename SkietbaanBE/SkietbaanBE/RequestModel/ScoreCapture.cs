@@ -9,7 +9,7 @@ namespace SkietbaanBE.RequestModel
     {
         public string CompetitionName { get; set; }
         public string Token { get; set; }
-        public int UserScore { get; set; }
+        public double UserScore { get; set; }
         public string PictureURL { get; set; }
         public float Latitude { get; set; }
         public float Longitude { get; set; }
