@@ -18,11 +18,8 @@ namespace SkietbaanBE.Controllers
     {
         private ModelsContext _context;
         private SendMail sendMail = new SendMail();
-
         private static int numberShots = 0;
         private static int competitionID = 0;
-
-
 
         public DocumentsController(ModelsContext db)
         {
@@ -45,8 +42,7 @@ namespace SkietbaanBE.Controllers
             }
             else {
                 competitionID = ID;
-            }
-            
+            }            
         }
         
         [HttpGet]
@@ -67,70 +63,78 @@ namespace SkietbaanBE.Controllers
         {
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
 
-            if (Member != null)
+            try
             {
-                MemoryStream memoryStream = new MemoryStream();
-
-                StreamReader streamReader;
-
-                streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
-
-                if (streamReader != null)
+                if (Member != null)
                 {
-                    string content = streamReader.ReadToEnd();
+                    MemoryStream memoryStream = new MemoryStream();
 
-                    if (content != null)
+                    StreamReader streamReader;
+
+                    streamReader = new StreamReader(Directory.GetCurrentDirectory().ToString() + "\\Controllers\\Documents\\Certificate.html");
+
+                    if (streamReader != null)
                     {
-                        content.ToString();
+                        string content = streamReader.ReadToEnd();
 
-                        streamReader.Close();
-
-                        string content1 = content.Replace("Name", Member.Username)
-                           .Replace("Type", "Letter Of Dedicated Status")
-                           .Replace("Date", "December 2019");
-
-                        SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-                        converter.Options.PdfPageSize = PdfPageSize.A4;
-                        converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
-                        converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-                        converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
-
-                        PdfDocument doc = new PdfDocument();
-                        doc = converter.ConvertHtmlString(content1);
-
-
-                        if (doc != null)
+                        if (content != null)
                         {
-                            doc.Save(memoryStream);
+                            content.ToString();
 
-                            byte[] bytes = memoryStream.ToArray();
+                            streamReader.Close();
 
-                            memoryStream.Close();
+                            string content1 = content.Replace("Name", Member.Username)
+                               .Replace("Type", "Letter Of Dedicated Status")
+                               .Replace("Date", "December 2019");
 
-                            if (bytes != null)
+                            SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+                            converter.Options.PdfPageSize = PdfPageSize.A4;
+                            converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+                            converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                            converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.AutoFit;
+
+                            PdfDocument doc = new PdfDocument();
+                            doc = converter.ConvertHtmlString(content1);
+
+
+                            if (doc != null)
                             {
-                                sendMail.SendEmail(Member.Email, "Letter Of Dedicated Status", new Attachment(new MemoryStream(bytes), "LOS.pdf"));
+                                doc.Save(memoryStream);
 
-                                doc.Close();
+                                byte[] bytes = memoryStream.ToArray();
 
-                                return ("Document Sent");
+                                memoryStream.Close();
+
+                                if (bytes != null)
+                                {
+                                    sendMail.SendEmail(Member.Email, "Letter Of Dedicated Status", new Attachment(new MemoryStream(bytes), "LOS.pdf"));
+
+                                    doc.Close();
+
+                                    return ("Document Sent");
+
+                                }
+
+                                return ("Document Not Sent");
+
 
                             }
 
                             return ("Document Not Sent");
-
 
                         }
 
                         return ("Document Not Sent");
 
                     }
-
                     return ("Document Not Sent");
-
                 }
-                return ("Document Not Sent");
             }
+
+            catch (Exception e)
+            {
+                return ("Document Not Sent");
+            }            
             return ("Document Not Sent");
         }
 
@@ -243,41 +247,52 @@ namespace SkietbaanBE.Controllers
         {
 
             var Member = _context.Users.FirstOrDefault(x => x.Token == Token);
-            int counts = 0;
 
-            Competition compSelected = _context.Competitions.FirstOrDefault(x => x.Id == competitionID);
-
-            if(compSelected != null)
+            try
             {
-                string compName = compSelected.Name;
+                int counts = 0;
 
-
-                if (Member != null)
+                Competition compSelected = _context.Competitions.FirstOrDefault(x => x.Id == competitionID);
+                
+                if (compSelected != null)
                 {
-                    if (Member.MemberID != null)
+                    string compName = compSelected.Name;
 
+
+                    if (Member != null)
                     {
+                        if (Member.MemberID != null)
 
-
-                        var comp = from score in _context.Scores
-                                   where (score.Competition.Id == competitionID && score.User.Id == Member.Id)
-                                   select new
-                                   {
-                                       score.UserScore
-                                   };
-                        counts += comp.ToList().Count;
-
-
-                        if (counts > numberShots)
                         {
-                            return ("Document");
+
+
+                            var comp = from score in _context.Scores
+                                       where (score.Competition.Id == competitionID && score.User.Id == Member.Id)
+                                       select new
+                                       {
+                                           score.UserScore
+                                       };
+                            counts += comp.ToList().Count;
+
+
+                            if (counts > numberShots)
+                            {
+                                return ("Document");
+                            }
+                            return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
                         }
-                        return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
                     }
+                    return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
                 }
-                return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
+                return ("Admin has not set requirements for letter of dedicated status");
+
             }
-            return ("Admin has not set requirements for letter of dedicated status");
+            catch (Exception e)
+            {
+                return ("Admin has not set requirements for letter of dedicated status");
+            }
+            
+            
         }
     }
 }
