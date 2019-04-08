@@ -134,36 +134,49 @@ namespace SkietbaanBE.Controllers
         [Route("add")]
         public void AddListUsers([FromBody] CreateGroup createobj)
         {
-            Group group = new Group();
-            group.Name = createobj.name;
-            group.IsActive = true;
-            Group tempGroup = _context.Groups.Where(g => g.Name.Equals(group.Name)).FirstOrDefault<Group>();
-            if (tempGroup == null)
+            try
             {
-                _context.Groups.Add(group);
-                _context.SaveChanges();
-                group = _context.Groups.Where(g => g.Name.Equals(group.Name)).FirstOrDefault<Group>();
-            }
-            else
-            {
-                group = tempGroup;
+                Group group = new Group();
+                group.Name = createobj.name;
                 group.IsActive = true;
-            }
+                Group tempGroup = _context.Groups.Where(g => g.Name.Equals(group.Name)).FirstOrDefault<Group>();
+                if (tempGroup == null)
+                {
+                    _context.Groups.Add(group);
+                    _context.SaveChanges();
+                    group = _context.Groups.Where(g => g.Name.Equals(group.Name)).FirstOrDefault<Group>();
+                }
+                else
+                {
+                    group = tempGroup;
+                    group.IsActive = true;
+                }
 
-      
-            List<UserGroup> userGroups = new List<UserGroup>();
-            for (int i = 0; i < createobj.users.Length; i++)
+
+                List<UserGroup> userGroups = new List<UserGroup>();
+                for (int i = 0; i < createobj.users.Length; i++)
+                {
+
+                    UserGroup userGroup = new UserGroup();
+                    try
+                    {
+                        User dbUser = _context.Users.FirstOrDefault(x => x.Token == createobj.users.ElementAt(i).Token);
+                        userGroup.GroupId = group.Id;
+                        userGroup.UserId = dbUser.Id;
+                        userGroups.Add(userGroup);
+                        _notificationMessages.GroupNotification(group, dbUser);
+                    }
+                    catch (Exception e)
+                    {
+                        break;
+                    }
+                }
+                _context.UserGroups.AddRange(userGroups);
+                _context.SaveChanges();
+            }catch(Exception e)
             {
-                string standard = "";
-                UserGroup userGroup = new UserGroup();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Token == createobj.users.ElementAt(i).Token);
-                userGroup.GroupId = group.Id;
-                userGroup.UserId = dbUser.Id;
-                userGroups.Add(userGroup);
-                _notificationMessages.GroupNotification(group, dbUser);
+                e.ToString();
             }
-            _context.UserGroups.AddRange(userGroups);
-            _context.SaveChanges();
         }
 
         //get users that do not in the group
@@ -182,6 +195,7 @@ namespace SkietbaanBE.Controllers
                             {
                                 User
                             };
+            
                 var qry = _context.Users.Select(x => x).ToList();
                 if (qry != null)
                 {
@@ -268,10 +282,16 @@ namespace SkietbaanBE.Controllers
             for (int i = 0; i < usersobj.users.Length; i++)
             {
                 UserGroup userGroup = new UserGroup();
-                User dbUser = _context.Users.FirstOrDefault(x => x.Token == usersobj.users.ElementAt(i).Token);
-                userGroup.Group = group;
+                try
+                {
+                    User dbUser = _context.Users.FirstOrDefault(x => x.Token == usersobj.users.ElementAt(i).Token);
+                    userGroup.Group = group;
 
-                userGroup.User = dbUser;
+                    userGroup.User = dbUser;
+                }catch(Exception e)
+                {
+                    break;
+                }
                 _context.UserGroups.Add(userGroup);
                 _context.SaveChanges();
             }
