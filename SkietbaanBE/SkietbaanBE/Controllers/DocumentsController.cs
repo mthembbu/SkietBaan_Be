@@ -18,11 +18,8 @@ namespace SkietbaanBE.Controllers
     {
         private ModelsContext _context;
         private SendMail sendMail = new SendMail();
-
         private static int numberShots = 0;
         private static int competitionID = 0;
-
-
 
         public DocumentsController(ModelsContext db)
         {
@@ -45,8 +42,7 @@ namespace SkietbaanBE.Controllers
             }
             else {
                 competitionID = ID;
-            }
-            
+            }            
         }
         
         [HttpGet]
@@ -257,7 +253,7 @@ namespace SkietbaanBE.Controllers
                 int counts = 0;
 
                 Competition compSelected = _context.Competitions.FirstOrDefault(x => x.Id == competitionID);
-
+                
                 if (compSelected != null)
                 {
                     string compName = compSelected.Name;
@@ -288,6 +284,7 @@ namespace SkietbaanBE.Controllers
                     }
                     return ("requires: " + numberShots.ToString() + " Shots, in " + compName + " competition");
                 }
+                return ("Admin has not set requirements for letter of dedicated status");
 
             }
             catch (Exception e)
@@ -295,7 +292,7 @@ namespace SkietbaanBE.Controllers
                 return ("Admin has not set requirements for letter of dedicated status");
             }
             
-            return ("Admin has not set requirements for letter of dedicated status");
+            
         }
     }
 }
