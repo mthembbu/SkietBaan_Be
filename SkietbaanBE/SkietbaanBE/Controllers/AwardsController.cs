@@ -35,10 +35,11 @@ namespace SkietbaanBE.Controllers
         [HttpGet("{token}")]
         public List<AwardObject> GetAllAwards(string token) {
             if (!ModelState.IsValid) return null;
+
             List<AwardObject> awardCompetitions = new List<AwardObject>();
             bool notValid = context.Users.Where(x => x.Token == token).FirstOrDefault() == null;
             if (notValid) return awardCompetitions;
-
+            if (context.Competitions.Count() == 0) return null;
             var competitionsUserPartakesIn = from UserCompetitionTotalScore in context.UserCompetitionTotalScores
                                                 where (UserCompetitionTotalScore.User.Token == token)
                                                 select new {
@@ -49,7 +50,8 @@ namespace SkietbaanBE.Controllers
             foreach (var comp in context.Competitions) {
                 try {
                     if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
-                        double accuracy = Math.Round(context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore, 1);
+                        double sum = context.Scores.Sum(x => x.UserScore);
+                        double accuracy = Math.Round(sum / (double)(comp.MaximumScore * context.Scores.Count()) * 100, 1);
                         AwardObject awardObject = new AwardObject {
                             CompetitionName = comp.Name,
                             IsCompetitionLocked = false,
