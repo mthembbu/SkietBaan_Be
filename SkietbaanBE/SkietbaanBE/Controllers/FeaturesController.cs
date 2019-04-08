@@ -42,25 +42,33 @@ namespace SkietbaanBE.Controllers
         [HttpPost]
         public string ForgotPassword(string user)
         {
-            var username = _context.Users.FirstOrDefault(x => x.Username == user);
-
-            if (username == null)
+            try
             {
-                var email = _context.Users.FirstOrDefault(x => x.Email == user);
+                var username = _context.Users.FirstOrDefault(x => x.Username == user);
 
-                if (email == null)
+                if (username == null)
                 {
-                    return ("user not registered");
+                    var email = _context.Users.FirstOrDefault(x => x.Email == user);
+
+                    if (email == null)
+                    {
+                        return ("user not registered");
+                    }
+
+                    sendMail.SendPasswordEmail(user, "reset Password", email.Token);
+
+                    return ("Email Sent To: " + email.Email);
                 }
 
-                sendMail.SendPasswordEmail(user, "reset Password", email.Token);
+                sendMail.SendPasswordEmail(username.Email, "reset Password", username.Token);
 
-                return ("Email Sent To: "+ email.Email);
+                return ("Email Sent To: " + username.Email);
             }
-
-            sendMail.SendPasswordEmail(username.Email, "reset Password", username.Token);
-
-            return ("Email Sent To: " + username.Email);
+            catch(Exception e)
+            {
+                return ("something went wrong");
+            }
+            
         }    
         
         [HttpPost]
