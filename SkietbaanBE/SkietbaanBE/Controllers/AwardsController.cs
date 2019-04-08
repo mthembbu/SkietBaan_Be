@@ -87,8 +87,13 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet("hours/{token}")]
         public HoursAward GetHours(string token) {
-            if (!ModelState.IsValid) return null;
-            return CheckAward.Hours(token, context);
+            try {
+                if (!ModelState.IsValid) return null;
+                return CheckAward.Hours(token, context);
+            } catch (Exception) {
+                return null;
+            }
+            
 
         }
     }
