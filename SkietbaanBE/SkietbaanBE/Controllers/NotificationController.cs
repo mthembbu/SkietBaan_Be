@@ -51,16 +51,16 @@ namespace SkietbaanBE.Controllers
         [HttpGet("{id}", Name = "GetNotificationById")]
         public async Task<Notifications> GetNotificationById(int id)
         {
-            var notification = _context.Notifications.SingleOrDefault(x => x.Id == id);
-            if (notification == null)
+            Notifications notification = new Notifications();
+            try
             {
-                NotFound();
+                notification = await _context.Notifications.FindAsync(id);      
             }
-            else
+            catch(Exception ex)
             {
-                Ok();
+                var message = ex.Message;
             }
-            return await _context.Notifications.FindAsync(id);
+            return notification;
         }
 
         [HttpGet]
@@ -81,8 +81,15 @@ namespace SkietbaanBE.Controllers
         public int GetNumberOfNotifications(string token)
         {
             var notificationsList = GetNotificationsByUser(token);
-            var unReadNotifications = notificationsList.Where(x => x.IsRead == false);
-            return unReadNotifications.Count();
+            if (notificationsList == null)
+            {
+                return 0;
+            }
+            else
+            {
+                var unReadNotifications = notificationsList.Where(x => x.IsRead == false);
+                return unReadNotifications.Count();
+            }
         }
 
         [HttpPost]
@@ -106,22 +113,30 @@ namespace SkietbaanBE.Controllers
             var notification = new Notifications();
             if (id.Equals(""))
             {
-                return new BadRequestObjectResult("Invaild type for Id");
+                return new OkObjectResult("Invaild type for Id");
             }
             else
             {
                 notification = await GetNotificationById(id);
             }
 
-            notification.IsRead = true;
-            try
+            if (notification == null)
             {
-                _context.Notifications.Update(notification);
+                return new OkObjectResult("Notification not found"); ;
             }
-            catch (Exception ex)
-            {
-                var result = ex.Message;
+            else {
+                try
+                {
+                    notification.IsRead = true;
+                    _context.Notifications.Update(notification);
+                }
+                catch (Exception ex)
+                {
+                    var result = ex.Message;
+
+                }
             }
+            
             await _context.SaveChangesAsync();
             return new OkObjectResult("IsRead Property Updated Successfully");
         }
