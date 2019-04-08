@@ -51,7 +51,6 @@ namespace SkietbaanBE.Helper
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
                 return false;
             }
             return true;
@@ -68,10 +67,18 @@ namespace SkietbaanBE.Helper
 
         public void SmtpSend(MailMessage mail)
         {
-            SmtpClient smtp = new SmtpClient(smtpAddress, portNumber);
-            smtp.Credentials = new NetworkCredential(emailFromAddress, password);
-            smtp.EnableSsl = enableSSL;
-            smtp.Send(mail);
+            try
+            {
+                SmtpClient smtp = new SmtpClient(smtpAddress, portNumber);
+                smtp.Credentials = new NetworkCredential(emailFromAddress, password);
+                smtp.EnableSsl = enableSSL;
+                smtp.Send(mail);
+            }
+            catch (Exception e)
+            {
+                e.ToString();
+            }
+           
         }
     }
 }
