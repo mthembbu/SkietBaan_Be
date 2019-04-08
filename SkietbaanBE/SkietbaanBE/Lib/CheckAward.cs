@@ -111,7 +111,6 @@ namespace SkietbaanBE.Lib {
         }
 
         public static HoursAward Hours(string token, ModelsContext context) {
-            NotificationMessages notificationMessages = new NotificationMessages(context);
             HoursAward hours = null;
             try {
                 var hoursRecord = context.TimeSpents
@@ -124,7 +123,8 @@ namespace SkietbaanBE.Lib {
                     MembershipNumber = context.Users.Where(x => x.Token == token).First().MemberID,
                     Username = context.Users.Where(x => x.Token == token).First().Username
                 };
-            
+
+                NotificationMessages notificationMessages = new NotificationMessages(context);
                 //Has not added any score in skietbaan
                 if (hoursRecord == null) return hours;
 
