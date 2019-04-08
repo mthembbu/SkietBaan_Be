@@ -1,0 +1,12 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "System": "Information",
+      "Microsoft": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "SkietbaanDatabase": "Server=CDS-Skietbaan;Database=skietbaan;User Id=skietbaanscoring;Password=63qsx6bWR3bV9bV9;"
+  }
+}
