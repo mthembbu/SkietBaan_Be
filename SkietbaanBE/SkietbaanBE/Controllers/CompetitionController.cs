@@ -163,7 +163,7 @@ namespace SkietbaanBE.Controllers
                     //error handling, check if client provided valid data
                     if (requirements == null)
                         return new BadRequestObjectResult("requirements cannot be null");
-                    else if (_context.Competitions == null) {
+                    else if (_context.Competitions.Count() == 0) {
                         return BadRequest("Database is currently empty!");
                     }
                     else
