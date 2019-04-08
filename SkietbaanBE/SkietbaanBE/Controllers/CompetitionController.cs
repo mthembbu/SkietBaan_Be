@@ -25,30 +25,57 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<Competition> GetCompetitions()    
         {
-            //get the competitions where(Status == true)
-            List<Competition> competitionsList = (from Comp in _context.Competitions
-                                                  where Comp.Status == true
-                                                  select Comp).ToList<Competition>();     
-            return competitionsList;
+            try
+            {  //get the competitions where(Status == true)
+                List<Competition> competitionsList = (from Comp in _context.Competitions
+                                                      where Comp.Status == true
+                                                      select Comp).ToList<Competition>();
+
+                if (competitionsList == null)
+                    return new List<Competition>();
+                else
+                    return competitionsList;
+            }
+            catch { return new List<Competition>(); }
+
         }
         // The method that return an array of competition objects whether status is true or false
         // GET: api/Competition/all
         [HttpGet("all")]
         public IEnumerable<Competition> GetAllCompetitions()
        {
+            List<Competition> competitionsList = new List<Competition>();
+            //List<Competition> competitoinList;
             //get the competitions where(Status == true / false)
-            List<Competition> competitionsList = (from C in _context.Competitions
-                                                  select C).OrderBy(c => c.Status == false).ThenBy(x => x.Name).ToList<Competition>();
-            return competitionsList;
+            try
+            {
+                competitionsList = (from C in _context.Competitions
+                                                      select C).OrderBy(c => c.Status == false).ThenBy(x => x.Name).ToList<Competition>();
+
+                if (competitionsList == null)
+                    return new List<Competition>();
+                else
+                    return competitionsList;
+            }
+            catch { return competitionsList; }
         }
         //A method that returns a last competitions ID
         //GET: api/Competition/getCompId
         [HttpGet("getCompID")]
-        public int GetLastCompetitionID() { 
-
-                return _context.Competitions.Last<Competition>().Id;
-                
-                }
+        public int GetLastCompetitionID() {
+            try
+            {
+                int compId = 0;
+                compId = _context.Competitions.Last<Competition>().Id;
+                return compId;
+            }
+            catch
+            {
+                return -1;
+            }
+            
+        }    
+           
         //posting the competition to the competition table
         // POST: api/Competition
         [HttpPost]
@@ -61,31 +88,36 @@ namespace SkietbaanBE.Controllers
                 {
                     return new BadRequestObjectResult("competition cannot be null");
                 }
-                else{
-                        Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == Comp.Name);
-                        if (dbCompetition != null)
-                            return new BadRequestObjectResult(Comp.Name + " already exists");
-                    _notificationMessages.CompetitionNotification(Comp);
-                     _context.Competitions.Add(Comp);
+                else if (_context.Competitions == null) {
+                    _context.Competitions.Add(Comp);
                     _context.SaveChanges();
-                    dbCompetition = _context.Competitions.Last <Competition>();
-                   for (int i =0; i < 3;i++)
+                    return Ok("Competition " + Comp.Name + " Added!");
+                }
+                else {
+                    Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == Comp.Name);
+                    if (dbCompetition != null)
+                        return new BadRequestObjectResult(Comp.Name + " already exists");
+                    _notificationMessages.CompetitionNotification(Comp);
+                    _context.Competitions.Add(Comp);
+                    _context.SaveChanges();
+                    dbCompetition = _context.Competitions.Last<Competition>();
+                    for (int i = 0; i < 3; i++)
                     {
                         Requirement R = new Requirement {
-                            Competition = dbCompetition  
+                            Competition = dbCompetition
                         };
                         _context.Requirements.Add(R);
                     }
                     await _context.SaveChangesAsync();
-                    return Ok("Competition"+Comp.Name+" Added!");
-                    }
+                    return Ok("Competition " + Comp.Name + " Added!");
+                }
                 }  
                 else {
                 return new BadRequestObjectResult("competition cannot be null");
             }
         }
         //A method that updates the status of the competition
-        // PUT: api/Competition/5
+        // POST: api/Competition/5
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateCompetitionByStatus(int id, [FromBody]Competition comp)
         {
@@ -94,6 +126,9 @@ namespace SkietbaanBE.Controllers
                 //error handling, check if client provided valid data
                 if (comp == null) {
                     return new BadRequestObjectResult("competition cannot be null");
+                }
+                else if(_context.Competitions == null){
+                    return BadRequest("Database is Empty!!!");
                 }
                 else
                 {
@@ -113,7 +148,7 @@ namespace SkietbaanBE.Controllers
                 }
             }
             else{
-                return new BadRequestObjectResult("competition cannot be null");
+                return new BadRequestObjectResult("competition Model cannot be null");
             }
         }
         //A method that updates the competition standards / requirements by {Id}
@@ -123,28 +158,37 @@ namespace SkietbaanBE.Controllers
         {
             if (ModelState.IsValid)
             {
-                //error handling, check if client provided valid data
-                if (requirements == null)
-                    return new BadRequestObjectResult("requirements cannot be null");
-                else
-                {
-                    //assume the competition does not exist
-                    Competition dbCompetition = _context.Competitions.Where(C => C.Id == CompID).FirstOrDefault<Competition>();
-                    if (dbCompetition == null)
-                    {
-                        return BadRequest("Cannot update requirements, competition does not exist!");
+                try {
+
+                    //error handling, check if client provided valid data
+                    if (requirements == null)
+                        return new BadRequestObjectResult("requirements cannot be null");
+                    else if (_context.Competitions == null) {
+                        return BadRequest("Database is currently empty!");
                     }
-                    List<Requirement> requirementsList = GetRequirementsByID(CompID).ToList<Requirement>();
-                    for (int i =0; i < requirements.Length; i++)
+                    else
                     {
-                        Requirement R = requirementsList.ElementAt(i);
-                        R.Standard = requirements[i].Standard;
-                        R.Accuracy = requirements[i].Accuracy;
-                        R.Total = requirements[i].Total;
-                        _context.Requirements.Update(R);   
+                        //assume the competition does not exist
+                        Competition dbCompetition = _context.Competitions.Where(C => C.Id == CompID).FirstOrDefault<Competition>();
+                        if (dbCompetition == null)
+                        {
+                            return BadRequest("Cannot update requirements, competition does not exist!");
+                        }
+                        List<Requirement> requirementsList = GetRequirementsByID(CompID).ToList<Requirement>();
+                        for (int i = 0; i < requirements.Length; i++)
+                        {
+                            Requirement R = requirementsList.ElementAt(i);
+                            R.Standard = requirements[i].Standard;
+                            R.Accuracy = requirements[i].Accuracy;
+                            R.Total = requirements[i].Total;
+                            _context.Requirements.Update(R);
+                        }
+                        await _context.SaveChangesAsync();
+                        return Ok("All Requirements for the " + dbCompetition.Name + " have been updated");
                     }
-                    await _context.SaveChangesAsync();
-                    return Ok("All Requirements for the " + dbCompetition.Name + " have been updated");
+                }
+                catch {
+                    return null;
                 }
             }
             else
@@ -152,30 +196,20 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("Invalid requirements model!");
             }
         }
- //##########################################################################################################
-        //GET: api/Competition/Requirements/{id}
-        /**returning an array of requirements for a given competition Id
-         * The newly selected object contains only the Competition.ID and 
-         * a Requirement object which will be converted in a front-end.
-        */
-        [HttpGet("/Requirements/{CompID}")]
-        public IEnumerable<Object> GetRequirementsByCompID(int CompID)
-        {
-            var comp = from R in _context.Requirements
-                        where (R.Competition.Id == CompID)
-                        select new{
-                            R.Competition.Id, R 
-                        };
-            List<Object> RList = comp.ToList<Object>();
-            return RList;
-        }
         //GET: /R/{CompID}
         /**Returns an array of requirements together with a null competition
          */
         [HttpGet("/R/{CompID}")]
         public IEnumerable<Requirement> GetRequirementsByID(int CompID)
         {
-            return _context.Requirements.Where(R => R.Competition.Id == CompID).ToList<Requirement>();
+            List<Requirement> requirementList = new List<Requirement>();
+            try {
+                    requirementList = _context.Requirements.Where(R => R.Competition.Id == CompID).ToList<Requirement>();
+                if (requirementList == null)
+                    return new List<Requirement>();
+                else return requirementList;
+            } catch { return requirementList; }
+            
         }
 //##########################################################################################################
         //GET: api/competition/participants
@@ -183,15 +217,22 @@ namespace SkietbaanBE.Controllers
         public Dictionary<int, int> getUsersPerCompetition()
         {
             Dictionary<int, int> mapCompToNumUser = new Dictionary<int, int>();
-            var competitionsList = this.GetCompetitions();
-            foreach (var comp in competitionsList)
-            {
-                int count = (from score in _context.Scores
-                             where score.Competition.Id == comp.Id
-                             select score.User.Id).Distinct().ToList().Count();
-                mapCompToNumUser.Add(comp.Id, count);
+            try {
+                var competitionsList = this.GetCompetitions();
+                    foreach (var comp in competitionsList)
+                        {
+                             int count = (from score in _context.Scores
+                                            where score.Competition.Id == comp.Id
+                                            select score.User.Id).Distinct().ToList().Count();
+                             mapCompToNumUser.Add(comp.Id, count);
             }
-            return mapCompToNumUser;
+                if (mapCompToNumUser == null)
+                    return new Dictionary<int, int>();
+                return mapCompToNumUser;
+            } catch {
+                return mapCompToNumUser;
+            }
+            
         }
     }
 }
