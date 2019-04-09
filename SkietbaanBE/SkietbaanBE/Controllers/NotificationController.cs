@@ -54,12 +54,15 @@ namespace SkietbaanBE.Controllers
             Notifications notification = new Notifications();
             try
             {
-
-                    notification = await _context.Notifications.FindAsync(id);           
+                notification = await _context.Notifications.FindAsync(id);
+                if (notification == null)
+                {
+                    NotFound();
+                }
             }
             catch(Exception ex)
             {
-                notification.NotificationMessage = ex.Message;
+                var message = ex.Message;
             }
             return notification;
         }
@@ -79,7 +82,9 @@ namespace SkietbaanBE.Controllers
                         return notificationsList.ToList();
                     }
                     else
+                    {
                         return null;
+                    }
                 }
                 return null;
             }
