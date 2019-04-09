@@ -168,7 +168,7 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpPost]
-        public void Announcements([FromBody] string message)
+        public void Announcements(string message)
         {
             _notificationMessage.MakeAnnouncement(message);
         }
