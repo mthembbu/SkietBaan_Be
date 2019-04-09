@@ -54,11 +54,12 @@ namespace SkietbaanBE.Controllers
             Notifications notification = new Notifications();
             try
             {
-                notification = await _context.Notifications.FindAsync(id);      
+
+                    notification = await _context.Notifications.FindAsync(id);           
             }
             catch(Exception ex)
             {
-                var message = ex.Message;
+                notification.NotificationMessage = ex.Message;
             }
             return notification;
         }
@@ -66,30 +67,50 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
-            var notifications = _context.Notifications.Where(x => x.User.Token == token);
-            var query = notifications.OrderBy(x => x.IsRead == true);
-            var notificationsList = notifications.OrderByDescending(x => x.TimeOfArrival);
-            if (notificationsList != null)
+            try
             {
-                return notificationsList.ToList();
-            }
-            else
+                if(token != null)
+                {
+                    var notifications = _context.Notifications.Where(x => x.User.Token == token);
+                    var query = notifications.OrderBy(x => x.IsRead == true);
+                    var notificationsList = notifications.OrderByDescending(x => x.TimeOfArrival);
+                    if (notificationsList != null)
+                    {
+                        return notificationsList.ToList();
+                    }
+                    else
+                        return null;
+                }
                 return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            
         }
 
         [HttpGet]
         public int GetNumberOfNotifications(string token)
         {
-            var notificationsList = GetNotificationsByUser(token);
-            if (notificationsList == null)
+            try
+            {
+                var notificationsList = GetNotificationsByUser(token);
+                if (notificationsList == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    var unReadNotifications = notificationsList.Where(x => x.IsRead == false);
+                    return unReadNotifications.Count();
+                }
+            }
+            catch (Exception e)
             {
                 return 0;
             }
-            else
-            {
-                var unReadNotifications = notificationsList.Where(x => x.IsRead == false);
-                return unReadNotifications.Count();
-            }
+            
         }
 
         [HttpPost]
@@ -109,7 +130,7 @@ namespace SkietbaanBE.Controllers
 
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateIsReadProperty(int id)
-        {
+        { 
             var notification = new Notifications();
             if (id.Equals(""))
             {
