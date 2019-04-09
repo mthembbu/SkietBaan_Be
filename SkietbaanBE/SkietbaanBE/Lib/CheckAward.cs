@@ -111,11 +111,10 @@ namespace SkietbaanBE.Lib {
         }
 
         public static HoursAward Hours(string token, ModelsContext context) {
-            var hoursRecord = context.TimeSpents
-                            .FirstOrDefault(x => x.User.Token == token);
-            NotificationMessages notificationMessages = new NotificationMessages(context);
             HoursAward hours = null;
             try {
+                var hoursRecord = context.TimeSpents
+                            .FirstOrDefault(x => x.User.Token == token);
                 hours = new HoursAward {
                     Gold = false,
                     Bronze = false,
@@ -124,27 +123,29 @@ namespace SkietbaanBE.Lib {
                     MembershipNumber = context.Users.Where(x => x.Token == token).First().MemberID,
                     Username = context.Users.Where(x => x.Token == token).First().Username
                 };
-            }catch(Exception) {
+
+                NotificationMessages notificationMessages = new NotificationMessages(context);
+                //Has not added any score in skietbaan
+                if (hoursRecord == null) return hours;
+
+                hours.Hours = hoursRecord.HoursSpent;
+                //MAKE THIS DYNAMIC
+                if (hours.Hours >= 5) {
+                    hours.Bronze = true;
+                    notificationMessages.HoursAwardNotification("bronze", hours);
+                }
+                if (hours.Hours >= 10) {
+                    hours.Silver = true;
+                    notificationMessages.HoursAwardNotification("silver", hours);
+                }
+                if (hours.Hours >= 15) {
+                    hours.Gold = true;
+                    notificationMessages.HoursAwardNotification("gold", hours);
+            }
+
+            } catch (Exception) {
                 return hours;
             }
-            //Has not added any score in skietbaan
-            if (hoursRecord == null) return hours;
-
-            hours.Hours = hoursRecord.HoursSpent;
-            //MAKE THIS DYNAMIC
-            if (hours.Hours >= 5) {
-                hours.Bronze = true;
-                notificationMessages.HoursAwardNotification("bronze", hours);
-            }
-            if (hours.Hours >= 10) {
-                hours.Silver = true;
-                notificationMessages.HoursAwardNotification("silver", hours);
-            }
-            if (hours.Hours >= 15) {
-                hours.Gold = true;
-                notificationMessages.HoursAwardNotification("gold", hours);
-            }
-
             return hours;
         }
 
