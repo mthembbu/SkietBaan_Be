@@ -63,7 +63,7 @@ namespace SkietbaanBE.Controllers
                 //update User Competition Stats
                 Calculations calculations = new Calculations(_context);
                 calculations.performCalculations(user.Id, competition.Id);
-
+                CheckAward.UpdateAccuracyAndTotalAward(score, _context);
                 return Ok("Score Added Successfully");
             }
             else
