@@ -75,7 +75,6 @@ namespace SkietbaanBE.Controllers
                 if(token != null)
                 {
                     var notifications = _context.Notifications.Where(x => x.User.Token == token);
-                    var query = notifications.OrderBy(x => x.IsRead == true);
                     var notificationsList = notifications.OrderByDescending(x => x.TimeOfArrival);
                     if (notificationsList != null)
                     {
