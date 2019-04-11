@@ -86,7 +86,6 @@ namespace SkietbaanBE.Controllers
                 }
             }
             return awardCompetitions;
-
         }
 
         [HttpGet("hours/{token}")]
