@@ -82,6 +82,21 @@ namespace SkietbaanBE.Controllers
                         awardCompetitions.Add(awardObject);
                     }
                 } catch {
+                    if(context.Competitions.Count() != 0) {
+                        foreach(Competition competition in context.Competitions) {
+                            AwardObject awardObject = new AwardObject {
+                                CompetitionName = comp.Name,
+                                IsCompetitionLocked = true,
+                                Total = "0",
+                                Accuracy = 0,
+                                TotalAward = CheckAward.Total(0, true, comp.Name, context),
+                                AccuracyAward = CheckAward.Accuracy(0, true, comp.Name, context),
+                                BestInMonth = "No Award"
+                            };
+                            awardCompetitions.Add(awardObject);
+                        }
+                        return awardCompetitions;
+                    }
                     return null;
                 }
             }
