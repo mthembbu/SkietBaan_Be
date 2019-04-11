@@ -190,27 +190,25 @@ namespace SkietbaanBE.Lib {
             return hours;
         }
 
-        public static IActionResult UpdateHoursSpent(ModelsContext context, Score score) {
+        public static void UpdateHoursSpent(ModelsContext context, Score score) {
             TimeSpent dbRecord = null;
             try {
                 dbRecord = context.TimeSpents.FirstOrDefault(x => x.UserId == score.User.Id);
+                if (dbRecord == null) {
+                    TimeSpent timeSpent = new TimeSpent {
+                        User = score.User,
+                        HoursSpent = score.Competition.Hours
+                    };
+
+                    context.TimeSpents.Add(timeSpent);
+                } else {
+                    dbRecord.HoursSpent += score.Competition.Hours;
+                    context.TimeSpents.Update(dbRecord);
+                }
+                context.SaveChanges();
             } catch (Exception) {
-                return new BadRequestObjectResult("Something went wrong");
+                //LOG THIS ERROR TO FILE   
             }
-
-            if (dbRecord == null) {
-                TimeSpent timeSpent = new TimeSpent {
-                    User = score.User,
-                    HoursSpent = score.Competition.Hours
-                };
-
-                context.TimeSpents.Add(timeSpent);
-            } else {
-                dbRecord.HoursSpent += score.Competition.Hours;
-                context.TimeSpents.Update(dbRecord);
-            }
-            context.SaveChanges();
-            return new OkObjectResult("Updated succesfully");
         }
 
         /*TODO: REMOVE THE HARDCODED REQUIREMENTS*/
