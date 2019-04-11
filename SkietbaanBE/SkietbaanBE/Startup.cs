@@ -7,6 +7,7 @@ using SkietbaanBE.Helper;
 using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 
 namespace SkietbaanBE
 {
@@ -17,12 +18,13 @@ namespace SkietbaanBE
             Configuration = configuration;
         }
         public IConfiguration Configuration { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
             services.AddDbContext<ModelsContext>
-            (options => options.UseSqlServer(Configuration.GetConnectionString("SkietbaanDatabase")));
+            (options => options.UseSqlServer(Environment.GetEnvironmentVariable("SkietbaanDatabase")));
             services.AddScoped<NotificationMessages>();
             services.AddCors(options =>
             {
