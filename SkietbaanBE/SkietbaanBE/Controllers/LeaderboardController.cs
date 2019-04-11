@@ -127,6 +127,11 @@ namespace SkietbaanBE.Controllers
 
                     }
                 }
+                string displayName = getDisplayName(user.Name, user.Surname);
+                if (displayName.Length > 0)
+                {
+                    leaderboardFilterData.user.Username = displayName;
+                }
             }
 
             return leaderboardFilterData;
