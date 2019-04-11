@@ -83,7 +83,7 @@ namespace SkietbaanBE.Controllers
 
                             streamReader.Close();
 
-                            string content1 = content.Replace("Name", Member.Username)
+                            string content1 = content.Replace("Name", Member.Name + " " + Member.Surname)
                                .Replace("Type", "Letter Of Dedicated Status")
                                .Replace("Date", "December 2019");
 
@@ -162,7 +162,7 @@ namespace SkietbaanBE.Controllers
 
                         streamReader.Close();
 
-                         string content1 = content.Replace("Name", Member.Username)
+                         string content1 = content.Replace("Name", Member.Name+ " "+ Member.Surname)
                             .Replace("Type", "Letter Of Good Standing")
                             .Replace("Date", "December 2019");
                         
