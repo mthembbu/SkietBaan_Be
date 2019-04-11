@@ -141,8 +141,7 @@ namespace SkietbaanBE.Lib {
                 if (hours.Hours >= 15) {
                     hours.Gold = true;
                     notificationMessages.HoursAwardNotification("gold", hours);
-            }
-
+                }
             } catch (Exception) {
                 return hours;
             }
@@ -153,12 +152,12 @@ namespace SkietbaanBE.Lib {
             TimeSpent dbRecord = null;
             try {
                 dbRecord = context.TimeSpents.FirstOrDefault(x => x.UserId == score.User.Id);
-            } catch(Exception) {
+            } catch (Exception) {
                 return new BadRequestObjectResult("Something went wrong");
 
             }
 
-            if(dbRecord == null) {
+            if (dbRecord == null) {
                 TimeSpent timeSpent = new TimeSpent {
                     User = score.User,
                     HoursSpent = score.Competition.Hours
@@ -171,6 +170,136 @@ namespace SkietbaanBE.Lib {
             }
             context.SaveChanges();
             return new OkObjectResult("Updated succesfully");
+        }
+
+        public static void UpdateAccuracyAndTotalAward(Score score, ModelsContext context) {
+            try {
+                double total = context.UserCompetitionTotalScores
+                            .FirstOrDefault(x => x.UserId == score.User.Id && x.CompetitionId == score.Competition.Id)
+                            .Total;
+
+                double sum = context.Scores
+                            .Where(x => x.User.Id == score.User.Id && x.Competition.Id == score.Competition.Id)
+                            .Sum(sc => sc.UserScore);
+                int numberOfScores = context.Scores
+                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
+                                    .Count();
+                double accuracy = Math.Round((sum / (numberOfScores * score.Competition.MaximumScore)) * 100, 1);
+
+                var requirements = context.Requirements.Where(x => x.Competition.Id == score.Competition.Id);
+                bool changeMade = false;
+                foreach(var requirement in requirements) {
+                    switch (requirement.Standard) {
+                        case "Gold":
+                        case "gold":
+                            if (total >= requirement.Total) {
+                                var record = context.Awards
+                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
+                                    .Where(desc => desc.Description.StartsWith("Total:Gold")).FirstOrDefault();
+                                if (record != null) break;
+                                Award award = new Award {
+                                    Competition = score.Competition,
+                                    User = score.User,
+                                    Month = score.UploadDate.Value.Month,
+                                    Year = score.UploadDate.Value.Year,
+                                    Description = "Total:Gold " + requirement.Total
+                                };
+                                context.Awards.Add(award);
+                                changeMade = true;
+                            }
+
+                            if(accuracy >= requirement.Accuracy) {
+                                var record = context.Awards
+                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
+                                    .Where(desc => desc.Description.StartsWith("Accuracy:Gold")).FirstOrDefault();
+                                if (record != null) break;
+                                Award award = new Award {
+                                    Competition = score.Competition,
+                                    User = score.User,
+                                    Month = score.UploadDate.Value.Month,
+                                    Year = score.UploadDate.Value.Year,
+                                    Description = "Accuracy:Gold " + requirement.Accuracy
+                                };
+                                context.Awards.Add(award);
+                                changeMade = true;
+                            }
+                            break;
+                        case "Silver":
+                        case "silver":
+                            if (total >= requirement.Total) {
+                                var record = context.Awards
+                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
+                                    .Where(desc => desc.Description.StartsWith("Total:Silver")).FirstOrDefault();
+                                if (record != null) break;
+                                Award award = new Award {
+                                    Competition = score.Competition,
+                                    User = score.User,
+                                    Month = score.UploadDate.Value.Month,
+                                    Year = score.UploadDate.Value.Year,
+                                    Description = "Total:Silver " + requirement.Total
+                                };
+                                context.Awards.Add(award);
+                                changeMade = true;
+                            }
+
+                            if (accuracy >= requirement.Accuracy) {
+                                var record = context.Awards
+                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
+                                    .Where(desc => desc.Description.StartsWith("Accuracy:Silver")).FirstOrDefault();
+                                if (record != null) break;
+                                Award award = new Award {
+                                    Competition = score.Competition,
+                                    User = score.User,
+                                    Month = score.UploadDate.Value.Month,
+                                    Year = score.UploadDate.Value.Year,
+                                    Description = "Accuracy:Silver " + requirement.Accuracy
+                                };
+                                context.Awards.Add(award);
+                                changeMade = true;
+                            }
+                            break;
+                        case "Bronze":
+                        case "bronze":
+                            if (total >= requirement.Total) {
+                                var record = context.Awards
+                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
+                                    .Where(desc => desc.Description.StartsWith("Total:Bronze")).FirstOrDefault();
+                                if (record != null) break;
+                                Award award = new Award {
+                                    Competition = score.Competition,
+                                    User = score.User,
+                                    Month = score.UploadDate.Value.Month,
+                                    Year = score.UploadDate.Value.Year,
+                                    Description = "Total:Bronze " + requirement.Total
+                                };
+                                context.Awards.Add(award);
+                                changeMade = true;
+                            }
+
+                            if (accuracy >= requirement.Accuracy) {
+                                var record = context.Awards
+                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
+                                    .Where(desc => desc.Description.StartsWith("Accuracy:Bronze")).FirstOrDefault();
+                                if (record != null) break;
+                                Award award = new Award {
+                                    Competition = score.Competition,
+                                    User = score.User,
+                                    Month = score.UploadDate.Value.Month,
+                                    Year = score.UploadDate.Value.Year,
+                                    Description = "Accuracy:Bronze " + requirement.Accuracy
+                                };
+                                context.Awards.Add(award);
+                                changeMade = true;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (changeMade) context.SaveChanges();
+            } catch {
+
+            }
         }
 
         public static IActionResult MonthBest(int compId, string token, ModelsContext context) {

@@ -50,8 +50,12 @@ namespace SkietbaanBE.Controllers
             foreach (var comp in context.Competitions) {
                 try {
                     if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
-                        double sum = context.Scores.Sum(x => x.UserScore);
-                        int numberOfScores = context.Scores.Where(x => x.Competition.Id == comp.Id).Count();
+                        double sum = context.Scores
+                            .Where(x => x.User.Token ==  token && x.Competition.Id == comp.Id)
+                            .Sum(sc => sc.UserScore);
+                        int numberOfScores = context.Scores
+                                    .Where(x => x.Competition.Id == comp.Id && x.User.Token == token)
+                                    .Count();
                         double accuracy = Math.Round((sum / (numberOfScores * comp.MaximumScore)) * 100, 1);
                         AwardObject awardObject = new AwardObject {
                             CompetitionName = comp.Name,
