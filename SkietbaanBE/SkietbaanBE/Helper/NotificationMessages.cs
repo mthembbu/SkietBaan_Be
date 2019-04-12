@@ -116,7 +116,7 @@ namespace SkietbaanBE.Helper
                 IsRead = false,
                 TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Group",
-                NotificationMessage = group.Name + ", created. Check it out!"
+                NotificationMessage = group.Name + ", group created and they added you!"
             };
 
             try

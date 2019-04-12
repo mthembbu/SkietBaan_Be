@@ -288,6 +288,7 @@ namespace SkietbaanBE.Controllers
                     userGroup.Group = group;
 
                     userGroup.User = dbUser;
+                    _notificationMessages.GroupNotification(group, dbUser);
                 }catch(Exception e)
                 {
                     break;
