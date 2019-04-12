@@ -87,7 +87,7 @@ namespace SkietbaanBE.Controllers
                             if (Member.Name != null || Member.Surname != null)
                             {
                                 content1 = content.Replace("Name", Member.Name + " " + Member.Surname)
-                                .Replace("Type", "Letter Of Good Standing")
+                                .Replace("Type", "Letter Of Dedicated Status")
                                 .Replace("Date", "December 2019");
                             }
                             else
