@@ -93,7 +93,7 @@ namespace SkietbaanBE.Controllers
                             else
                             {
                                 content1 = content.Replace("Name", Member.Username)
-                                .Replace("Type", "Letter Of Good Standing")
+                                .Replace("Type", "Letter Of Dedicated Status")
                                 .Replace("Date", "December 2019");
 
                             }
