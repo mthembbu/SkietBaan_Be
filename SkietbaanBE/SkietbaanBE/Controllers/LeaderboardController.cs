@@ -154,6 +154,14 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public LeaderboardResults GetLeaderboardRankings(int competitionID, int groupID, string userToken,string selectedRank)
         {
+            List<Competition> comps = _context.Competitions.Where(c => c.Status == true).ToList<Competition>();
+            if(competitionID == -1)
+            {
+                if (comps != null)
+                {
+                    competitionID = comps.ElementAt(0).Id;
+                }
+            }
             //from arry index to data base ID;
             LeaderboardResults leaderboardResults = new LeaderboardResults();
             try
