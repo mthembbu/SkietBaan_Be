@@ -29,7 +29,11 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<int>("Month");
+
                     b.Property<int?>("UserId");
+
+                    b.Property<int>("Year");
 
                     b.HasKey("Id");
 
@@ -47,11 +51,19 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<int>("BestScoresNumber");
 
+                    b.Property<int>("Hours");
+
+                    b.Property<int>("MaximumScore");
+
                     b.Property<string>("Name");
 
                     b.Property<bool>("Status");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
 
                     b.ToTable("Competitions");
                 });
@@ -67,6 +79,10 @@ namespace SkietbaanBE.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
+
                     b.ToTable("Groups");
                 });
 
@@ -79,6 +95,8 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<string>("NotificationMessage");
 
+                    b.Property<string>("TimeOfArrival");
+
                     b.Property<string>("TypeOfNotification");
 
                     b.Property<int?>("UserId");
@@ -88,6 +106,42 @@ namespace SkietbaanBE.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.OTP", b =>
+                {
+                    b.Property<int>("UserId");
+
+                    b.Property<DateTime>("OTPExpiry");
+
+                    b.Property<int>("OneTimePassword");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("OTPs");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.Requirement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("Accuracy");
+
+                    b.Property<int?>("CompetitionId");
+
+                    b.Property<string>("Standard");
+
+                    b.Property<double>("Total");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetitionId");
+
+                    b.ToTable("Requirements");
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
@@ -107,7 +161,7 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<int?>("UserId");
 
-                    b.Property<int>("UserScore");
+                    b.Property<double>("UserScore");
 
                     b.HasKey("Id");
 
@@ -116,6 +170,17 @@ namespace SkietbaanBE.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Scores");
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.TimeSpent", b =>
+                {
+                    b.Property<int>("UserId");
+
+                    b.Property<int>("HoursSpent");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("TimeSpents");
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.User", b =>
@@ -135,7 +200,13 @@ namespace SkietbaanBE.Migrations
 
                     b.Property<DateTime?>("MemberStartDate");
 
+                    b.Property<string>("Name");
+
                     b.Property<string>("Password");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<string>("Surname");
 
                     b.Property<string>("Token");
 
@@ -148,64 +219,34 @@ namespace SkietbaanBE.Migrations
 
             modelBuilder.Entity("SkietbaanBE.Models.UserCompetitionTotalScore", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("CompetitionId");
+
+                    b.Property<int>("UserId");
 
                     b.Property<double>("Average");
 
-                    b.Property<int>("Best");
+                    b.Property<double>("Best");
 
-                    b.Property<int?>("CompetitionId");
+                    b.Property<double>("PreviousTotal");
 
-                    b.Property<int>("Total");
+                    b.Property<double>("Total");
 
-                    b.Property<int?>("UserId");
+                    b.Property<int>("Year");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompetitionId");
+                    b.HasKey("CompetitionId", "UserId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("UserCompetitionTotalScores");
                 });
 
-            modelBuilder.Entity("SkietbaanBE.Models.UserCompStats", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("CompetitionId");
-
-                    b.Property<int>("Month");
-
-                    b.Property<int>("MonthBestScore");
-
-                    b.Property<int?>("UserId");
-
-                    b.Property<int>("Year");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompetitionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserCompStats");
-                });
-
             modelBuilder.Entity("SkietbaanBE.Models.UserGroup", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("GroupId");
 
-                    b.Property<int?>("GroupId");
+                    b.Property<int>("UserId");
 
-                    b.Property<int?>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
+                    b.HasKey("GroupId", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -230,6 +271,21 @@ namespace SkietbaanBE.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("SkietbaanBE.Models.OTP", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SkietbaanBE.Models.Requirement", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.Competition", "Competition")
+                        .WithMany()
+                        .HasForeignKey("CompetitionId");
+                });
+
             modelBuilder.Entity("SkietbaanBE.Models.Score", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
@@ -241,37 +297,38 @@ namespace SkietbaanBE.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("SkietbaanBE.Models.TimeSpent", b =>
+                {
+                    b.HasOne("SkietbaanBE.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SkietbaanBE.Models.UserCompetitionTotalScore", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Competition", "Competition")
                         .WithMany()
-                        .HasForeignKey("CompetitionId");
+                        .HasForeignKey("CompetitionId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("SkietbaanBE.Models.UserCompStats", b =>
-                {
-                    b.HasOne("SkietbaanBE.Models.Competition", "Competition")
-                        .WithMany()
-                        .HasForeignKey("CompetitionId");
-
-                    b.HasOne("SkietbaanBE.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("SkietbaanBE.Models.UserGroup", b =>
                 {
                     b.HasOne("SkietbaanBE.Models.Group", "Group")
                         .WithMany()
-                        .HasForeignKey("GroupId");
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SkietbaanBE.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
