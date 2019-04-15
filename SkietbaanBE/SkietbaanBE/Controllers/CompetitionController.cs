@@ -101,10 +101,15 @@ namespace SkietbaanBE.Controllers
                     _context.Competitions.Add(Comp);
                     _context.SaveChanges();
                     dbCompetition = _context.Competitions.Last<Competition>();
+                    string[] standards = { "Bronze", "Silver", "Gold" };
+                    int[] defaults = { 70, 80, 90 };
                     for (int i = 0; i < 3; i++)
                     {
                         Requirement R = new Requirement {
-                            Competition = dbCompetition
+                            Competition = dbCompetition,
+                            Standard = standards[i],
+                            Accuracy = defaults[i],
+                            Total = defaults[i]
                         };
                         _context.Requirements.Add(R);
                     }
