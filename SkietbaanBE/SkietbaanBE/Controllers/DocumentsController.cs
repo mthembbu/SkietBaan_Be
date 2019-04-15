@@ -82,10 +82,21 @@ namespace SkietbaanBE.Controllers
                             content.ToString();
 
                             streamReader.Close();
+                            string content1;
 
-                            string content1 = content.Replace("Name", Member.Username)
-                               .Replace("Type", "Letter Of Dedicated Status")
-                               .Replace("Date", "December 2019");
+                            if (Member.Name != null || Member.Surname != null)
+                            {
+                                content1 = content.Replace("Name", Member.Name + " " + Member.Surname)
+                                .Replace("Type", "Letter Of Dedicated Status")
+                                .Replace("Date", "December 2019");
+                            }
+                            else
+                            {
+                                content1 = content.Replace("Name", Member.Username)
+                                .Replace("Type", "Letter Of Dedicated Status")
+                                .Replace("Date", "December 2019");
+
+                            }
 
                             SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
                             converter.Options.PdfPageSize = PdfPageSize.A4;
@@ -161,10 +172,23 @@ namespace SkietbaanBE.Controllers
                         content.ToString();
 
                         streamReader.Close();
+                        string content1;
 
-                         string content1 = content.Replace("Name", Member.Username)
+                        if (Member.Name != null || Member.Surname !=null)
+                        {
+                            content1 = content.Replace("Name", Member.Name + " " + Member.Surname)
                             .Replace("Type", "Letter Of Good Standing")
                             .Replace("Date", "December 2019");
+                        }
+                        else
+                        {
+                            content1 = content.Replace("Name", Member.Username)
+                            .Replace("Type", "Letter Of Good Standing")
+                            .Replace("Date", "December 2019");
+
+                        }
+
+                         
                         
                         SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
                        converter.Options.PdfPageSize = PdfPageSize.A4;
