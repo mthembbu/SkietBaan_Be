@@ -74,13 +74,51 @@ namespace SkietbaanBE.Controllers
                 return -1;
             }
             
-        }    
-           
+        }
+        //posting the competition to the competition table together with a array of requirements using the Requirements filter
+        // POST: api/Competition/filter
+        [HttpPost("filter")]
+        public async Task<IActionResult> AddRequirementsFilter([FromBody]RequirementsFilter rFilter)
+        { //error handling, check if client provided valid data
+            try { 
+                if (rFilter.competition == null) {
+                    return new BadRequestObjectResult("competition cannot be null");
+                }
+                else if (_context.Competitions == null){
+                    _context.Competitions.Add(rFilter.competition);
+                    _context.SaveChanges();
+                    return Ok("Competition " + rFilter.competition.Name + " Added!");
+                }
+                else {
+                    Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == rFilter.competition.Name);
+                    if (dbCompetition != null)
+                        return new BadRequestObjectResult(rFilter.competition.Name + " already exists");
+                    _notificationMessages.CompetitionNotification(rFilter.competition);
+                    _context.Competitions.Add(rFilter.competition);
+                    _context.SaveChanges();
+                    dbCompetition = _context.Competitions.Last<Competition>();
+                    for (int i = 0; i < 3; i++){
+                        Requirement R = new Requirement{
+                            Competition = dbCompetition,
+                            Standard = rFilter.GetRequirements.ElementAt(i).Standard,
+                            Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy,
+                            Total = rFilter.GetRequirements.ElementAt(i).Total
+                        };
+                        _context.Requirements.Add(R);
+                    }
+                    await _context.SaveChangesAsync();
+                    return Ok("Competition " + rFilter.competition.Name + " Added!");
+                }
+            }
+            catch { return new BadRequestObjectResult("Could not connect to Backend"); ; }
+        }
+
         //posting the competition to the competition table
         // POST: api/Competition
         [HttpPost]
         public async Task<IActionResult> AddCompetition([FromBody]Competition Comp)
-        {
+        
+{
             if (ModelState.IsValid)
             {
                 //error handling, check if client provided valid data
@@ -102,7 +140,7 @@ namespace SkietbaanBE.Controllers
                     _context.SaveChanges();
                     dbCompetition = _context.Competitions.Last<Competition>();
                     string[] standards = { "Bronze", "Silver", "Gold" };
-                    int[] defaults = { 70, 80, 90 };
+                    int[] defaults = { 40, 50, 60 };
                     for (int i = 0; i < 3; i++)
                     {
                         Requirement R = new Requirement {
