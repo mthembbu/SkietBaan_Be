@@ -362,7 +362,7 @@ namespace SkietbaanBE.Lib {
                                 changeMade = true;
                             }
                             var bronzeReqAccuracy = requirement.Accuracy;
-                            if (bronzeReqAccuracy == 0) bronzeReqAccuracy = 80;// In case default requirement is not set in db
+                            if (bronzeReqAccuracy == 0) bronzeReqAccuracy = 70;// In case default requirement is not set in db
                             if (accuracy >= bronzeReqAccuracy) {
                                 var record = context.Awards
                                     .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
