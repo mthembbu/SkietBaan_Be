@@ -200,9 +200,9 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void TotalAwardNotification(string award, string competitionName)
+        public void TotalAwardNotification(string token, string award, string competitionName)
         {
-            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
             var notification = new Notifications
             {
                 User = user,
@@ -214,7 +214,18 @@ namespace SkietbaanBE.Helper
             
             try
             {
-                _context.Add(notification);
+                var dbNotitifications = _context.Notifications.Where(x => x.NotificationMessage.StartsWith(award)
+                            && x.NotificationMessage.EndsWith(competitionName));
+                if (dbNotitifications.Count() == 0) {
+                    _context.Notifications.Add(notification);
+                    _context.SaveChanges();
+                }
+                foreach (var dbNotification in dbNotitifications) {
+                    if (!dbNotification.NotificationMessage.Contains("total")) {
+                        _context.Notifications.Add(notification);
+                        _context.SaveChanges();
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -224,9 +235,9 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void AccuracyAwardNotification(string award, string competitionName)
+        public void AccuracyAwardNotification(string token, string award, string competitionName)
         {
-            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
             var notification = new Notifications {
                 User = user,
                 IsRead = false,
@@ -237,17 +248,28 @@ namespace SkietbaanBE.Helper
             
             try
             {
-                _context.Add(notification);
+                var dbNotitifications = _context.Notifications.Where(x => x.NotificationMessage.StartsWith(award)
+                                            && x.NotificationMessage.EndsWith(competitionName));
+                if (dbNotitifications.Count() == 0) {
+                    _context.Notifications.Add(notification);
+                    _context.SaveChanges();
+                }
+                foreach (var dbNotification in dbNotitifications) {
+                    if (!dbNotification.NotificationMessage.Contains("accuracy")) {
+                        _context.Notifications.Add(notification);
+                        _context.SaveChanges();
+                    }
+                }
             }catch(Exception e)
             {
                 response = e.Message;
             }
-            _context.SaveChanges();
+            
         }
 
-        public void HoursAwardNotification(string award, HoursAward hours)
+        public void HoursAwardNotification(string token, string award, HoursAward hours)
         {
-            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
             var notification = new Notifications
             {
                 User = user,
@@ -256,21 +278,22 @@ namespace SkietbaanBE.Helper
                 TypeOfNotification = "Award",
                 NotificationMessage = award + " award received for " + hours.Hours + " hours"
             };
-            
-            try
-            {
-                _context.Add(notification);
-            }
-            catch (Exception e)
-            {
+
+            try {
+                var dbNotitifications = _context.Notifications.FirstOrDefault(x => x.NotificationMessage.StartsWith(award));
+                if (dbNotitifications == null) {
+                    _context.Notifications.Add(notification);
+                    _context.SaveChanges();
+                }
+            } catch (Exception e) {
                 response = e.Message;
             }
-            _context.SaveChanges();
+            
         }
 
-        public void MonthAwardNotification(string description)
+        public void MonthAwardNotification(string token, string description)
         {
-            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var user = _context.Users.SingleOrDefault(x => x.Token == token);
             var notification = new Notifications
             {
                 User = user,
