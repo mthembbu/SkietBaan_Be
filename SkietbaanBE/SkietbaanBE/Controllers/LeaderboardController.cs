@@ -157,7 +157,7 @@ namespace SkietbaanBE.Controllers
             List<Competition> comps = _context.Competitions.Where(c => c.Status == true).ToList<Competition>();
             if(competitionID == -1)
             {
-                if (comps != null)
+                if (comps.Count() > 0)
                 {
                     competitionID = comps.ElementAt(0).Id;
                 }
