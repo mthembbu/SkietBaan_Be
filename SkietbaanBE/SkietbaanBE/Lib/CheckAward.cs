@@ -7,104 +7,142 @@ using SkietbaanBE.Helper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SkietbaanBE.Lib {
-    public class CheckAward {
-        private static string awardRequirements = "Total:gold 90,silver 80,bronze 70\n" +
-                                            "Hours:gold 100,silver 70,bronze 50\n" +
-                                            "Accuracy:gold 95,silver 85,bronze 75";
-        public static TotalAward Total(double total, bool isLocked, string compName, ModelsContext context) {
+    public class CheckAward { 
+        public static TotalAward Total(double total, bool isLocked, string token, string compName, ModelsContext context) {
             TotalAward totalAward = new TotalAward();
+            var requirements = context.Requirements.Where(x => x.Competition.Name == compName);
             if (!isLocked) {
-                var requirements = ReadAwardsRules()["Total"];
-                foreach (string req in requirements.Split(',')) {
-                    if (req.Contains("gold")) {
-                        totalAward.Gold = total >= int.Parse(req.Split(' ')[1].Trim());
-                        if (totalAward.Gold) {
-                            NotificationMessages notificationMessages = new NotificationMessages(context);
-                            notificationMessages.TotalAwardNotification("gold", compName);
-                        }
-                        if (totalAward.Gold)
-                            totalAward.GoldRequirementStatus = req.Split(' ')[1].Trim() + " REACHED";
-                        else
-                            totalAward.GoldRequirementStatus = "REACH " + req.Split(' ')[1].Trim();
-                    } else if (req.Contains("silver")) {
-                        totalAward.Silver = total >= int.Parse(req.Split(' ')[1].Trim());
-                        if (totalAward.Silver) {
-                            NotificationMessages notificationMessages = new NotificationMessages(context);
-                            notificationMessages.TotalAwardNotification("silver", compName);
-                        }
-                        if (totalAward.Silver)
-                            totalAward.SilverRequirementStatus = req.Split(' ')[1].Trim() + " REACHED";
-                        else
-                            totalAward.SilverRequirementStatus = "REACH " + req.Split(' ')[1].Trim();
-                    } else {
-                        totalAward.Bronze = total >= int.Parse(req.Split(' ')[1].Trim());
-                        if (totalAward.Bronze) {
-                            NotificationMessages notificationMessages = new NotificationMessages(context);
-                            notificationMessages.TotalAwardNotification("bronze", compName);
-                        }
-                        if (totalAward.Bronze)
-                            totalAward.BronzeRequirementStatus = req.Split(' ')[1].Trim() + " REACHED";
-                        else
-                            totalAward.BronzeRequirementStatus = "REACH " + req.Split(' ')[1].Trim();
+                foreach (var requirement in requirements) {
+                    switch (requirement.Standard) {
+                        case "gold":
+                        case "Gold":
+                            totalAward.Gold = total >= requirement.Total;
+                            if (totalAward.Gold) {
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.TotalAwardNotification(token, "gold", compName);
+                                totalAward.GoldRequirementStatus = requirement.Total + " REACHED";
+                            } else {
+                                totalAward.GoldRequirementStatus = "REACH " + requirement.Total + "%";
+                            }
+                            break;
+                        case "silver":
+                        case "Silver":
+                            totalAward.Silver = total >= requirement.Total;
+                            if (totalAward.Silver) {
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.TotalAwardNotification(token, "silver", compName);
+                                totalAward.SilverRequirementStatus = requirement.Total + " REACHED";
+                            } else {
+                                totalAward.SilverRequirementStatus = "REACH " + requirement.Total + "%";
+                            }
+                            break;
+                        case "bronze":
+                        case "Bronze":
+                            totalAward.Bronze = total >= requirement.Total;
+                            if (totalAward.Bronze) {
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.TotalAwardNotification(token, "bronze", compName);
+                                totalAward.BronzeRequirementStatus = requirement.Total + " REACHED";
+                            } else {
+                                totalAward.BronzeRequirementStatus = "REACH " + requirement.Total + "%";
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             } else {
-                var requirements = ReadAwardsRules()["Total"];
-                totalAward.Gold = false;
-                totalAward.GoldRequirementStatus = "REACH " + requirements.Split(',')[0].Split(' ')[1];
-                totalAward.Silver = false;
-                totalAward.SilverRequirementStatus = "REACH " + requirements.Split(',')[1].Split(' ')[1];
-                totalAward.Bronze = false;
-                totalAward.BronzeRequirementStatus = "REACH " + requirements.Split(',')[2].Split(' ')[1];
+                foreach (var requirement in requirements) {
+                    switch (requirement.Standard) {
+                        case "gold":
+                        case "Gold":
+                            totalAward.Gold = false;
+                            totalAward.GoldRequirementStatus = "REACH " + requirement.Total + "%";
+                            break;
+                        case "silver":
+                        case "Silver":
+                            totalAward.Silver = false;
+                            totalAward.SilverRequirementStatus = "REACH " + requirement.Total + "%";
+                            break;
+                        case "bronze":
+                        case "Bronze":
+                            totalAward.Bronze = false;
+                            totalAward.BronzeRequirementStatus = "REACH " + requirement.Total + "%";
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
             return totalAward;
         }
 
-        public static AccuracyAward Accuracy(double compAccuracy, bool isLocked, string compName, ModelsContext context) {
+        public static AccuracyAward Accuracy(double compAccuracy, bool isLocked, string token,
+                                                string compName, ModelsContext context) {
             AccuracyAward accuracyAward = new AccuracyAward();
+            var requirements = context.Requirements.Where(x => x.Competition.Name == compName);
             if (!isLocked) {
-                var requirements = ReadAwardsRules()["Accuracy"];
-                foreach (string req in requirements.Split(',')) {
-                    if (req.Contains("gold")) {
-                        accuracyAward.Gold = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                        if (accuracyAward.Gold) {
-                            NotificationMessages notificationMessages = new NotificationMessages(context);
-                            notificationMessages.AccuracyAwardNotification("gold", compName);
-                        }
-                        if (accuracyAward.Gold)
-                            accuracyAward.GoldRequirementStatus = req.Split(' ')[1].Trim() + "% REACHED";
-                        else
-                            accuracyAward.GoldRequirementStatus = "REACH " + req.Split(' ')[1].Trim() + "%";
-                    } else if (req.Contains("silver")) {
-                        accuracyAward.Silver = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                        if (accuracyAward.Silver) {
-                            NotificationMessages notificationMessages = new NotificationMessages(context);
-                            notificationMessages.AccuracyAwardNotification("silver", compName);
-                        }
-                        if (accuracyAward.Silver)
-                            accuracyAward.SilverRequirementStatus = req.Split(' ')[1].Trim() + "% REACHED";
-                        else
-                            accuracyAward.SilverRequirementStatus = "REACH " + req.Split(' ')[1].Trim() + "%";
-                    } else {
-                        accuracyAward.Bronze = compAccuracy >= int.Parse(req.Split(' ')[1].Trim());
-                        if (accuracyAward.Bronze) {
-                            NotificationMessages notificationMessages = new NotificationMessages(context);
-                            notificationMessages.AccuracyAwardNotification("bronze", compName);
-                        }
-                        if (accuracyAward.Bronze)
-                            accuracyAward.BronzeRequirementStatus = req.Split(' ')[1].Trim() + "% REACHED";
-                        else
-                            accuracyAward.BronzeRequirementStatus = "REACH " + req.Split(' ')[1].Trim() + "%";
+                foreach (var requirement in requirements) {
+                    switch (requirement.Standard) {
+                        case "gold":
+                        case "Gold":
+                            accuracyAward.Gold = compAccuracy >= requirement.Accuracy;
+                            if (accuracyAward.Gold) {
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.AccuracyAwardNotification(token, "gold", compName);
+                                accuracyAward.GoldRequirementStatus = requirement.Accuracy + "% REACHED";
+                            } else {
+                                accuracyAward.GoldRequirementStatus = "REACH " + requirement.Accuracy + "%";
+                            }
+                            break;
+                        case "silver":
+                        case "Silver":
+                            accuracyAward.Silver = compAccuracy >= requirement.Accuracy;
+                            if (accuracyAward.Silver) {
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.AccuracyAwardNotification(token, "silver", compName);
+                                accuracyAward.SilverRequirementStatus = requirement.Accuracy + "% REACHED";
+                            } else {
+                                accuracyAward.SilverRequirementStatus = "REACH " + requirement.Accuracy + "%";
+                            }
+                            break;
+                        case "bronze":
+                        case "Bronze":
+                            accuracyAward.Bronze = compAccuracy >= requirement.Accuracy;
+                            if (accuracyAward.Bronze) {
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.AccuracyAwardNotification(token, "bronze", compName);
+                                accuracyAward.BronzeRequirementStatus = requirement.Accuracy + "% REACHED";
+                            } else {
+                                accuracyAward.BronzeRequirementStatus = "REACH " + requirement.Accuracy + "%";
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             } else {
-                var requirements = ReadAwardsRules()["Accuracy"];
-                accuracyAward.Gold = false;
-                accuracyAward.GoldRequirementStatus = "REACH " + requirements.Split(',')[0].Split(' ')[1] + "%";
-                accuracyAward.Silver = false;
-                accuracyAward.SilverRequirementStatus = "REACH " + requirements.Split(',')[1].Split(' ')[1] + "%";
-                accuracyAward.Bronze = false;
-                accuracyAward.BronzeRequirementStatus = "REACH " + requirements.Split(',')[2].Split(' ')[1] + "%";
+                foreach(var requirement in requirements) {
+                    switch (requirement.Standard) {
+                        case "gold":
+                        case "Gold":
+                            accuracyAward.Gold = false;
+                            accuracyAward.GoldRequirementStatus = "REACH " + requirement.Accuracy + "%";
+                            break;
+                        case "silver":
+                        case "Silver":
+                            accuracyAward.Silver = false;
+                            accuracyAward.SilverRequirementStatus = "REACH " + requirement.Accuracy + "%";
+                            break;
+                        case "bronze":
+                        case "Bronze":
+                            accuracyAward.Bronze = false;
+                            accuracyAward.BronzeRequirementStatus = "REACH " + requirement.Accuracy + "%";
+                            break;
+                        default:
+                            break;
+                    }
+                } 
             }
 
             return accuracyAward;
@@ -145,7 +183,7 @@ namespace SkietbaanBE.Lib {
                         context.Awards.Add(award);
                         context.SaveChanges();
                         hours.Bronze = true;
-                        notificationMessages.HoursAwardNotification("bronze", hours);
+                        notificationMessages.HoursAwardNotification(token, "bronze", hours);
                     }
                 }
                 if (hours.Hours >= 40) {
@@ -163,7 +201,7 @@ namespace SkietbaanBE.Lib {
                         context.Awards.Add(award);
                         context.SaveChanges();
                         hours.Silver = true;
-                        notificationMessages.HoursAwardNotification("silver", hours);
+                        notificationMessages.HoursAwardNotification(token, "silver", hours);
                     }
                 }
                 if (hours.Hours >= 60) {
@@ -180,7 +218,7 @@ namespace SkietbaanBE.Lib {
                         context.Awards.Add(award);
                         context.SaveChanges();
                         hours.Gold = true;
-                        notificationMessages.HoursAwardNotification("gold", hours);
+                        notificationMessages.HoursAwardNotification(token, "gold", hours);
                     }
                 }
             } catch (Exception) {
@@ -233,7 +271,7 @@ namespace SkietbaanBE.Lib {
                         case "Gold":
                         case "gold":
                             var goldReqTotal = requirement.Total;
-                            if (goldReqTotal == 0) goldReqTotal = 90;
+                            if (goldReqTotal == 0) goldReqTotal = 90; // In case default requirement is not set in db
                             if (total >= goldReqTotal) {
                                 var record = context.Awards
                                     .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
@@ -250,7 +288,7 @@ namespace SkietbaanBE.Lib {
                                 changeMade = true;
                             }
                             var goldReqAccuracy = requirement.Accuracy;
-                            if (goldReqAccuracy == 0) goldReqAccuracy = 90;
+                            if (goldReqAccuracy == 0) goldReqAccuracy = 90; // In case default requirement is not set in db
                             if (accuracy >= goldReqAccuracy) {
                                 var record = context.Awards
                                     .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
@@ -270,7 +308,7 @@ namespace SkietbaanBE.Lib {
                         case "Silver":
                         case "silver":
                             var silverReqTotal = requirement.Total;
-                            if (silverReqTotal == 0) silverReqTotal = 80;
+                            if (silverReqTotal == 0) silverReqTotal = 80; // In case default requirement is not set in db
                             if (total >= silverReqTotal) {
                                 var record = context.Awards
                                     .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
@@ -287,7 +325,7 @@ namespace SkietbaanBE.Lib {
                                 changeMade = true;
                             }
                             var silverReqAccuracy = requirement.Accuracy;
-                            if (silverReqAccuracy == 0) silverReqAccuracy = 80;
+                            if (silverReqAccuracy == 0) silverReqAccuracy = 80; // In case default requirement is not set in db
                             if (accuracy >= silverReqAccuracy) {
                                 var record = context.Awards
                                     .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
@@ -307,7 +345,7 @@ namespace SkietbaanBE.Lib {
                         case "Bronze":
                         case "bronze":
                             var bronzeReqTotal = requirement.Total;
-                            if (bronzeReqTotal == 0) bronzeReqTotal = 70;
+                            if (bronzeReqTotal == 0) bronzeReqTotal = 70;// In case default requirement is not set in db
                             if (total >= bronzeReqTotal) {
                                 var record = context.Awards
                                     .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
@@ -324,7 +362,7 @@ namespace SkietbaanBE.Lib {
                                 changeMade = true;
                             }
                             var bronzeReqAccuracy = requirement.Accuracy;
-                            if (bronzeReqAccuracy == 0) bronzeReqAccuracy = 80;
+                            if (bronzeReqAccuracy == 0) bronzeReqAccuracy = 80;// In case default requirement is not set in db
                             if (accuracy >= bronzeReqAccuracy) {
                                 var record = context.Awards
                                     .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
@@ -351,28 +389,16 @@ namespace SkietbaanBE.Lib {
             }
         }
 
-        public static IActionResult MonthBest(int compId, string token, ModelsContext context) {
+        public static string MonthBest(int compId, string token, ModelsContext context) {
             Award award = null;
             try {
                 award = context.Awards.FirstOrDefault(x => x.Competition.Id == compId && x.User.Token == token
                                                     && x.Month == DateTime.Today.Month && x.Year == DateTime.Today.Year);
             } catch {
-                return new BadRequestObjectResult("Something went wrong");
+                return "No award";
             }
-            if (award != null) return new OkObjectResult(award.Description);
-            return new OkObjectResult("No award");
+            if (award != null) return award.Description;
+            return "No award";
         }
-
-        private static Dictionary<string, string> ReadAwardsRules() {
-            string[] lines = awardRequirements.Split('\n');
-
-            Dictionary<string, string> awardsMap = new Dictionary<string, string>();
-            foreach (string line in lines) {
-                awardsMap.Add(line.Split(':')[0], line.Split(':')[1]);
-            }
-
-            return awardsMap;
-        }
-
     }
 }
