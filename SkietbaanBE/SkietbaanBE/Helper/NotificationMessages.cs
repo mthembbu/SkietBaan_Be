@@ -214,19 +214,8 @@ namespace SkietbaanBE.Helper
             
             try
             {
-                var dbNotitifications = _context.Notifications.Where(x => x.NotificationMessage.StartsWith(award)
-                            && x.NotificationMessage.EndsWith(competitionName));
-                bool isChanged = false;
-                if (dbNotitifications.Count() == 0) {
-                    _context.Notifications.Add(notification);
-                    _context.SaveChanges();
-                }
-                foreach (var dbNotification in dbNotitifications) {
-                    if (!dbNotification.NotificationMessage.Contains("total")) {
-                        _context.Notifications.Add(notification);
-                    }
-                }
-                if(isChanged) _context.SaveChanges();
+                _context.Notifications.Add(notification);
+                _context.SaveChanges();
             }
             catch (Exception e)
             {
@@ -247,20 +236,8 @@ namespace SkietbaanBE.Helper
             
             try
             {
-                var dbNotitifications = _context.Notifications.Where(x => x.NotificationMessage.StartsWith(award)
-                                            && x.NotificationMessage.EndsWith(competitionName));
-                bool isChanged = false;
-                if (dbNotitifications.Count() == 0) {
-                    _context.Notifications.Add(notification);
-                    _context.SaveChanges();
-                }
-                foreach (var dbNotification in dbNotitifications) {
-                    if (!dbNotification.NotificationMessage.Contains("accuracy")) {
-                        _context.Notifications.Add(notification);
-                        isChanged = true;
-                    }
-                }
-                if(isChanged) _context.SaveChanges();
+                _context.Notifications.Add(notification);
+                _context.SaveChanges();
             } catch(Exception e)
             {
                 response = e.Message;
