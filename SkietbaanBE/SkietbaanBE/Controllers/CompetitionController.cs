@@ -30,14 +30,12 @@ namespace SkietbaanBE.Controllers
                 List<Competition> competitionsList = (from Comp in _context.Competitions
                                                       where Comp.Status == true
                                                       select Comp).ToList<Competition>();
-
                 if (competitionsList == null)
                     return new List<Competition>();
                 else
                     return competitionsList;
             }
             catch { return new List<Competition>(); }
-
         }
         // The method that return an array of competition objects whether status is true or false
         // GET: api/Competition/all
@@ -86,6 +84,16 @@ namespace SkietbaanBE.Controllers
                 }
                 else if (_context.Competitions == null){
                     _context.Competitions.Add(rFilter.competition);
+                    for (int i = 0; i < 3; i++) {
+                         Requirement R = new Requirement
+                         {
+                             Competition = rFilter.competition,
+                             Standard = rFilter.GetRequirements.ElementAt(i).Standard,
+                             Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy,
+                             Total = rFilter.GetRequirements.ElementAt(i).Total
+                         };
+                        _context.Requirements.Add(R);
+                    }
                     _context.SaveChanges();
                     return Ok("Competition " + rFilter.competition.Name + " Added!");
                 }
@@ -93,6 +101,7 @@ namespace SkietbaanBE.Controllers
                     Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == rFilter.competition.Name);
                     if (dbCompetition != null)
                         return new BadRequestObjectResult(rFilter.competition.Name + " already exists");
+                    else { 
                     _notificationMessages.CompetitionNotification(rFilter.competition);
                     _context.Competitions.Add(rFilter.competition);
                     _context.SaveChanges();
@@ -108,6 +117,7 @@ namespace SkietbaanBE.Controllers
                     }
                     await _context.SaveChangesAsync();
                     return Ok("Competition " + rFilter.competition.Name + " Added!");
+                   }
                 }
             }
             catch { return new BadRequestObjectResult("Could not connect to Backend"); ; }
