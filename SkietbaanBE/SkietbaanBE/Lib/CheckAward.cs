@@ -18,8 +18,6 @@ namespace SkietbaanBE.Lib {
                         case "Gold":
                             totalAward.Gold = total >= requirement.Total;
                             if (totalAward.Gold) {
-                                NotificationMessages notificationMessages = new NotificationMessages(context);
-                                notificationMessages.TotalAwardNotification(token, "gold", compName);
                                 totalAward.GoldRequirementStatus = requirement.Total + " REACHED";
                             } else {
                                 totalAward.GoldRequirementStatus = "REACH " + requirement.Total + "%";
@@ -29,8 +27,6 @@ namespace SkietbaanBE.Lib {
                         case "Silver":
                             totalAward.Silver = total >= requirement.Total;
                             if (totalAward.Silver) {
-                                NotificationMessages notificationMessages = new NotificationMessages(context);
-                                notificationMessages.TotalAwardNotification(token, "silver", compName);
                                 totalAward.SilverRequirementStatus = requirement.Total + " REACHED";
                             } else {
                                 totalAward.SilverRequirementStatus = "REACH " + requirement.Total + "%";
@@ -40,8 +36,6 @@ namespace SkietbaanBE.Lib {
                         case "Bronze":
                             totalAward.Bronze = total >= requirement.Total;
                             if (totalAward.Bronze) {
-                                NotificationMessages notificationMessages = new NotificationMessages(context);
-                                notificationMessages.TotalAwardNotification(token, "bronze", compName);
                                 totalAward.BronzeRequirementStatus = requirement.Total + " REACHED";
                             } else {
                                 totalAward.BronzeRequirementStatus = "REACH " + requirement.Total + "%";
@@ -88,8 +82,6 @@ namespace SkietbaanBE.Lib {
                         case "Gold":
                             accuracyAward.Gold = compAccuracy >= requirement.Accuracy;
                             if (accuracyAward.Gold) {
-                                NotificationMessages notificationMessages = new NotificationMessages(context);
-                                notificationMessages.AccuracyAwardNotification(token, "gold", compName);
                                 accuracyAward.GoldRequirementStatus = requirement.Accuracy + "% REACHED";
                             } else {
                                 accuracyAward.GoldRequirementStatus = "REACH " + requirement.Accuracy + "%";
@@ -99,8 +91,6 @@ namespace SkietbaanBE.Lib {
                         case "Silver":
                             accuracyAward.Silver = compAccuracy >= requirement.Accuracy;
                             if (accuracyAward.Silver) {
-                                NotificationMessages notificationMessages = new NotificationMessages(context);
-                                notificationMessages.AccuracyAwardNotification(token, "silver", compName);
                                 accuracyAward.SilverRequirementStatus = requirement.Accuracy + "% REACHED";
                             } else {
                                 accuracyAward.SilverRequirementStatus = "REACH " + requirement.Accuracy + "%";
@@ -110,8 +100,6 @@ namespace SkietbaanBE.Lib {
                         case "Bronze":
                             accuracyAward.Bronze = compAccuracy >= requirement.Accuracy;
                             if (accuracyAward.Bronze) {
-                                NotificationMessages notificationMessages = new NotificationMessages(context);
-                                notificationMessages.AccuracyAwardNotification(token, "bronze", compName);
                                 accuracyAward.BronzeRequirementStatus = requirement.Accuracy + "% REACHED";
                             } else {
                                 accuracyAward.BronzeRequirementStatus = "REACH " + requirement.Accuracy + "%";
@@ -273,10 +261,9 @@ namespace SkietbaanBE.Lib {
                             var goldReqTotal = requirement.Total;
                             if (goldReqTotal == 0) goldReqTotal = 90; // In case default requirement is not set in db
                             if (total >= goldReqTotal) {
-                                var record = context.Awards
-                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
-                                    .Where(desc => desc.Description.StartsWith("Total:Gold")).FirstOrDefault();
-                                if (record != null) break;
+                                if (IsAwardGiven("Total:Gold", score.User.Token, score.Competition.Name, context)) break;
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.TotalAwardNotification(score.User.Token, "gold", score.Competition.Name);
                                 Award award = new Award {
                                     Competition = score.Competition,
                                     User = score.User,
@@ -290,10 +277,9 @@ namespace SkietbaanBE.Lib {
                             var goldReqAccuracy = requirement.Accuracy;
                             if (goldReqAccuracy == 0) goldReqAccuracy = 90; // In case default requirement is not set in db
                             if (accuracy >= goldReqAccuracy) {
-                                var record = context.Awards
-                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
-                                    .Where(desc => desc.Description.StartsWith("Accuracy:Gold")).FirstOrDefault();
-                                if (record != null) break;
+                                if (IsAwardGiven("Accuracy:Gold", score.User.Token, score.Competition.Name, context)) break;
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.AccuracyAwardNotification(score.User.Token, "gold", score.Competition.Name);
                                 Award award = new Award {
                                     Competition = score.Competition,
                                     User = score.User,
@@ -310,10 +296,9 @@ namespace SkietbaanBE.Lib {
                             var silverReqTotal = requirement.Total;
                             if (silverReqTotal == 0) silverReqTotal = 80; // In case default requirement is not set in db
                             if (total >= silverReqTotal) {
-                                var record = context.Awards
-                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
-                                    .Where(desc => desc.Description.StartsWith("Total:Silver")).FirstOrDefault();
-                                if (record != null) break;
+                                if (IsAwardGiven("Total:Silver", score.User.Token, score.Competition.Name, context)) break;
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.TotalAwardNotification(score.User.Token, "silver", score.Competition.Name);
                                 Award award = new Award {
                                     Competition = score.Competition,
                                     User = score.User,
@@ -327,10 +312,9 @@ namespace SkietbaanBE.Lib {
                             var silverReqAccuracy = requirement.Accuracy;
                             if (silverReqAccuracy == 0) silverReqAccuracy = 80; // In case default requirement is not set in db
                             if (accuracy >= silverReqAccuracy) {
-                                var record = context.Awards
-                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
-                                    .Where(desc => desc.Description.StartsWith("Accuracy:Silver")).FirstOrDefault();
-                                if (record != null) break;
+                                if (IsAwardGiven("Accuracy:Silver", score.User.Token, score.Competition.Name, context)) break;
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.AccuracyAwardNotification(score.User.Token, "silver", score.Competition.Name);
                                 Award award = new Award {
                                     Competition = score.Competition,
                                     User = score.User,
@@ -347,10 +331,9 @@ namespace SkietbaanBE.Lib {
                             var bronzeReqTotal = requirement.Total;
                             if (bronzeReqTotal == 0) bronzeReqTotal = 70;// In case default requirement is not set in db
                             if (total >= bronzeReqTotal) {
-                                var record = context.Awards
-                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
-                                    .Where(desc => desc.Description.StartsWith("Total:Bronze")).FirstOrDefault();
-                                if (record != null) break;
+                                if (IsAwardGiven("Total:Bronze", score.User.Token, score.Competition.Name, context)) break;
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.TotalAwardNotification(score.User.Token, "bronze", score.Competition.Name);
                                 Award award = new Award {
                                     Competition = score.Competition,
                                     User = score.User,
@@ -364,10 +347,9 @@ namespace SkietbaanBE.Lib {
                             var bronzeReqAccuracy = requirement.Accuracy;
                             if (bronzeReqAccuracy == 0) bronzeReqAccuracy = 70;// In case default requirement is not set in db
                             if (accuracy >= bronzeReqAccuracy) {
-                                var record = context.Awards
-                                    .Where(x => x.Competition.Id == score.Competition.Id && x.User.Id == score.User.Id)
-                                    .Where(desc => desc.Description.StartsWith("Accuracy:Bronze")).FirstOrDefault();
-                                if (record != null) break;
+                                if (IsAwardGiven("Accuracy:Bronze", score.User.Token, score.Competition.Name, context)) break;
+                                NotificationMessages notificationMessages = new NotificationMessages(context);
+                                notificationMessages.AccuracyAwardNotification(score.User.Token, "bronze", score.Competition.Name);
                                 Award award = new Award {
                                     Competition = score.Competition,
                                     User = score.User,
@@ -387,6 +369,13 @@ namespace SkietbaanBE.Lib {
             } catch {
                 //LOG THE ERROR TO SOME FILE
             }
+        }
+
+        public static bool IsAwardGiven(string award, string token, string competitionName, ModelsContext context) {
+            bool exist = context.Awards
+                .Where(x => x.Competition.Name == competitionName && x.User.Token == token)
+                .Where(desc => desc.Description.StartsWith(award)).FirstOrDefault() != null;
+            return exist;
         }
 
         public static string MonthBest(int compId, string token, ModelsContext context) {
