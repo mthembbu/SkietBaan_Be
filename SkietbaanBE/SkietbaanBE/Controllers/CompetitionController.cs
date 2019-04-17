@@ -43,7 +43,6 @@ namespace SkietbaanBE.Controllers
         public IEnumerable<Competition> GetAllCompetitions()
        {
             List<Competition> competitionsList = new List<Competition>();
-            //List<Competition> competitoinList;
             //get the competitions where(Status == true / false)
             try
             {
