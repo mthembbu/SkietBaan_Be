@@ -87,7 +87,10 @@ namespace SkietbaanBE.Helper
                         }
                     }
 
-                    if (isDeleted) continue;
+                    if (isDeleted)
+                    {
+                        continue;
+                    }
 
                     var dbNotification = _context.Notifications.FirstOrDefault(x => x.TypeOfNotification == "Expiry" && x.User.Id == user.Id);
                     if (dbNotification == null)
@@ -119,8 +122,11 @@ namespace SkietbaanBE.Helper
                         }
                     }
                 }
-            
-                if(isChanged) _context.SaveChanges();
+
+                if (isChanged)
+                {
+                    _context.SaveChanges();
+                }
 
                 response = "successful";
             }
