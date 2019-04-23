@@ -72,8 +72,23 @@ namespace SkietbaanBE.Helper
             try
             {
                 bool isChanged = false;
+                
                 foreach(User user in users)
                 {
+                    bool isDeleted = false;
+                    var deletedNotificationsList = _context.Notifications.Where(x => x.TypeOfNotification == "Deleted" && x.User.Id == user.Id);
+                    
+                    foreach (var deletedNotification in deletedNotificationsList)
+                    {
+                        if (deletedNotification.NotificationMessage.Split(":")[1].Trim().Split(" ")[0] == user.MemberExpiryDate.Value.Date.ToString().Split(" ")[0].Trim())
+                        {
+                            isDeleted = true;
+                            break;
+                        }
+                    }
+
+                    if (isDeleted) continue;
+
                     var dbNotification = _context.Notifications.FirstOrDefault(x => x.TypeOfNotification == "Expiry" && x.User.Id == user.Id);
                     if (dbNotification == null)
                     {
@@ -90,7 +105,9 @@ namespace SkietbaanBE.Helper
                     {
                         var newUserExpiry = user.MemberExpiryDate.Value.Date.ToString().Split(" ")[0].Trim();
                         var oldUserExpiry = dbNotification.NotificationMessage.Split(":")[1].Trim().Split(" ")[0];
-                        if (newUserExpiry != oldUserExpiry){
+
+                        if (newUserExpiry != oldUserExpiry)
+                        {
                             expiryDate = user.MemberExpiryDate.Value.ToString("DD/MM/YYYY");
                             notification.User = user;
                             notification.IsRead = false;

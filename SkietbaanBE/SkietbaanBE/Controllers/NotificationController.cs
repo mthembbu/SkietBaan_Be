@@ -75,7 +75,7 @@ namespace SkietbaanBE.Controllers
                 if(token != null)
                 {
                     var notifications = _context.Notifications.Where(x => x.User.Token == token);
-                    var notificationsList = notifications.OrderByDescending(x => x.TypeOfNotification == "Deleted");
+                    var notificationsList = notifications.OrderBy(x => x.TypeOfNotification == "Deleted");
                     var newList = new List<Notifications>();
                     foreach(var notification in notificationsList)
                     {
