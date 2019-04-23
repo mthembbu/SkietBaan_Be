@@ -75,10 +75,20 @@ namespace SkietbaanBE.Controllers
                 if(token != null)
                 {
                     var notifications = _context.Notifications.Where(x => x.User.Token == token);
-                    var notificationsList = notifications.OrderByDescending(x => x.Id);
-                    if (notificationsList != null)
+                    var notificationsList = notifications.OrderBy(x => x.TypeOfNotification == "Deleted");
+                    var newList = new List<Notifications>();
+                    foreach(var notification in notificationsList)
                     {
-                        return notificationsList.ToList();
+                        if (notification.TypeOfNotification != "Deleted")
+                        {
+                            newList.Add(notification);
+                        }
+                        else
+                            break;
+                    }
+                    if (newList != null)
+                    {
+                        return newList.OrderByDescending(x => x.Id);
                     }
                     else
                     {
@@ -122,14 +132,26 @@ namespace SkietbaanBE.Controllers
         {
             try
             {
-                _context.Notifications.RemoveRange(list);
+                List<Notifications> newList = new List<Notifications>();
+                foreach (var notification in list)
+                {
+                    if(notification.TypeOfNotification == "Expiry")
+                    {
+                        notification.TypeOfNotification = "Deleted";
+                        _context.Notifications.Update(notification);
+                    }
+                    else
+                    {
+                        newList.Add(notification);
+                    }
+                }
+                _context.Notifications.RemoveRange(newList);
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {
                 var message = ex.Message;
             }
-
-            _context.SaveChanges();
         }
 
         [HttpPost("{id}")]

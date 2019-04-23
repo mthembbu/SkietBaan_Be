@@ -313,10 +313,12 @@ namespace SkietbaanBE.Controllers
                 if (months[i] <= 2)
                 {
                     users.Add(dbUsers.ToList().ElementAt(i));
-                    _notificationMessage.ExpiryNotification(users);
                 }
             }
-
+            if (users.Count != 0)
+            {
+                _notificationMessage.ExpiryNotification(users);
+            }
             return users.ToArray<User>();
         }
 
