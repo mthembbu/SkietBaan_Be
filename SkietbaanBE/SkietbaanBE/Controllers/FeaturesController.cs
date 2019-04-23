@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using SkietbaanBE.Helper;
 using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
+using System.Data;
+using System.Net.Mail;
+using System.Text;
 
 namespace SkietbaanBE.Controllers
 {
@@ -33,9 +37,77 @@ namespace SkietbaanBE.Controllers
                 User user = _context.Users.FirstOrDefault(x => x.Token == token);
                 return user;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return null;
+            }
+        }
+
+        [HttpPost]
+        public string generateCSV(string filter,string adminToken)
+        {
+            var dbUsers = (_context.Users.ToArray());
+            var Adminuser = _context.Users.FirstOrDefault(x => x.Token == adminToken);
+            if (filter == "members")
+            {
+                 dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
+            }
+            else if(filter == "users")
+            {
+                 dbUsers = (_context.Users.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
+
+            }
+            else if(filter == "expiring")
+            {
+                var expdbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "" && u.MemberExpiryDate != null && u.MemberStartDate != null)).OrderBy(x => x.Username);
+                DateTime current = DateTime.Now;
+                var months = new List<int>();
+                foreach (var user in expdbUsers)
+                {
+                    DateTime expiry = (DateTime)user.MemberExpiryDate;
+                    TimeSpan span = expiry.Subtract(current);
+                    months.Add((span.Days) / 30);
+                }
+
+                //Looks for Members with expiry time left that is <=2 months
+                var timeMonths = months.ToArray();
+                List<User> users = new List<User>();
+                for (int i = 0; i < timeMonths.Length; i++)
+                {
+                    if (months[i] <= 2)
+                    {
+                        users.Add(dbUsers.ToList().ElementAt(i));
+                        _notificationMessage.ExpiryNotification(users);
+                    }
+                }
+                dbUsers = users.ToArray<User>();
+            }
+
+            StringBuilder mydata = new StringBuilder();
+
+            mydata.Append("Username" + "," + "Cellphone Number" + "," + "Email Address" + "," + "Name and Surname");
+            mydata.Append(System.Environment.NewLine);
+
+            foreach (User user in dbUsers)
+            {
+                mydata.Append(user.Username+","+0+user.PhoneNumber + "," + user.Email+"," + user.Name+" "+user.Surname);
+                mydata.Append(System.Environment.NewLine);   
+            }
+
+            byte[] data = Encoding.ASCII.GetBytes(mydata.ToString());
+
+            MemoryStream ms = new MemoryStream(data);           
+
+            Attachment attachment = new Attachment(ms, $"{filter}.csv", "text/plain");
+
+            if(Adminuser != null)
+            {
+                sendMail.SendEmail(Adminuser.Email, "csv", attachment);
+                return (filter+".csv"+" sent to "+Adminuser.Email);
+            }
+            else
+            {
+                return "Something went wrong";
             }
         }
 
@@ -224,7 +296,7 @@ namespace SkietbaanBE.Controllers
         [ActionName("SearchExpiringMember")]
         public IEnumerable<User> SearchExpiringMember()
         {
-            var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x => x.Username);
+            var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != ""&& u.MemberExpiryDate!=null&& u.MemberStartDate!=null)).OrderBy(x => x.Username);
             DateTime current = DateTime.Now;
             var months = new List<int>();
             foreach (var user in dbUsers)
@@ -253,7 +325,7 @@ namespace SkietbaanBE.Controllers
         [ActionName("SearchExpiringMemberTimeLeft")]
         public IEnumerable<int> SearchExpiringMemberTimeLeft()
         {
-            var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x => x.Username);
+            var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "" && u.MemberExpiryDate != null && u.MemberStartDate != null)).OrderBy(x => x.Username);
             DateTime current = DateTime.Now;
             var months = new List<int>();
             foreach (var user in dbUsers)
