@@ -59,7 +59,7 @@ namespace SkietbaanBE.Lib {
                 Award award = new Award {
                     Competition = comp,
                     User = user,
-                    Description = $"Best shooter in {GetMonthNameByMonthNumber(DateTime.Today.Month)}" + " " +
+                    Description = $"Month:Best shooter in {GetMonthNameByMonthNumber(DateTime.Today.Month)}" + " " +
                                     $"{DateTime.Today.Year}",
                     Month = DateTime.Today.Month,
                     Year = DateTime.Today.Year

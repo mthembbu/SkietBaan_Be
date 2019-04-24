@@ -382,11 +382,12 @@ namespace SkietbaanBE.Lib {
             Award award = null;
             try {
                 award = context.Awards.FirstOrDefault(x => x.Competition.Id == compId && x.User.Token == token
-                                                    && x.Month == DateTime.Today.Month && x.Year == DateTime.Today.Year);
+                                                    && x.Month == DateTime.Today.Month && x.Year == DateTime.Today.Year
+                                                    && x.Description.StartsWith("Month"));
             } catch {
                 return "No award";
             }
-            if (award != null) return award.Description;
+            if (award != null) return award.Description.Split(":")[1];
             return "No award";
         }
     }

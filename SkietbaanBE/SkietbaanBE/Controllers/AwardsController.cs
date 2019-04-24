@@ -113,8 +113,6 @@ namespace SkietbaanBE.Controllers
             } catch (Exception) {
                 return null;
             }
-            
-
         }
     }
 }
