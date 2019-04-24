@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using SkietbaanBE.Helper;
 using SkietbaanBE.Lib;
 using SkietbaanBE.Models;
+using System.IO;
 
 namespace SkietbaanBE.Controllers
 {
@@ -38,11 +39,11 @@ namespace SkietbaanBE.Controllers
             {
                 return (_context.Users.ToArray<User>()).OrderBy(x => x.Username).ToArray<User>();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return new List<User>();
             }
-           
+
         }
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
@@ -52,13 +53,12 @@ namespace SkietbaanBE.Controllers
             {
                 return await _context.Users.FindAsync(id);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return null;
             }
         }
 
-        
         //POST: api/User
         [HttpPost]
         public async Task<ActionResult> AddUser([FromBody] User user)

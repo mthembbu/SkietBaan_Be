@@ -8,7 +8,7 @@ using System.Threading;
 namespace SkietbaanBE.Lib {
     public class ScheduleJob {
 
-        private ModelsContext _context;
+        private static ModelsContext _context;
         private Timer awardTimer; //this timer runs only once at the end of every month
         private Timer updateAwardTimer; //this timer updates the awardTimer on how many days are in the current month
         private NotificationMessages _notificationMessage;
@@ -127,8 +127,31 @@ namespace SkietbaanBE.Lib {
                     strMonth = "December";
                     break;
             }
-
             return strMonth;
+        }
+
+        public static void ReNewUserMemberShip(User dbUser)
+        {
+            long ReNewGetMilliSecondsToNextMonth()
+            {
+                int daysInMonth = DateTime.DaysInMonth(dbUser.MemberExpiryDate.Value.Year, dbUser.MemberExpiryDate.Value.Month);
+                var target = new DateTime(dbUser.MemberExpiryDate.Value.Year, dbUser.MemberExpiryDate.Value.Month, daysInMonth);
+                var current = DateTime.Today;
+                return (long)target.Subtract(current).TotalMilliseconds;
+            }
+            void sendDetails(object source)
+            {
+                dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1);
+                dbUser.AdvanceExpiryDate = null;
+                _context.Users.Update(dbUser);
+                _context.SaveChanges();
+            }
+            new Timer(
+               callback: new TimerCallback(sendDetails),
+                      state: "",
+                      dueTime: ReNewGetMilliSecondsToNextMonth(),
+                      period: 0
+                  );
         }
     }
 }
