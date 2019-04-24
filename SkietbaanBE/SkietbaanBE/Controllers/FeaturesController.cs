@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -272,14 +273,23 @@ namespace SkietbaanBE.Controllers
         {
             var dbUsers =( _context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x=>x.Username);
             DateTime current = DateTime.Now;
+         
             var months = new List<int>();
             foreach (var user in dbUsers)
             {
                 if(user.MemberExpiryDate.HasValue)
                 {
-                    DateTime expiry = (DateTime) user.MemberExpiryDate;
-                    TimeSpan span = expiry.Subtract(current);
-                    months.Add((span.Days) / 30);
+                   if((((user.MemberExpiryDate.Value.Year - current.Year) * 12) + (user.MemberExpiryDate.Value.Month - current.Month))>0){
+                            months.Add(((user.MemberExpiryDate.Value.Year - current.Year) * 12) + user.MemberExpiryDate.Value.Month - current.Month);
+                    }
+                   else if((((user.MemberExpiryDate.Value.Year - current.Year) * 12) + (user.MemberExpiryDate.Value.Month - current.Month)) == 0)
+                    {
+                        if (user.MemberExpiryDate.Value.Day - current.Day > 0)
+                        {
+                            months.Add(((user.MemberExpiryDate.Value.Year - current.Year) * 12) + user.MemberExpiryDate.Value.Month - current.Month);
+                        }
+                    }
+                      
                 }
             }
             return months.ToArray();
@@ -290,7 +300,33 @@ namespace SkietbaanBE.Controllers
         [ActionName("SearchMember")]
         public IEnumerable<User> SearchMember()
         {
-            return (_context.Users.ToArray<User>().Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x=>x.Username);
+            try
+            {
+                var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x => x.Username);
+                DateTime current = DateTime.Now;
+                int result;
+                List<User> users = new List<User>();
+                foreach (var user in dbUsers)
+                {
+                    if ((((user.MemberExpiryDate.Value.Year - current.Year) * 12) + (user.MemberExpiryDate.Value.Month - current.Month)) > 0)
+                    {
+                        users.Add(user);
+                    }
+                    else if ((((user.MemberExpiryDate.Value.Year - current.Year) * 12) + (user.MemberExpiryDate.Value.Month - current.Month)) == 0)
+                    {
+                        if (user.MemberExpiryDate.Value.Day - current.Day > 0)
+                        {
+                            users.Add(user);
+                        }
+                    }
+                }
+                return users.ToArray();
+            }
+            catch
+            {
+                return null;
+            }
+            
         }
 
         //// GET: api/User/SearchNonMember
@@ -413,10 +449,13 @@ namespace SkietbaanBE.Controllers
         [ActionName("Update")]
         public async Task<IActionResult> PutUserMember([FromBody] User user)
         {
+
+            int year = ((user.MemberExpiryDate).Value).Year;
             if (user.Username == null)
             {
                 return new BadRequestObjectResult("No empty fields allowed");
             }
+           
             User dbUser = _context.Users.Where(u => u.Username == user.Username)
                     .FirstOrDefault<User>();
             if (dbUser == null)
@@ -424,9 +463,16 @@ namespace SkietbaanBE.Controllers
                     return BadRequest("User is null");
                 }
              dbUser.MemberID = user.MemberID;
-             dbUser.MemberStartDate = user.MemberExpiryDate;
-             dbUser.MemberStartDate = dbUser.MemberStartDate.Value.AddYears(-1);
-             dbUser.MemberExpiryDate = user.MemberExpiryDate;
+             dbUser.MemberStartDate = user.MemberStartDate;
+            
+             if((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)){
+                dbUser.MemberExpiryDate = user.MemberExpiryDate.Value.AddYears(+1);
+                dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddDays(+1);
+            }
+            else
+            {
+                dbUser.MemberExpiryDate = user.MemberExpiryDate.Value.AddYears(+1);
+            }
              _context.Users.Update(dbUser);
              await _context.SaveChangesAsync();
             _notificationMessage.ConfirmationNotification(dbUser);
@@ -442,14 +488,25 @@ namespace SkietbaanBE.Controllers
             {
                 return new BadRequestObjectResult("No empty fields allowed");
             }
+        
             User dbUser = _context.Users.Where(u => u.Username == user.Username)
                     .FirstOrDefault<User>();
             if (dbUser == null)
             {
                 return BadRequest("User is null");
             }
-            dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1); ;
-            _context.Users.Update(dbUser);
+
+            if (user.EntryDate == user.MemberExpiryDate)
+            {
+                dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1); ;
+                _context.Users.Update(dbUser);
+            }
+            else
+            {
+                dbUser.AdvanceExpiryDate = user.MemberExpiryDate;
+                _context.Users.Update(dbUser);
+                ScheduleJob.ReNewUserMemberShip(dbUser);
+            }
             await _context.SaveChangesAsync();
             _notificationMessage.RenewalNotification(dbUser);
             return Ok("User update successful");
@@ -458,8 +515,6 @@ namespace SkietbaanBE.Controllers
         [HttpGet]
         public string TestExel()
         {
-            
-
             ExelTestData exelTestData = new ExelTestData(_context);
             exelTestData.AddUsersFromExcel();
             exelTestData.AddCompetitionsFromExcel();
