@@ -45,7 +45,6 @@ namespace SkietbaanBE.Controllers
             }
 
         }
-
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
         public async Task<User> GetUser(int id)

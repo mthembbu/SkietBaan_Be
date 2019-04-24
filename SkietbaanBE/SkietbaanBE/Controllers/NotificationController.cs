@@ -51,38 +51,80 @@ namespace SkietbaanBE.Controllers
         [HttpGet("{id}", Name = "GetNotificationById")]
         public async Task<Notifications> GetNotificationById(int id)
         {
-            var notification = _context.Notifications.SingleOrDefault(x => x.Id == id);
-            if (notification == null)
+            Notifications notification = new Notifications();
+            try
             {
-                NotFound();
+                notification = await _context.Notifications.FindAsync(id);
+                if (notification == null)
+                {
+                    NotFound();
+                }
             }
-            else
+            catch(Exception ex)
             {
-                Ok();
+                var message = ex.Message;
             }
-            return await _context.Notifications.FindAsync(id);
+            return notification;
         }
 
         [HttpGet]
         public IEnumerable<Notifications> GetNotificationsByUser([FromQueryAttribute] string token)
         {
-            var notifications = _context.Notifications.Where(x => x.User.Token == token);
-            var query = notifications.OrderBy(x => x.IsRead == true);
-            var notificationsList = notifications.OrderByDescending(x => x.TimeOfArrival);
-            if (notificationsList != null)
+            try
             {
-                return notificationsList.ToList();
-            }
-            else
+                if(token != null)
+                {
+                    var notifications = _context.Notifications.Where(x => x.User.Token == token);
+                    var notificationsList = notifications.OrderBy(x => x.TypeOfNotification == "Deleted");
+                    var newList = new List<Notifications>();
+                    foreach(var notification in notificationsList)
+                    {
+                        if (notification.TypeOfNotification != "Deleted")
+                        {
+                            newList.Add(notification);
+                        }
+                        else
+                            break;
+                    }
+                    if (newList != null)
+                    {
+                        return newList.OrderByDescending(x => x.Id);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
                 return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            
         }
 
         [HttpGet]
         public int GetNumberOfNotifications(string token)
         {
-            var notificationsList = GetNotificationsByUser(token);
-            var unReadNotifications = notificationsList.Where(x => x.IsRead == false);
-            return unReadNotifications.Count();
+            try
+            {
+                var notificationsList = GetNotificationsByUser(token);
+                if (notificationsList == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    var unReadNotifications = notificationsList.Where(x => x.IsRead == false);
+                    return unReadNotifications.Count();
+                }
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
+            
         }
 
         [HttpPost]
@@ -90,38 +132,58 @@ namespace SkietbaanBE.Controllers
         {
             try
             {
-                _context.Notifications.RemoveRange(list);
+                List<Notifications> newList = new List<Notifications>();
+                foreach (var notification in list)
+                {
+                    if(notification.TypeOfNotification == "Expiry")
+                    {
+                        notification.TypeOfNotification = "Deleted";
+                        _context.Notifications.Update(notification);
+                    }
+                    else
+                    {
+                        newList.Add(notification);
+                    }
+                }
+                _context.Notifications.RemoveRange(newList);
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {
                 var message = ex.Message;
             }
-
-            _context.SaveChanges();
         }
 
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateIsReadProperty(int id)
-        {
+        { 
             var notification = new Notifications();
             if (id.Equals(""))
             {
-                return new BadRequestObjectResult("Invaild type for Id");
+                return new OkObjectResult("Invaild type for Id");
             }
             else
             {
                 notification = await GetNotificationById(id);
             }
 
-            notification.IsRead = true;
-            try
+            if (notification == null)
             {
-                _context.Notifications.Update(notification);
+                return new OkObjectResult("Notification not found"); ;
             }
-            catch (Exception ex)
-            {
-                var result = ex.Message;
+            else {
+                try
+                {
+                    notification.IsRead = true;
+                    _context.Notifications.Update(notification);
+                }
+                catch (Exception ex)
+                {
+                    var result = ex.Message;
+
+                }
             }
+            
             await _context.SaveChangesAsync();
             return new OkObjectResult("IsRead Property Updated Successfully");
         }

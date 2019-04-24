@@ -33,12 +33,14 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpGet("{token}")]
-        public List<AwardObject> GetAllAwards(string token) {
+        public IActionResult GetAllAwards(string token) {
             if (!ModelState.IsValid) return null;
+
             List<AwardObject> awardCompetitions = new List<AwardObject>();
             bool notValid = context.Users.Where(x => x.Token == token).FirstOrDefault() == null;
-            if (notValid) return awardCompetitions;
-
+            if (notValid) return new BadRequestObjectResult("Invalid Token. Please Logout and Login again");
+            if (context.Competitions.Count() == 0)
+                return new BadRequestObjectResult("No competitions available at the moment");
             var competitionsUserPartakesIn = from UserCompetitionTotalScore in context.UserCompetitionTotalScores
                                                 where (UserCompetitionTotalScore.User.Token == token)
                                                 select new {
@@ -49,15 +51,22 @@ namespace SkietbaanBE.Controllers
             foreach (var comp in context.Competitions) {
                 try {
                     if (competitionsUserPartakesIn.Where(x => x.Competition.Id == comp.Id).Count() != 0) {
-                        double accuracy = Math.Round(context.Scores.Sum(x => x.UserScore) / (double)comp.MaximumScore, 1);
+                        double sum = context.Scores
+                            .Where(x => x.User.Token ==  token && x.Competition.Id == comp.Id)
+                            .Sum(sc => sc.UserScore);
+                        int numberOfScores = context.Scores
+                                    .Where(x => x.Competition.Id == comp.Id && x.User.Token == token)
+                                    .Count();
+                        double accuracy = Math.Round((sum / (numberOfScores * comp.MaximumScore)) * 100, 1);
+                        double total = competitionsUserPartakesIn
+                                            .Where(x => x.Competition.Id == comp.Id).First().Total;
                         AwardObject awardObject = new AwardObject {
                             CompetitionName = comp.Name,
                             IsCompetitionLocked = false,
                             Total = GetTotalScore(token, comp.Name),
                             Accuracy = accuracy,
-                            TotalAward = CheckAward.Total(competitionsUserPartakesIn
-                                            .Where(x => x.Competition.Id == comp.Id).First().Total, false, comp.Name, context),
-                            AccuracyAward = CheckAward.Accuracy(accuracy, false, comp.Name, context),
+                            TotalAward = CheckAward.Total(total, false, token, comp.Name, context),
+                            AccuracyAward = CheckAward.Accuracy(accuracy, false, token, comp.Name, context),
                             BestInMonth = CheckAward.MonthBest(comp.Id, token, context).ToString()
                         };
 
@@ -68,24 +77,43 @@ namespace SkietbaanBE.Controllers
                             IsCompetitionLocked = true,
                             Total = "0",
                             Accuracy = 0,
-                            TotalAward = CheckAward.Total(0, true, comp.Name, context),
-                            AccuracyAward = CheckAward.Accuracy(0, true, comp.Name, context),
+                            TotalAward = CheckAward.Total(0, true, token, comp.Name, context),
+                            AccuracyAward = CheckAward.Accuracy(0, true, token, comp.Name, context),
                             BestInMonth = "No Award"
                         };
                         awardCompetitions.Add(awardObject);
                     }
                 } catch {
+                    if(context.Competitions.Count() != 0) {
+                        foreach(Competition competition in context.Competitions) {
+                            AwardObject awardObject = new AwardObject {
+                                CompetitionName = comp.Name,
+                                IsCompetitionLocked = true,
+                                Total = "0",
+                                Accuracy = 0,
+                                TotalAward = CheckAward.Total(0, true, token, comp.Name, context),
+                                AccuracyAward = CheckAward.Accuracy(0, true, token, comp.Name, context),
+                                BestInMonth = "No Award"
+                            };
+                            awardCompetitions.Add(awardObject);
+                        }
+                        return new OkObjectResult(awardCompetitions);
+                    }
                     return null;
                 }
             }
-            return awardCompetitions;
-
+            return new OkObjectResult(awardCompetitions);
         }
 
         [HttpGet("hours/{token}")]
         public HoursAward GetHours(string token) {
-            if (!ModelState.IsValid) return null;
-            return CheckAward.Hours(token, context);
+            try {
+                if (!ModelState.IsValid) return null;
+                return CheckAward.Hours(token, context);
+            } catch (Exception) {
+                return null;
+            }
+            
 
         }
     }

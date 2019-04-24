@@ -15,8 +15,8 @@ namespace SkietbaanBE.Helper
         string smtpAddress = "smtp.gmail.com";
         int portNumber = 587;
         bool enableSSL = true;
-        string emailFromAddress = Environment.GetEnvironmentVariable("email"); //Sender Email Address  
-        string password = Environment.GetEnvironmentVariable("emailPassword"); //Sender Password   
+        string emailFromAddress = Environment.GetEnvironmentVariable("emailFromAddress"); //Sender Email Address  
+        string password = Environment.GetEnvironmentVariable("emailpassword"); //Sender Password   
 
         public bool SendEmail(string To, string Subject, Attachment file)
         {

@@ -8,7 +8,7 @@ namespace SkietbaanBE.RequestModel
 {
     public class RequirementsFilter
     {
-        public int compID { get; set; }
+        public Competition competition{ get; set; }
         public List<Requirement> GetRequirements { get; set; }
     }
 }

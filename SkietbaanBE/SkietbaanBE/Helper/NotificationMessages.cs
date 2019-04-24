@@ -69,20 +69,64 @@ namespace SkietbaanBE.Helper
         public void ExpiryNotification(List<User> users){
             var notification = new Notifications();
             string expiryDate;
-            foreach(User user in users)
-            {
-                expiryDate = user.MemberExpiryDate.Value.ToString("DD/MM/YYYY");
-                notification.User = user;
-                notification.IsRead = false;
-                notification.TypeOfNotification = "Expiry";
-                notification.TimeOfArrival = DateTime.Now.ToString();
-                notification.NotificationMessage = "Hello " + user.Username + ". You're membership expires on ." + user.MemberExpiryDate;
-            }
-
             try
             {
-                _context.Notifications.Add(notification);
-                _context.SaveChanges();
+                bool isChanged = false;
+                
+                foreach(User user in users)
+                {
+                    bool isDeleted = false;
+                    var deletedNotificationsList = _context.Notifications.Where(x => x.TypeOfNotification == "Deleted" && x.User.Id == user.Id);
+                    
+                    foreach (var deletedNotification in deletedNotificationsList)
+                    {
+                        if (deletedNotification.NotificationMessage.Split(":")[1].Trim().Split(" ")[0] == user.MemberExpiryDate.Value.Date.ToString().Split(" ")[0].Trim())
+                        {
+                            isDeleted = true;
+                            break;
+                        }
+                    }
+
+                    if (isDeleted)
+                    {
+                        continue;
+                    }
+
+                    var dbNotification = _context.Notifications.FirstOrDefault(x => x.TypeOfNotification == "Expiry" && x.User.Id == user.Id);
+                    if (dbNotification == null)
+                    {
+                        expiryDate = user.MemberExpiryDate.Value.ToString("DD/MM/YYYY");
+                        notification.User = user;
+                        notification.IsRead = false;
+                        notification.TypeOfNotification = "Expiry";
+                        notification.TimeOfArrival = DateTime.Now.ToString();
+                        notification.NotificationMessage = "Hello " + user.Username + ". Your membership expires on: " + user.MemberExpiryDate.Value.Date;
+                        _context.Notifications.Add(notification);
+                        isChanged = true;
+                    }
+                    else
+                    {
+                        var newUserExpiry = user.MemberExpiryDate.Value.Date.ToString().Split(" ")[0].Trim();
+                        var oldUserExpiry = dbNotification.NotificationMessage.Split(":")[1].Trim().Split(" ")[0];
+
+                        if (newUserExpiry != oldUserExpiry)
+                        {
+                            expiryDate = user.MemberExpiryDate.Value.ToString("DD/MM/YYYY");
+                            notification.User = user;
+                            notification.IsRead = false;
+                            notification.TypeOfNotification = "Expiry";
+                            notification.TimeOfArrival = DateTime.Now.ToString();
+                            notification.NotificationMessage = "Hello " + user.Username + ". Your membership expires on: " + user.MemberExpiryDate.Value.Date;
+                            _context.Notifications.Add(notification);
+                            isChanged = true;
+                        }
+                    }
+                }
+
+                if (isChanged)
+                {
+                    _context.SaveChanges();
+                }
 
                 response = "successful";
             }
@@ -116,7 +160,7 @@ namespace SkietbaanBE.Helper
                 IsRead = false,
                 TimeOfArrival = DateTime.Now.ToString(),
                 TypeOfNotification = "Group",
-                NotificationMessage = group.Name + ", created. Check it out!"
+                NotificationMessage = group.Name + ", group created and they added you!"
             };
 
             try
@@ -200,9 +244,9 @@ namespace SkietbaanBE.Helper
             _context.SaveChanges();
         }
 
-        public void TotalAwardNotification(string award, string competitionName)
+        public void TotalAwardNotification(string token, string award, string competitionName)
         {
-            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
             var notification = new Notifications
             {
                 User = user,
@@ -214,19 +258,18 @@ namespace SkietbaanBE.Helper
             
             try
             {
-                _context.Add(notification);
+                _context.Notifications.Add(notification);
+                _context.SaveChanges();
             }
             catch (Exception e)
             {
                 response = e.Message;
             }
-            
-            _context.SaveChanges();
         }
 
-        public void AccuracyAwardNotification(string award, string competitionName)
+        public void AccuracyAwardNotification(string token, string award, string competitionName)
         {
-            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
             var notification = new Notifications {
                 User = user,
                 IsRead = false,
@@ -237,17 +280,18 @@ namespace SkietbaanBE.Helper
             
             try
             {
-                _context.Add(notification);
-            }catch(Exception e)
+                _context.Notifications.Add(notification);
+                _context.SaveChanges();
+            } catch(Exception e)
             {
                 response = e.Message;
             }
-            _context.SaveChanges();
+            
         }
 
-        public void HoursAwardNotification(string award, HoursAward hours)
+        public void HoursAwardNotification(string token, string award, HoursAward hours)
         {
-            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var user = _context.Users.FirstOrDefault(x => x.Token == token);
             var notification = new Notifications
             {
                 User = user,
@@ -256,21 +300,22 @@ namespace SkietbaanBE.Helper
                 TypeOfNotification = "Award",
                 NotificationMessage = award + " award received for " + hours.Hours + " hours"
             };
-            
-            try
-            {
-                _context.Add(notification);
-            }
-            catch (Exception e)
-            {
+
+            try {
+                var dbNotitifications = _context.Notifications.FirstOrDefault(x => x.NotificationMessage.StartsWith(award));
+                if (dbNotitifications == null) {
+                    _context.Notifications.Add(notification);
+                    _context.SaveChanges();
+                }
+            } catch (Exception e) {
                 response = e.Message;
             }
-            _context.SaveChanges();
+            
         }
 
-        public void MonthAwardNotification(string description)
+        public void MonthAwardNotification(string token, string description)
         {
-            var user = _context.Users.SingleOrDefault(x => x.Id == 1);
+            var user = _context.Users.SingleOrDefault(x => x.Token == token);
             var notification = new Notifications
             {
                 User = user,

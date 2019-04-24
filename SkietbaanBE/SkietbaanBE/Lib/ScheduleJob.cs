@@ -64,7 +64,7 @@ namespace SkietbaanBE.Lib {
                     Month = DateTime.Today.Month,
                     Year = DateTime.Today.Year
                 };
-                _notificationMessage.MonthAwardNotification(award.Description);
+                _notificationMessage.MonthAwardNotification(user.Token, award.Description);
                 _context.Awards.Add(award);
             }
 
