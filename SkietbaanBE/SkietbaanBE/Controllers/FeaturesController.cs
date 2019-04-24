@@ -86,8 +86,7 @@ namespace SkietbaanBE.Controllers
             StringBuilder mydata = new StringBuilder();
 
             mydata.Append("Username" + "," + "Cellphone Number" + "," + "Email Address" + "," + "Name and Surname");
-            mydata.Append(System.Environment.NewLine);
-            
+            mydata.Append(System.Environment.NewLine);            
 
             foreach (User user in dbUsers)
             {
@@ -98,11 +97,8 @@ namespace SkietbaanBE.Controllers
                     number = " ";                    
                 }
                 else {
-
                     number += "+27";
                     number += user.PhoneNumber.Substring(1, user.PhoneNumber.Length-1);
-
-
                 }
                 mydata.Append(user.Username+","+ number + "," + user.Email+"," + user.Name+" "+user.Surname);
                 mydata.Append(System.Environment.NewLine);   
