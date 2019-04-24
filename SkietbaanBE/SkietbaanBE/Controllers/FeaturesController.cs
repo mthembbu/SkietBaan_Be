@@ -300,25 +300,33 @@ namespace SkietbaanBE.Controllers
         [ActionName("SearchMember")]
         public IEnumerable<User> SearchMember()
         {
-            var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x => x.Username);
-            DateTime current = DateTime.Now;
-            int result;
-             List<User> users = new List<User>();
-            foreach (var user in dbUsers)
+            try
             {
-                if ((((user.MemberExpiryDate.Value.Year - current.Year) * 12) + (user.MemberExpiryDate.Value.Month - current.Month)) > 0)
+                var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x => x.Username);
+                DateTime current = DateTime.Now;
+                int result;
+                List<User> users = new List<User>();
+                foreach (var user in dbUsers)
                 {
-                    users.Add(user);
-                }
-                else if ((((user.MemberExpiryDate.Value.Year - current.Year) * 12) + (user.MemberExpiryDate.Value.Month - current.Month)) == 0)
-                {
-                    if (user.MemberExpiryDate.Value.Day - current.Day > 0)
+                    if ((((user.MemberExpiryDate.Value.Year - current.Year) * 12) + (user.MemberExpiryDate.Value.Month - current.Month)) > 0)
                     {
                         users.Add(user);
                     }
+                    else if ((((user.MemberExpiryDate.Value.Year - current.Year) * 12) + (user.MemberExpiryDate.Value.Month - current.Month)) == 0)
+                    {
+                        if (user.MemberExpiryDate.Value.Day - current.Day > 0)
+                        {
+                            users.Add(user);
+                        }
+                    }
                 }
+                return users.ToArray();
             }
-            return users.ToArray();
+            catch
+            {
+                return null;
+            }
+            
         }
 
         //// GET: api/User/SearchNonMember
