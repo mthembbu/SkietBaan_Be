@@ -505,6 +505,7 @@ namespace SkietbaanBE.Controllers
             {
                 dbUser.AdvanceExpiryDate = user.MemberExpiryDate;
                 _context.Users.Update(dbUser);
+                _context.SaveChanges();
                 ScheduleJob.ReNewUserMemberShip(dbUser);
             }
             await _context.SaveChangesAsync();
