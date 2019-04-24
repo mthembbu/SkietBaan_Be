@@ -194,7 +194,7 @@ namespace SkietbaanBE.Controllers
 
                 if (user.PhoneNumber == "")
                 {
-                    user.PhoneNumber = "null";
+                    user.PhoneNumber = null;
                 }
                 tempUser.PhoneNumber = user.PhoneNumber;
                 if (user.Name == "")
