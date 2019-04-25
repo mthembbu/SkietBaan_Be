@@ -16,28 +16,40 @@ namespace SkietbaanBE.Lib {
                     switch (requirement.Standard) {
                         case "gold":
                         case "Gold":
-                            totalAward.Gold = total >= requirement.Total;
-                            if (totalAward.Gold) {
+                            bool goldExist = context.Awards.Where(x => x.Competition.Name == compName &&
+                                            x.User.Token == token)
+                                            .FirstOrDefault(aw => aw.Description.StartsWith("Total:Gold")) == null;
+                            if (goldExist) {
+                                totalAward.Gold = true;
                                 totalAward.GoldRequirementStatus = requirement.Total + " REACHED";
                             } else {
+                                totalAward.Gold = false;
                                 totalAward.GoldRequirementStatus = "REACH " + requirement.Total + "%";
                             }
                             break;
                         case "silver":
                         case "Silver":
-                            totalAward.Silver = total >= requirement.Total;
-                            if (totalAward.Silver) {
+                            bool silverExist = context.Awards.Where(x => x.Competition.Name == compName &&
+                                            x.User.Token == token)
+                                            .FirstOrDefault(aw => aw.Description.StartsWith("Total:Silver")) == null;
+                            if (silverExist) {
+                                totalAward.Silver = true;
                                 totalAward.SilverRequirementStatus = requirement.Total + " REACHED";
                             } else {
+                                totalAward.Silver = false;
                                 totalAward.SilverRequirementStatus = "REACH " + requirement.Total + "%";
                             }
                             break;
                         case "bronze":
                         case "Bronze":
-                            totalAward.Bronze = total >= requirement.Total;
-                            if (totalAward.Bronze) {
+                            bool bronzeExist = context.Awards.Where(x => x.Competition.Name == compName &&
+                                            x.User.Token == token)
+                                            .FirstOrDefault(aw => aw.Description.StartsWith("Total:Bronze")) == null;
+                            if (bronzeExist) {
+                                totalAward.Bronze = true;
                                 totalAward.BronzeRequirementStatus = requirement.Total + " REACHED";
                             } else {
+                                totalAward.Bronze = false;
                                 totalAward.BronzeRequirementStatus = "REACH " + requirement.Total + "%";
                             }
                             break;
@@ -80,28 +92,40 @@ namespace SkietbaanBE.Lib {
                     switch (requirement.Standard) {
                         case "gold":
                         case "Gold":
-                            accuracyAward.Gold = compAccuracy >= requirement.Accuracy;
-                            if (accuracyAward.Gold) {
+                            bool goldExist = context.Awards.Where(x => x.Competition.Name == compName &&
+                                            x.User.Token == token)
+                                            .FirstOrDefault(aw => aw.Description.StartsWith("Accuracy:Gold")) == null;
+                            if (goldExist) {
+                                accuracyAward.Gold = true;
                                 accuracyAward.GoldRequirementStatus = requirement.Accuracy + "% REACHED";
                             } else {
                                 accuracyAward.GoldRequirementStatus = "REACH " + requirement.Accuracy + "%";
+                                accuracyAward.Gold = false;
                             }
                             break;
                         case "silver":
                         case "Silver":
-                            accuracyAward.Silver = compAccuracy >= requirement.Accuracy;
-                            if (accuracyAward.Silver) {
+                            bool silverExist = context.Awards.Where(x => x.Competition.Name == compName &&
+                                        x.User.Token == token)
+                                        .FirstOrDefault(aw => aw.Description.StartsWith("Accuracy:Silver")) == null;
+                            if (silverExist) {
+                                accuracyAward.Silver = true;
                                 accuracyAward.SilverRequirementStatus = requirement.Accuracy + "% REACHED";
                             } else {
+                                accuracyAward.Silver = false;
                                 accuracyAward.SilverRequirementStatus = "REACH " + requirement.Accuracy + "%";
                             }
                             break;
                         case "bronze":
                         case "Bronze":
-                            accuracyAward.Bronze = compAccuracy >= requirement.Accuracy;
-                            if (accuracyAward.Bronze) {
+                            bool bronzeExist = context.Awards.Where(x => x.Competition.Name == compName &&
+                                        x.User.Token == token)
+                                        .FirstOrDefault(aw => aw.Description.StartsWith("Accuracy:Bronze")) == null;
+                            if (bronzeExist) {
+                                accuracyAward.Bronze = true;
                                 accuracyAward.BronzeRequirementStatus = requirement.Accuracy + "% REACHED";
                             } else {
+                                accuracyAward.Bronze = false;
                                 accuracyAward.BronzeRequirementStatus = "REACH " + requirement.Accuracy + "%";
                             }
                             break;
@@ -382,11 +406,12 @@ namespace SkietbaanBE.Lib {
             Award award = null;
             try {
                 award = context.Awards.FirstOrDefault(x => x.Competition.Id == compId && x.User.Token == token
-                                                    && x.Month == DateTime.Today.Month && x.Year == DateTime.Today.Year);
+                                                    && x.Month == DateTime.Today.Month && x.Year == DateTime.Today.Year
+                                                    && x.Description.StartsWith("Month"));
             } catch {
                 return "No award";
             }
-            if (award != null) return award.Description;
+            if (award != null) return award.Description.Split(":")[1];
             return "No award";
         }
     }
