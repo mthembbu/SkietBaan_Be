@@ -324,6 +324,10 @@ namespace SkietbaanBE.Controllers
                     tempRankResult.Average = 0;
                     tempRankResult.Rank = 0;
                     tempRankResult.RankStatus = "equal";
+                    if(user.MemberID != null)
+                    {
+                        tempRankResult.isMember = true;
+                    }
                     ranklist.Add(tempRankResult);
                 }
                 return ranklist;
