@@ -75,6 +75,33 @@ namespace SkietbaanBE.Controllers
             }
             
         }
+
+        // DELETE: api/Groups/5
+        [HttpPost("delete")]
+        public void DeleteGroup([FromBody] Competition[] Compobj)
+        {
+            try
+            {
+                for (int i = 0; i < Compobj.Length; i++)
+                {
+                    var query = _context.Requirements.Where(m => m.Competition.Id == Compobj.ElementAt(i).Id);
+                    if (query != null)
+                    {
+                        foreach (var item in query)
+                        {
+                            _context.Requirements.Remove(item);
+                        }
+                    }
+                    _context.Competitions.Remove(Compobj.ElementAt(i));
+                    _context.SaveChanges();
+                }
+            }
+            catch
+            {
+
+            }
+    
+        }
         //posting the competition to the competition table together with a array of requirements using the Requirements filter
         // POST: api/Competition/filter
         [HttpPost("filter")]
