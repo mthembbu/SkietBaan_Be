@@ -99,37 +99,55 @@ namespace SkietbaanBE.Controllers
         //posting the competition to the competition table together with a array of requirements using the Requirements filter
         // POST: api/Competition/filter
         [HttpPost("filter")]
-        public async Task<IActionResult> AddRequirementsFilter([FromBody]RequirementsFilter rFilter)
+        public IActionResult AddRequirementsFilter([FromBody]RequirementsFilter rFilter)
         { //error handling, check if client provided valid data
-            try { 
-                if (rFilter.competition == null) {
-                    return new BadRequestObjectResult("competition cannot be null");
-                }
-                else if (_context.Competitions == null){
-                    _context.Competitions.Add(rFilter.competition);
-                    _context.SaveChanges();
-                    return Ok("Competition " + rFilter.competition.Name + " Added!");
-                }
-                else {
-                    Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == rFilter.competition.Name);
-                    if (dbCompetition != null)
-                        return new BadRequestObjectResult(rFilter.competition.Name + " already exists");
-                    _notificationMessages.CompetitionNotification(rFilter.competition);
-                    _context.Competitions.Add(rFilter.competition);
-                    _context.SaveChanges();
-                    dbCompetition = _context.Competitions.Last<Competition>();
-                    for (int i = 0; i < 3; i++){
-                        Requirement R = new Requirement{
-                            Competition = dbCompetition,
-                            Standard = rFilter.GetRequirements.ElementAt(i).Standard,
-                            Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy,
-                            Total = rFilter.GetRequirements.ElementAt(i).Total
-                        };
-                        _context.Requirements.Add(R);
+            try {
+                if (rFilter == null) return new BadRequestObjectResult("Invalid competition object");
+                
+                Competition dbCompetition = _context.Competitions.FirstOrDefault(c => c.Name == rFilter.Competition.Name);
+                if (dbCompetition != null)
+                    return new BadRequestObjectResult(rFilter.Competition.Name + " already exists");
+                _context.Competitions.Add(rFilter.Competition);
+                _context.SaveChanges();
+                _notificationMessages.CompetitionNotification(rFilter.Competition);
+                dbCompetition = _context.Competitions.FirstOrDefault(x => x.Name == rFilter.Competition.Name);
+                for (int i = 0; i < 3; i++){
+                    Requirement R = new Requirement{
+                        Competition = dbCompetition,
+                        Standard = rFilter.GetRequirements.ElementAt(i).Standard
+                    };
+
+                    switch (R.Standard) {
+                        case "Bronze":
+                        case "bronze":
+                            if (rFilter.GetRequirements.ElementAt(i).Accuracy == 0) R.Accuracy = 60;
+                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
+                            if (rFilter.GetRequirements.ElementAt(i).Total == 0)
+                                R.Total = rFilter.Competition.MaximumScore * 0.6;
+                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Total;
+                            break;
+                        case "Silver":
+                        case "silver":
+                            if (rFilter.GetRequirements.ElementAt(i).Accuracy == 0) R.Accuracy = 70;
+                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
+                            if (rFilter.GetRequirements.ElementAt(i).Total == 0)
+                                R.Total = rFilter.Competition.MaximumScore * 0.7;
+                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Total;
+                            break;
+                        case "Gold":
+                        case "gold":
+                            if (rFilter.GetRequirements.ElementAt(i).Accuracy == 0) R.Accuracy = 90;
+                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
+                            if (rFilter.GetRequirements.ElementAt(i).Total == 0)
+                                R.Total = rFilter.Competition.MaximumScore * 0.90;
+                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Total;
+                            break;
                     }
-                    await _context.SaveChangesAsync();
-                    return Ok("Competition " + rFilter.competition.Name + " Added!");
+                    _context.Requirements.Add(R);
                 }
+                _context.SaveChanges();
+                return Ok("Competition " + rFilter.Competition.Name + " Added!");
+                
             }
             catch { return new BadRequestObjectResult("Could not connect to Backend"); ; }
         }
