@@ -80,19 +80,25 @@ namespace SkietbaanBE.Controllers
         [HttpPost("delete")]
         public void DeleteGroup([FromBody] Competition[] Compobj)
         {
-            for(int i = 0; i < Compobj.Length; i++)
+            try
             {
-                var query = _context.Requirements.Where(m => m.Competition.Id == Compobj.ElementAt(i).Id);
-                if (query != null)
+                for (int i = 0; i < Compobj.Length; i++)
                 {
-                    foreach (var item in query)
+                    var query = _context.Requirements.Where(m => m.Competition.Id == Compobj.ElementAt(i).Id);
+                    if (query != null)
                     {
-                        _context.Requirements.Remove(item);
+                        foreach (var item in query)
+                        {
+                            _context.Requirements.Remove(item);
+                        }
                     }
-                    _context.SaveChanges(); 
+                    _context.Competitions.Remove(Compobj.ElementAt(i));
+                    _context.SaveChanges();
                 }
-                _context.Competitions.Remove(Compobj.ElementAt(i));
-                _context.SaveChanges();
+            }
+            catch
+            {
+
             }
     
         }
