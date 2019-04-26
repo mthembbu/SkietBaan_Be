@@ -167,39 +167,5 @@ namespace SkietbaanBE.Controllers
                 return new Dictionary<string, int>();
             }
         }
-
-        [HttpGet("groups/{token}")]
-        public List<Group> GetGroups(string token) {
-            try {
-                var groupList = (from groups in context.Groups
-                                 join userGroup in context.UserGroups on groups.Id equals userGroup.Group.Id
-                                 join user in context.Users on userGroup.User.Token equals user.Token
-                                 where(userGroup.User.Token == token)
-                                 select new {
-                                     groups
-                                 }).Select(x => x.groups).Distinct();
-
-                return groupList.ToList();
-            } catch (Exception) {
-                return null;
-            }
-        }
-
-        [HttpGet("competitions/{token}")]
-        public List<Competition> GetCompetitions(string token) {
-            try {
-                var competitionsUserPartakesIn = (from userCompetitionTotalScore in context.UserCompetitionTotalScores
-                                                  join competition in context.Competitions on
-                                                     userCompetitionTotalScore.Competition.Id equals competition.Id
-                                                  join user in context.Users on userCompetitionTotalScore.User.Token equals token
-                                                  where (userCompetitionTotalScore.User.Token == token)
-                                                  select new {
-                                                      competition
-                                                  }).Select(x => x.competition).Distinct();
-                return competitionsUserPartakesIn.ToList();
-            } catch (Exception) {
-                return null;
-            }
-        }
     }
 }
