@@ -85,6 +85,27 @@ namespace SkietbaanBE.Controllers
                 for (int i = 0; i < Compobj.Length; i++)
                 {
                     var query = _context.Requirements.Where(m => m.Competition.Id == Compobj.ElementAt(i).Id);
+                    var scores = _context.Scores.Where(s => s.Competition.Id == Compobj.ElementAt(i).Id);
+                    var userstat = _context.UserCompetitionTotalScores.Where(w => w.Competition.Id == Compobj.ElementAt(i).Id);
+
+                    if (scores != null)
+                    {
+                        foreach (var item in scores)
+                        {
+                            _context.Scores.Remove(item);
+                        }
+                        _context.SaveChanges();
+                    }
+
+                    if (userstat != null)
+                    {
+                        foreach (var item in userstat)
+                        {
+                            _context.UserCompetitionTotalScores.Remove(item);  
+                        }
+                        _context.SaveChanges();
+                    }
+
                     if (query != null)
                     {
                         foreach (var item in query)
