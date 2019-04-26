@@ -177,9 +177,26 @@ namespace SkietbaanBE.Controllers
                                  where(userGroup.User.Token == token)
                                  select new {
                                      groups
-                                 }).Select(x => x.groups);
+                                 }).Select(x => x.groups).Distinct();
 
                 return groupList.ToList();
+            } catch (Exception) {
+                return null;
+            }
+        }
+
+        [HttpGet("competitions/{token}")]
+        public List<Competition> GetCompetitions(string token) {
+            try {
+                var competitionsUserPartakesIn = (from userCompetitionTotalScore in context.UserCompetitionTotalScores
+                                                  join competition in context.Competitions on
+                                                     userCompetitionTotalScore.Competition.Id equals competition.Id
+                                                  join user in context.Users on userCompetitionTotalScore.User.Token equals token
+                                                  where (userCompetitionTotalScore.User.Token == token)
+                                                  select new {
+                                                      competition
+                                                  }).Select(x => x.competition).Distinct();
+                return competitionsUserPartakesIn.ToList();
             } catch (Exception) {
                 return null;
             }
