@@ -21,109 +21,113 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet("{token}")]
         public IActionResult GetUsersLastTwentyScores(string token) {
-            if (!ModelState.IsValid) return null;
-            bool notValid = context.Users.Where(x => x.Token == token).FirstOrDefault() == null;
-            if (notValid) return new BadRequestObjectResult("Invalid Token. Please Logout and Login again");
+            try {
+                if (!ModelState.IsValid) return null;
+                bool notValid = context.Users.Where(x => x.Token == token).FirstOrDefault() == null;
+                if (notValid) return new BadRequestObjectResult("Invalid Token. Please Logout and Login again");
 
-            if (context.Competitions.Count() == 0)
-                return new BadRequestObjectResult("No competitions available at the moment");
+                if (context.Competitions.Count() == 0)
+                    return new BadRequestObjectResult("No competitions available at the moment");
 
-            List<GraphData> graphDataList = new List<GraphData>();
-            var scores = context.Scores.Where(x => x.User.Token == token);
-            DateTime firstScoreDate, lastScoreDate;
-            
-            foreach (var competition in context.Competitions) {
-                var scoreInComp = scores.Where(x => x.Competition.Id == competition.Id);
-                GraphData graphData = new GraphData();
-                if (scoreInComp.Count() == 0) continue;
-                
+                List<GraphData> graphDataList = new List<GraphData>();
+                var scores = context.Scores.Where(x => x.User.Token == token);
+                DateTime firstScoreDate, lastScoreDate;
 
-                graphData.Average = Math.Round(scoreInComp.Sum(x => x.UserScore) / scoreInComp.Count(), 2);
-                graphData.Max = scoreInComp.OrderByDescending(x => x.UserScore).FirstOrDefault().UserScore;
-                graphData.Min = scoreInComp.OrderBy(x => x.UserScore).FirstOrDefault().UserScore;
+                foreach (var competition in context.Competitions) {
+                    var scoreInComp = scores.Where(x => x.Competition.Id == competition.Id);
+                    GraphData graphData = new GraphData();
+                    if (scoreInComp.Count() == 0) continue;
 
-                List<Data> dataList = new List<Data>();
 
-                var sorted = scoreInComp.OrderBy(x => x.UserScore);
+                    graphData.Average = Math.Round(scoreInComp.Sum(x => x.UserScore) / scoreInComp.Count(), 2);
+                    graphData.Max = scoreInComp.OrderByDescending(x => x.UserScore).FirstOrDefault().UserScore;
+                    graphData.Min = scoreInComp.OrderBy(x => x.UserScore).FirstOrDefault().UserScore;
 
-                scoreInComp = scoreInComp.OrderBy(x => x.UploadDate.Value.Date);
-                //take the last 20 scores if they are more than 20
-                
-                if (scoreInComp.Count() > 20) scoreInComp = scoreInComp.Skip(scoreInComp.ToList().Count() - 20);
-                var maxScoreDates = scoreInComp
-                .Where(x => x.UserScore == graphData.Max).Select(date => date.UploadDate);
-                var minScoreDates = scoreInComp
-                                .Where(x => x.UserScore == graphData.Min).Select(date => date.UploadDate);
+                    List<Data> dataList = new List<Data>();
 
-                firstScoreDate = scoreInComp.First().UploadDate.Value;
-                lastScoreDate = scoreInComp.ToList().Skip(scoreInComp.ToList().Count() - 1).First().UploadDate.Value;
+                    var sorted = scoreInComp.OrderBy(x => x.UserScore);
 
-                int counter = 0;
-                foreach (var score in scoreInComp) {
-                    counter++;
-                    if (score.UploadDate.Value == firstScoreDate) {
-                        Data data = new Data {
-                            Label = "1",
-                            Value = score.UserScore
-                        };
+                    scoreInComp = scoreInComp.OrderBy(x => x.UploadDate.Value.Date);
+                    //take the last 20 scores if they are more than 20
 
-                        if (maxScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
-                            data.Description = "max";
+                    if (scoreInComp.Count() > 20) scoreInComp = scoreInComp.Skip(scoreInComp.ToList().Count() - 20);
+                    var maxScoreDates = scoreInComp
+                    .Where(x => x.UserScore == graphData.Max).Select(date => date.UploadDate);
+                    var minScoreDates = scoreInComp
+                                    .Where(x => x.UserScore == graphData.Min).Select(date => date.UploadDate);
+
+                    firstScoreDate = scoreInComp.First().UploadDate.Value;
+                    lastScoreDate = scoreInComp.ToList().Skip(scoreInComp.ToList().Count() - 1).First().UploadDate.Value;
+
+                    int counter = 0;
+                    foreach (var score in scoreInComp) {
+                        counter++;
+                        if (score.UploadDate.Value == firstScoreDate) {
+                            Data data = new Data {
+                                Label = "1",
+                                Value = score.UserScore
+                            };
+
+                            if (maxScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
+                                data.Description = "max";
+                            } else if (minScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
+                                data.Description = "min";
+                            } else
+                                data.Description = "first";
+
+                            dataList.Add(data);
+                            continue;
+                        } else if (score.UploadDate.Value == lastScoreDate) {
+                            Data data = new Data {
+                                Label = scoreInComp.ToList().Count().ToString(),
+                                Value = score.UserScore
+                            };
+                            if (maxScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
+                                data.Description = "max";
+                            } else if (minScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
+                                data.Description = "min";
+                            } else
+                                data.Description = "last";
+                            dataList.Add(data);
+                            continue;
                         } else if (minScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
-                            data.Description = "min";
-                        } else
-                            data.Description = "first";
-
-                        dataList.Add(data);
-                        continue;
-                    }else if(score.UploadDate.Value == lastScoreDate) {
-                        Data data = new Data {
-                            Label = scoreInComp.ToList().Count().ToString(),
-                            Value = score.UserScore
-                        };
-                        if (maxScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
-                            data.Description = "max";
-                        } else if (minScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
-                            data.Description = "min";
-                        } else
-                            data.Description = "last";
-                        dataList.Add(data);
-                        continue;
-                    }else if(minScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
-                        Data data = new Data {
-                            Label = counter.ToString(),
-                            Value = score.UserScore,
-                            Description = "min"
-                        };
-                        dataList.Add(data);
-                        continue;
-                    }else if(maxScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
-                        Data data = new Data {
-                            Label = counter.ToString(),
-                            Value = score.UserScore,
-                            Description = "max"
-                        };
-                        dataList.Add(data);
-                        continue;
-                    } else {
-                        Data data = new Data {
-                            Label = "",
-                            Value = score.UserScore,
-                            Description = ""
-                        };
-                        dataList.Add(data);
+                            Data data = new Data {
+                                Label = counter.ToString(),
+                                Value = score.UserScore,
+                                Description = "min"
+                            };
+                            dataList.Add(data);
+                            continue;
+                        } else if (maxScoreDates.FirstOrDefault(x => x.Value == score.UploadDate.Value) != null) {
+                            Data data = new Data {
+                                Label = counter.ToString(),
+                                Value = score.UserScore,
+                                Description = "max"
+                            };
+                            dataList.Add(data);
+                            continue;
+                        } else {
+                            Data data = new Data {
+                                Label = "",
+                                Value = score.UserScore,
+                                Description = ""
+                            };
+                            dataList.Add(data);
+                        }
                     }
+                    graphData.CompetitionName = competition.Name;
+                    graphData.CompetitionMaximum = competition.MaximumScore;
+                    graphData.IsParticipating = true;
+                    graphData.Data = dataList;
+                    graphDataList.Add(graphData);
                 }
-                graphData.CompetitionName = competition.Name;
-                graphData.CompetitionMaximum = competition.MaximumScore;
-                graphData.IsParticipating = true;
-                graphData.Data = dataList;
-                graphDataList.Add(graphData);
+                if (graphDataList.Count() == graphDataList.Where(x => x.IsParticipating == false).Count())
+                    return new OkObjectResult("You haven’t participated in any competitions for any shooting " +
+                        "statistics  to be available yet. Time to get shooting!");
+                return new OkObjectResult(graphDataList);
+            } catch (Exception) {
+                return null;
             }
-            if (graphDataList.Count() == graphDataList.Where(x => x.IsParticipating == false).Count())
-                return new OkObjectResult("You haven’t participated in any competitions for any shooting " +
-                    "statistics  to be available yet. Time to get shooting!");
-            return new OkObjectResult(graphDataList);
         }
 
         [HttpGet("participants")]
@@ -161,6 +165,23 @@ namespace SkietbaanBE.Controllers
                 return mapCompetitionToNumberOfUsers;
             } catch (Exception) {
                 return new Dictionary<string, int>();
+            }
+        }
+
+        [HttpGet("groups/{token}")]
+        public List<Group> GetGroups(string token) {
+            try {
+                var groupList = (from groups in context.Groups
+                                 join userGroup in context.UserGroups on groups.Id equals userGroup.Group.Id
+                                 join user in context.Users on userGroup.User.Token equals user.Token
+                                 where(userGroup.User.Token == token)
+                                 select new {
+                                     groups
+                                 }).Select(x => x.groups);
+
+                return groupList.ToList();
+            } catch (Exception) {
+                return null;
             }
         }
     }
