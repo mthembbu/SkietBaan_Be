@@ -18,6 +18,7 @@ namespace SkietbaanBE.Models {
         public DateTime? MemberStartDate { get; set; }
         public DateTime? MemberExpiryDate { get; set; }
         public DateTime EntryDate { get; set; }
+        public DateTime? AdvanceExpiryDate { get; set; }
         public bool Admin { get; set; }
         public string Token { get; set; }
     }
