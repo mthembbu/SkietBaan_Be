@@ -80,7 +80,8 @@ namespace SkietbaanBE.Controllers
         [HttpPost("delete")]
         public void DeleteGroup([FromBody] Competition[] Compobj)
         {
-          
+            try
+            {
                 for (int i = 0; i < Compobj.Length; i++)
                 {
                     var query = _context.Requirements.Where(m => m.Competition.Id == Compobj.ElementAt(i).Id);
@@ -94,7 +95,8 @@ namespace SkietbaanBE.Controllers
                             _context.Scores.Remove(item);
                         }
                         _context.SaveChanges();
-                    }if (awards != null)
+                    }
+                    if (awards != null)
                     {
                         foreach (var item in awards)
                         {
@@ -107,7 +109,7 @@ namespace SkietbaanBE.Controllers
                     {
                         foreach (var item in userstat)
                         {
-                            _context.UserCompetitionTotalScores.Remove(item);  
+                            _context.UserCompetitionTotalScores.Remove(item);
                         }
                         _context.SaveChanges();
                     }
@@ -122,9 +124,9 @@ namespace SkietbaanBE.Controllers
                     _context.Competitions.Remove(Compobj.ElementAt(i));
                     _context.SaveChanges();
                 }
-            
-          
-    
+
+            }
+            catch { }
         }
         //posting the competition to the competition table together with a array of requirements using the Requirements filter
         // POST: api/Competition/filter
