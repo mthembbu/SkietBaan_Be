@@ -80,19 +80,25 @@ namespace SkietbaanBE.Controllers
         [HttpPost("delete")]
         public void DeleteGroup([FromBody] Competition[] Compobj)
         {
-            try
-            {
+          
                 for (int i = 0; i < Compobj.Length; i++)
                 {
                     var query = _context.Requirements.Where(m => m.Competition.Id == Compobj.ElementAt(i).Id);
                     var scores = _context.Scores.Where(s => s.Competition.Id == Compobj.ElementAt(i).Id);
                     var userstat = _context.UserCompetitionTotalScores.Where(w => w.Competition.Id == Compobj.ElementAt(i).Id);
-
+                    var awards = _context.Awards.Where(z => z.Competition.Id == Compobj.ElementAt(i).Id);
                     if (scores != null)
                     {
                         foreach (var item in scores)
                         {
                             _context.Scores.Remove(item);
+                        }
+                        _context.SaveChanges();
+                    }if (awards != null)
+                    {
+                        foreach (var item in awards)
+                        {
+                            _context.Awards.Remove(item);
                         }
                         _context.SaveChanges();
                     }
@@ -116,11 +122,8 @@ namespace SkietbaanBE.Controllers
                     _context.Competitions.Remove(Compobj.ElementAt(i));
                     _context.SaveChanges();
                 }
-            }
-            catch
-            {
-
-            }
+            
+          
     
         }
         //posting the competition to the competition table together with a array of requirements using the Requirements filter
@@ -183,8 +186,7 @@ namespace SkietbaanBE.Controllers
         // POST: api/Competition
         [HttpPost]
         public async Task<IActionResult> AddCompetition([FromBody]Competition Comp)
-        
-{
+           {
             if (ModelState.IsValid)
             {
                 //error handling, check if client provided valid data
