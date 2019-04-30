@@ -35,43 +35,52 @@ namespace SkietbaanBE.Lib {
         //Add a record in the database of the user who has been top ranked at the end of the month
         private void AwardUserJob(Object source) {
             //join all competitions where the user participates, but only the active competitions
+            try {
+                var query = (from User in _context.Users
+                             join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id
+                                 equals UserCompetitionTotalScore.UserId
+                             join Competition in _context.Competitions on UserCompetitionTotalScore.CompetitionId
+                                 equals Competition.Id
+                             where (Competition.Status == true && UserCompetitionTotalScore.Year == DateTime.Today.Year)
+                             orderby Competition.Id, UserCompetitionTotalScore.Total descending
+                             select new {
+                                 User,
+                                 Competition.Id,
+                                 Competition,
+                                 UserCompetitionTotalScore.Total
+                             }).Distinct();
 
-            var query = (from User in _context.Users
-                        join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id
-                            equals UserCompetitionTotalScore.UserId
-                        join Competition in _context.Competitions on UserCompetitionTotalScore.CompetitionId 
-                            equals Competition.Id
-                        where (Competition.Status == true && UserCompetitionTotalScore.Year == DateTime.Today.Year)
-                        orderby Competition.Id, UserCompetitionTotalScore.Total descending
-                        select new{
-                            User,
-                            Competition.Id,
-                            Competition,
-                            UserCompetitionTotalScore.Total
-                        }).Distinct();
+                //award the users who ranked first in their respective competitions
+                var allCompIds = query.Select(x => x.Id).Distinct();
+                bool isChanged = false;
+                foreach (var i in allCompIds) {
+                    var top = query.Where(x => x.Id == i).First();
+                    var comp = _context.Competitions.Find(top.Id);
+                    var user = _context.Users.Find(top.User.Id);
+                    Award award = new Award {
+                        Competition = comp,
+                        User = user,
+                        Description = $"Month:Best shooter in {comp.Name} on " + $"{GetMonthNameByMonthNumber(DateTime.Today.Month)}" + " " +
+                                        $"{DateTime.Today.Year}",
+                        Month = DateTime.Today.Month,
+                        Year = DateTime.Today.Year
+                    };
 
-            //award the users who ranked first in their respective competitions
-            var allCompIds = query.Select(x => x.Id).Distinct();
-            foreach(var i in allCompIds){
-                var top = query.Where(x => x.Id == i).First();
-                var comp = _context.Competitions.Find(top.Id);
-                var user = _context.Users.Find(top.User.Id);
-                Award award = new Award {
-                    Competition = comp,
-                    User = user,
-                    Description = $"Month:Best shooter in {GetMonthNameByMonthNumber(DateTime.Today.Month)}" + " " +
-                                    $"{DateTime.Today.Year}",
-                    Month = DateTime.Today.Month,
-                    Year = DateTime.Today.Year
-                };
-                _notificationMessage.MonthAwardNotification(user.Token, award.Description);
-                _context.Awards.Add(award);
+                    var dbRecord = _context.Awards.FirstOrDefault(x => x.Description == award.Description);
+                    if (dbRecord != null) continue;
+
+                    isChanged = true;
+                    _notificationMessage.MonthAwardNotification(user.Token, award.Description);
+                    _context.Awards.Add(award);
+                }
+
+                if(isChanged) _context.SaveChanges();
+
+                //run the updateAwardTimer once again after 20 days
+                updateAwardTimer.Change((int)TimeSpan.FromDays(20).TotalMilliseconds, 0);
+            } catch (Exception) {
+                // log to file
             }
-
-            _context.SaveChanges();
-
-            //run the updateAwardTimer once again after 20 days
-            updateAwardTimer.Change((int)TimeSpan.FromDays(20).TotalMilliseconds, 0);
         }   
 
         public void RunAwardUserJob(Object sender) {
