@@ -503,7 +503,7 @@ namespace SkietbaanBE.Controllers
             }
             else
             {
-                //dbUser.AdvanceExpiryDate = user.MemberExpiryDate;
+                dbUser.AdvanceExpiryDate = user.MemberExpiryDate;
                 _context.Users.Update(dbUser);
                 _context.SaveChanges();
                 ScheduleJob.ReNewUserMemberShip(dbUser);
