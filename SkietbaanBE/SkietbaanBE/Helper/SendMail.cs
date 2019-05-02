@@ -24,14 +24,13 @@ namespace SkietbaanBE.Helper
             {
                 using (MailMessage mail = new MailMessage())
                 {
-                    MailAssignment(mail, emailFromAddress, To, Subject, "<h>view attachment</h1>");
+                    MailAssignment(mail, emailFromAddress, To, Subject, "<h1>view attachment</h1>");
                     mail.Attachments.Add(file);
                     SmtpSend(mail);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
                 return false;
             }
             return true;
@@ -43,7 +42,6 @@ namespace SkietbaanBE.Helper
             {
                 using (MailMessage mail = new MailMessage())
                 {
-
                     string url = Environment.GetEnvironmentVariable("resetUrl");
                     MailAssignment(mail, emailFromAddress, To, Subject, $"<div style='text-align: center;'><img src='https://firebasestorage.googleapis.com/v0/b/skietbaan-351ab.appspot.com/o/password%20reset.png?alt=media&token=b989fdf4-b19b-4e64-82aa-cf2ba41cc7ef'></img><div><h2>Click here to reset your password: <a href='{url}{token}'>Reset Password</a></h2><div></div>");
                     SmtpSend(mail);
@@ -76,9 +74,8 @@ namespace SkietbaanBE.Helper
             }
             catch (Exception e)
             {
-                e.ToString();
+                throw e;
             }
-           
         }
     }
 }
