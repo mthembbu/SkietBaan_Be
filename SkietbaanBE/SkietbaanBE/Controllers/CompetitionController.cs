@@ -156,7 +156,7 @@ namespace SkietbaanBE.Controllers
                             else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
                             if (rFilter.GetRequirements.ElementAt(i).Total == 0)
                                 R.Total = rFilter.Competition.MaximumScore * 0.6;
-                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Total;
+                            else R.Total = rFilter.GetRequirements.ElementAt(i).Total;
                             break;
                         case "Silver":
                         case "silver":
@@ -164,7 +164,7 @@ namespace SkietbaanBE.Controllers
                             else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
                             if (rFilter.GetRequirements.ElementAt(i).Total == 0)
                                 R.Total = rFilter.Competition.MaximumScore * 0.7;
-                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Total;
+                            else R.Total = rFilter.GetRequirements.ElementAt(i).Total;
                             break;
                         case "Gold":
                         case "gold":
@@ -172,7 +172,7 @@ namespace SkietbaanBE.Controllers
                             else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
                             if (rFilter.GetRequirements.ElementAt(i).Total == 0)
                                 R.Total = rFilter.Competition.MaximumScore * 0.90;
-                            else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Total;
+                            else R.Total = rFilter.GetRequirements.ElementAt(i).Total;
                             break;
                     }
                     _context.Requirements.Add(R);
