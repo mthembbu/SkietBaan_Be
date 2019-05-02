@@ -20,14 +20,80 @@ namespace SkietbaanBE.Controllers
         }
 
         // GET: api/Scores
-        [HttpGet("{token}")]
-        public Array GetScores(string token)
+        [HttpGet("{id}/{token}")]
+        public ActionResult GetScores(string id, string token)
         {
-            User userid = _context.Users.FirstOrDefault(x => x.Token.Equals(token));
-            var scoreList = _context.Scores.Where(x => x.User.Id == userid.Id);
-            return scoreList.ToArray();
+            Competition compId = _context.Competitions.FirstOrDefault(x => x.Id.ToString().Equals(id));
+            if(compId != null)
+            {
+                User userId = _context.Users.FirstOrDefault(x => x.Token.Equals(token));
+                if(userId != null)
+                {
+                    var scoreList = _context.Scores.Where(y => y.User.Id == userId.Id && y.Competition.Id == compId.Id);
+                    return Json(scoreList.ToArray());
+                }
+                else
+                {
+                    return NotFound("User not found");
+                }
+            }
+            else
+            {
+                return NotFound("Competition not found");
+            }
+
+        }
+        [Route("api/Scores/DeleteScoresById")]
+        [HttpPost("{id}")]
+        public async System.Threading.Tasks.Task DeleteScoresByIdAsync([FromBody] List<Score> list)
+        {
+             for(int i =0;i<list.Count;i++)
+             {
+                try
+                {
+                    Score tempScore = _context.Scores.Where(s => s.Id == list.ElementAt(i).Id).FirstOrDefault<Score>();
+                    if(tempScore != null)
+                    {
+                        _context.Scores.Remove(tempScore);
+                      
+                    }
+                }
+                catch (Exception e)
+                {
+                    
+                }
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e) { }
         }
 
+        [HttpGet("GetUsers/{compId}")]
+        public ActionResult GetUsers(int compId)
+        {
+            var query = from competition in _context.Competitions
+                        join score in _context.Scores on competition.Id equals score.Competition.Id
+                        join user in _context.Users on score.User.Id equals user.Id
+                        where competition.Id == compId
+                        select new
+                        {
+                            user.Username,
+                            user.Email,
+                            user.Token,
+                        };
+
+            if(query != null)
+            {
+                var scoresList = query.Distinct().ToList();
+                return Json(scoresList);
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         [HttpPost]
         public IActionResult ScoreCapture([FromBody]ScoreCapture scoreCapture)
