@@ -41,6 +41,10 @@ namespace SkietbaanBE.Controllers
             {
                 _notificationMessage.LOS(token);
             }
+            else
+            {
+                _notificationMessage.LOGS(token);
+            }
         }
 
         [HttpGet("{id}", Name = "GetNotificationById")]
