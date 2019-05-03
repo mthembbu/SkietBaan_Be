@@ -1,20 +1,9 @@
-﻿//using SkietbaanBE.Models;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
-//using Microsoft.AspNetCore.Mvc;
-//using SkietbaanBE.Controllers;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SkietbaanBE.Helper;
 using SkietbaanBE.Models;
-using SkietbaanBE.RequestModel;
 namespace SkietbaanBE.Controllers
 {
     public class AdminStatsController:Controller
