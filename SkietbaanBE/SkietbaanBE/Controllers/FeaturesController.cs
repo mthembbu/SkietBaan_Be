@@ -113,8 +113,10 @@ namespace SkietbaanBE.Controllers
 
             if(Adminuser != null)
             {
-                sendMail.SendEmail(Adminuser.Email, "csv", attachment);
-                return (filter+".csv"+" sent to "+Adminuser.Email);
+                if (sendMail.SendEmail(Adminuser.Email.Trim(), "csv", attachment))
+                    return (filter + ".csv" + " sent to " + Adminuser.Email);
+                else
+                    return "Could not send email.\nAuthentication Error";
             }
             else
             {
