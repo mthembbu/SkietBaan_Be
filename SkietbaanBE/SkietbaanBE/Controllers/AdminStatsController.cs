@@ -26,22 +26,40 @@ namespace SkietbaanBE.Controllers
 
         [HttpGet]
         [Route("adminstat")]
-        public Dictionary<String,int> getStatDetails()
+        public Dictionary<String, double> getStatDetails()
         {
-            Dictionary<String, int> statDetails = new Dictionary<String, int>();
-                var query = _context.Users.Where(u=>u.MemberID!=null);
-            int count = 0;
-            if (query != null)
+            try
             {
-                count = (query.ToList()).Count();
+                Dictionary<String, double> statDetails = new Dictionary<String, double>();
+                var query = _context.Users.Where(u => u.MemberID != null);
+                var users = _context.Users;
+                int count = 0;
+                DateTime date = DateTime.Now;
+                int month = date.Month;
+                int year = date.Year;
+                if (query != null)
+                {
+                    count = (query.ToList()).Count();
+                }
+                var nonMemberUsers = (users.Where(u => u.MemberID == null)).Count();
+                var newUsers = (double)((users.Where(x => x.EntryDate.Year == year && x.EntryDate.Month == month).ToList()).ToList()).Count;
+                var newMembers = (double)(users.Where(y => y.MemberStartDate.Value.Year == year && y.MemberStartDate.Value.Month == month)).Count();
+                var new_user_percent = Math.Round(((newUsers / nonMemberUsers) * 100), 1);
+                var new_member_percent = Math.Round(((newMembers / query.Count()) * 100), 1);
+                statDetails.Add("new user", newUsers);
+                statDetails.Add("new member", newMembers);
+                statDetails.Add("total users", (this.SearchNonMember()).Count());
+                statDetails.Add("total members", count);
+                statDetails.Add("expiring members", (this.SearchExpiringMember()).Count());
+                statDetails.Add("new user percentage", new_user_percent);
+                statDetails.Add("new member percentage", new_member_percent);
+                return statDetails;
+            }catch(Exception e)
+            {
+                return null;
             }
-            statDetails.Add("new user", 500);
-            statDetails.Add("new member", 500);
-            statDetails.Add("total users", (this.SearchNonMember()).Count());
-            statDetails.Add("total members", count);
-            statDetails.Add("expiring members", (this.SearchExpiringMember()).Count());
-            return statDetails;
         }
+
         public IEnumerable<User> SearchNonMember()
         {
             return (_context.Users.ToArray<User>().Where(u => u.MemberID == null || u.MemberID == "")).OrderBy(x => x.Username);
