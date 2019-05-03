@@ -306,7 +306,6 @@ namespace SkietbaanBE.Controllers
             {
                 var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x => x.Username);
                 DateTime current = DateTime.Now;
-                int result;
                 List<User> users = new List<User>();
                 foreach (var user in dbUsers)
                 {
