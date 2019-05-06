@@ -56,24 +56,18 @@ namespace SkietbaanBE.Controllers
             {
             if (filter.getfilterName[i] == "members")
             {
-                dbUsers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
-                if (dbUsers != null)
+               var tempMembers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
+                if (tempMembers != null)
                 {
-                    foreach (User member in dbUsers)
-                    {
-                        filterlist.Add(member);
-                    }
+                        filterlist.AddRange(tempMembers);
                 }
             }
             else if (filter.getfilterName[i] == "users")
             {
-                dbUsers = (dbUsers.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
-                if (dbUsers != null)
+                var tempUsers = (dbUsers.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
+                if (tempUsers != null)
                 {
-                    foreach (User user in dbUsers)
-                    {
-                        filterlist.Add(user);
-                    }
+                        filterlist.AddRange(tempUsers);
                 }
 
             }
@@ -99,13 +93,10 @@ namespace SkietbaanBE.Controllers
                         _notificationMessage.ExpiryNotification(users);
                     }
                 }
-                dbUsers = users.ToArray<User>();
+                var tempExpiry = users.ToArray<User>();
                 if (dbUsers != null)
                 {
-                    foreach (User expuser in dbUsers)
-                    {
-                        filterlist.Add(expuser);
-                    }
+                        filterlist.AddRange(tempExpiry);
                 }
             }
         }
@@ -134,7 +125,7 @@ namespace SkietbaanBE.Controllers
             if(Adminuser != null)
             {
                 if (sendMail.SendEmail(Adminuser.Email.Trim(), "csv", attachment))
-                    return (filter + ".csv" + " sent to " + "bmthembu@retrorabbit.co.za");
+                    return (filterName + ".csv" + " sent to " + "bmthembu@retrorabbit.co.za");
                 else
                     return "Could not send email.\nAuthentication Error";
             }
