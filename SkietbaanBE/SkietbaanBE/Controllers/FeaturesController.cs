@@ -12,6 +12,7 @@ using SkietbaanBE.Models;
 using System.Data;
 using System.Net.Mail;
 using System.Text;
+using SkietbaanBE.RequestModel;
 
 namespace SkietbaanBE.Controllers
 {
@@ -45,15 +46,15 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpPost]
-        public string generateCSV(string[] filter, string adminToken)
+        public string generateCSV([FromBody] CSVFilter filter)
         {
             List<User> filterlist = new List<User>();
             var dbUsers = (_context.Users.ToArray());
-            string filterName = "AllUSers";
-            var Adminuser = _context.Users.FirstOrDefault(x => x.Token == adminToken);
-            for (int i = 0; i < filter.Length; i++)
+            string filterName = "AllUsers";
+            var Adminuser = _context.Users.FirstOrDefault(x => x.Token == filter.getAdminToken);
+            for (int i = 0; i < filter.getfilterName.Length; i++)
             {
-            if (filter[i] == "members")
+            if (filter.getfilterName[i] == "members")
             {
                 dbUsers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
                 if (dbUsers != null)
@@ -64,7 +65,7 @@ namespace SkietbaanBE.Controllers
                     }
                 }
             }
-            else if (filter[i] == "users")
+            else if (filter.getfilterName[i] == "users")
             {
                 dbUsers = (dbUsers.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
                 if (dbUsers != null)
@@ -76,7 +77,7 @@ namespace SkietbaanBE.Controllers
                 }
 
             }
-            else if (filter[i] == "expiring")
+            else if (filter.getfilterName[i] == "expiring")
             {
                 var expdbUsers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "" && u.MemberExpiryDate != null && u.MemberStartDate != null)).OrderBy(x => x.Username);
                 DateTime current = DateTime.Now;
@@ -128,13 +129,12 @@ namespace SkietbaanBE.Controllers
                 mydata.Append(System.Environment.NewLine);   
             }
             byte[] data = Encoding.ASCII.GetBytes(mydata.ToString());
-            MemoryStream ms = new MemoryStream(data);           
-
+            MemoryStream ms = new MemoryStream(data); 
             Attachment attachment = new Attachment(ms, $"{filterName}.csv", "text/plain");
             if(Adminuser != null)
             {
                 if (sendMail.SendEmail(Adminuser.Email.Trim(), "csv", attachment))
-                    return (filter + ".csv" + " sent to " + Adminuser.Email);
+                    return (filter + ".csv" + " sent to " + "bmthembu@retrorabbit.co.za");
                 else
                     return "Could not send email.\nAuthentication Error";
             }
