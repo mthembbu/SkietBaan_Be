@@ -45,22 +45,40 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpPost]
-        public string generateCSV(string filter,string adminToken)
+        public string generateCSV(string[] filter, string adminToken)
         {
+            List<User> filterlist = new List<User>();
             var dbUsers = (_context.Users.ToArray());
+            string filterName = "AllUSers";
             var Adminuser = _context.Users.FirstOrDefault(x => x.Token == adminToken);
-            if (filter == "members")
+            for (int i = 0; i < filter.Length; i++)
             {
-                 dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
+            if (filter[i] == "members")
+            {
+                dbUsers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
+                if (dbUsers != null)
+                {
+                    foreach (User member in dbUsers)
+                    {
+                        filterlist.Add(member);
+                    }
+                }
             }
-            else if(filter == "users")
+            else if (filter[i] == "users")
             {
-                 dbUsers = (_context.Users.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
+                dbUsers = (dbUsers.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
+                if (dbUsers != null)
+                {
+                    foreach (User user in dbUsers)
+                    {
+                        filterlist.Add(user);
+                    }
+                }
 
             }
-            else if(filter == "expiring")
+            else if (filter[i] == "expiring")
             {
-                var expdbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "" && u.MemberExpiryDate != null && u.MemberStartDate != null)).OrderBy(x => x.Username);
+                var expdbUsers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "" && u.MemberExpiryDate != null && u.MemberStartDate != null)).OrderBy(x => x.Username);
                 DateTime current = DateTime.Now;
                 var months = new List<int>();
                 foreach (var user in expdbUsers)
@@ -69,27 +87,32 @@ namespace SkietbaanBE.Controllers
                     TimeSpan span = expiry.Subtract(current);
                     months.Add((span.Days) / 30);
                 }
-
                 //Looks for Members with expiry time left that is <=2 months
                 var timeMonths = months.ToArray();
                 List<User> users = new List<User>();
-                for (int i = 0; i < timeMonths.Length; i++)
+                for (int c = 0; c < timeMonths.Length; c++)
                 {
-                    if (months[i] <= 2)
+                    if (months[c] <= 2)
                     {
-                        users.Add(dbUsers.ToList().ElementAt(i));
+                        users.Add(dbUsers.ToList().ElementAt(c));
                         _notificationMessage.ExpiryNotification(users);
                     }
                 }
                 dbUsers = users.ToArray<User>();
+                if (dbUsers != null)
+                {
+                    foreach (User expuser in dbUsers)
+                    {
+                        filterlist.Add(expuser);
+                    }
+                }
             }
-
+        }
             StringBuilder mydata = new StringBuilder();
-
             mydata.Append("Username" + "," + "Cellphone Number" + "," + "Email Address" + "," + "Name and Surname");
             mydata.Append(System.Environment.NewLine);            
 
-            foreach (User user in dbUsers)
+            foreach (User user in filterlist)
             {
                 var number = "";
 
@@ -104,13 +127,10 @@ namespace SkietbaanBE.Controllers
                 mydata.Append(user.Username+","+ number + "," + user.Email+"," + user.Name+" "+user.Surname);
                 mydata.Append(System.Environment.NewLine);   
             }
-
             byte[] data = Encoding.ASCII.GetBytes(mydata.ToString());
-
             MemoryStream ms = new MemoryStream(data);           
 
-            Attachment attachment = new Attachment(ms, $"{filter}.csv", "text/plain");
-
+            Attachment attachment = new Attachment(ms, $"{filterName}.csv", "text/plain");
             if(Adminuser != null)
             {
                 if (sendMail.SendEmail(Adminuser.Email.Trim(), "csv", attachment))
