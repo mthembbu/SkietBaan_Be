@@ -12,6 +12,7 @@ using SkietbaanBE.Models;
 using System.Data;
 using System.Net.Mail;
 using System.Text;
+using SkietbaanBE.RequestModel;
 
 namespace SkietbaanBE.Controllers
 {
@@ -45,22 +46,34 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpPost]
-        public string generateCSV(string filter,string adminToken)
+        public string generateCSV([FromBody] CSVFilter filter)
         {
+            List<User> filterlist = new List<User>();
             var dbUsers = (_context.Users.ToArray());
-            var Adminuser = _context.Users.FirstOrDefault(x => x.Token == adminToken);
-            if (filter == "members")
+            string filterName = "AllUsers";
+            var Adminuser = _context.Users.FirstOrDefault(x => x.Token == filter.getAdminToken);
+            for (int i = 0; i < filter.getfilterName.Length; i++)
             {
-                 dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
+            if (filter.getfilterName[i] == "members")
+            {
+               var tempMembers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
+                if (tempMembers.Count() > 0)
+                {
+                        filterlist.AddRange(tempMembers);
+                }
             }
-            else if(filter == "users")
+            else if (filter.getfilterName[i] == "users")
             {
-                 dbUsers = (_context.Users.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
+                var tempUsers = (dbUsers.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
+                if (tempUsers.Count() > 0)
+                {
+                        filterlist.AddRange(tempUsers);
+                }
 
             }
-            else if(filter == "expiring")
+            else if (filter.getfilterName[i] == "expiring")
             {
-                var expdbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "" && u.MemberExpiryDate != null && u.MemberStartDate != null)).OrderBy(x => x.Username);
+                var expdbUsers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "" && u.MemberExpiryDate != null && u.MemberStartDate != null)).OrderBy(x => x.Username);
                 DateTime current = DateTime.Now;
                 var months = new List<int>();
                 foreach (var user in expdbUsers)
@@ -69,27 +82,29 @@ namespace SkietbaanBE.Controllers
                     TimeSpan span = expiry.Subtract(current);
                     months.Add((span.Days) / 30);
                 }
-
                 //Looks for Members with expiry time left that is <=2 months
                 var timeMonths = months.ToArray();
                 List<User> users = new List<User>();
-                for (int i = 0; i < timeMonths.Length; i++)
+                for (int c = 0; c < timeMonths.Length; c++)
                 {
-                    if (months[i] <= 2)
+                    if (months[c] <= 2)
                     {
-                        users.Add(dbUsers.ToList().ElementAt(i));
+                        users.Add(dbUsers.ToList().ElementAt(c));
                         _notificationMessage.ExpiryNotification(users);
                     }
                 }
-                dbUsers = users.ToArray<User>();
+                var tempExpiry = users.ToArray<User>();
+                if (tempExpiry.Count() > 0)
+                {
+                        filterlist.AddRange(tempExpiry);
+                }
             }
-
+        }
             StringBuilder mydata = new StringBuilder();
-
             mydata.Append("Username" + "," + "Cellphone Number" + "," + "Email Address" + "," + "Name and Surname");
             mydata.Append(System.Environment.NewLine);            
 
-            foreach (User user in dbUsers)
+            foreach (User user in filterlist)
             {
                 var number = "";
 
@@ -104,17 +119,15 @@ namespace SkietbaanBE.Controllers
                 mydata.Append(user.Username+","+ number + "," + user.Email+"," + user.Name+" "+user.Surname);
                 mydata.Append(System.Environment.NewLine);   
             }
-
             byte[] data = Encoding.ASCII.GetBytes(mydata.ToString());
-
-            MemoryStream ms = new MemoryStream(data);           
-
-            Attachment attachment = new Attachment(ms, $"{filter}.csv", "text/plain");
-
+            MemoryStream ms = new MemoryStream(data); 
+            Attachment attachment = new Attachment(ms, $"{filterName}.csv", "text/plain");
             if(Adminuser != null)
             {
-                sendMail.SendEmail(Adminuser.Email, "csv", attachment);
-                return (filter+".csv"+" sent to "+Adminuser.Email);
+                if (sendMail.SendEmail(Adminuser.Email.Trim(), "csv", attachment))
+                    return (filterName + ".csv" + " sent to " + "bmthembu@retrorabbit.co.za");
+                else
+                    return "Could not send email.\nAuthentication Error";
             }
             else
             {
@@ -304,7 +317,6 @@ namespace SkietbaanBE.Controllers
             {
                 var dbUsers = (_context.Users.Where(u => u.MemberID != null && u.MemberID != "")).OrderBy(x => x.Username);
                 DateTime current = DateTime.Now;
-                int result;
                 List<User> users = new List<User>();
                 foreach (var user in dbUsers)
                 {
