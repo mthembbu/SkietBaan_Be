@@ -57,7 +57,7 @@ namespace SkietbaanBE.Controllers
             if (filter.getfilterName[i] == "members")
             {
                var tempMembers = (dbUsers.Where(u => u.MemberID != null && u.MemberID != "")).ToArray();
-                if (tempMembers != null)
+                if (tempMembers.Count() > 0)
                 {
                         filterlist.AddRange(tempMembers);
                 }
@@ -65,7 +65,7 @@ namespace SkietbaanBE.Controllers
             else if (filter.getfilterName[i] == "users")
             {
                 var tempUsers = (dbUsers.Where(u => u.MemberID == null || u.MemberID == "")).ToArray();
-                if (tempUsers != null)
+                if (tempUsers.Count() > 0)
                 {
                         filterlist.AddRange(tempUsers);
                 }
@@ -94,7 +94,7 @@ namespace SkietbaanBE.Controllers
                     }
                 }
                 var tempExpiry = users.ToArray<User>();
-                if (dbUsers != null)
+                if (tempExpiry.Count() > 0)
                 {
                         filterlist.AddRange(tempExpiry);
                 }
