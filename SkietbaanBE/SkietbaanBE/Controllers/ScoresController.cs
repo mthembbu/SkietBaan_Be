@@ -55,7 +55,6 @@ namespace SkietbaanBE.Controllers
                     if(tempScore != null)
                     {
                         _context.Scores.Remove(tempScore);
-                      
                     }
                 }
                 catch (Exception e)
@@ -65,7 +64,9 @@ namespace SkietbaanBE.Controllers
             }
             try
             {
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
+                Calculations calculations = new Calculations(_context);
+                calculations.performCalculations(list.FirstOrDefault().User.Id, list.FirstOrDefault().Competition.Id);
             }
             catch (Exception e) { }
         }

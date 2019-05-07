@@ -23,7 +23,7 @@ namespace SkietbaanBE.Controllers
         }
 
         [HttpPost]
-        public NotificationMessages AddNotification(string token)
+        public void AddNotification([FromBody] string token)
         {
             var _document = new DocumentsController(_context);
             var doccieLOS = _document.UserLOS(token);
@@ -32,20 +32,19 @@ namespace SkietbaanBE.Controllers
             if (doccieLOGS == "Document" && doccieLOS == "Document")
             {
                 _notificationMessage.DocumenstNotification(token);
-                return _notificationMessage;
             }
-            else if (doccieLOGS == "Document" && doccieLOS == "No Document")
+            else if ((doccieLOGS == "Document" && doccieLOS == "No Document") || (doccieLOGS == "Document" && doccieLOS == "Admin has not set requirements for letter of dedicated status"))
             {
                 _notificationMessage.LOGS(token);
-                return _notificationMessage;
             }
-            else if (doccieLOGS == "No Document" && doccieLOS == "Document")
+            else if ((doccieLOGS == "No Document" && doccieLOS == "Document") || (doccieLOGS == "Admin has not set requirements for letter of dedicated status" && doccieLOS == "Document"))
             {
                 _notificationMessage.LOS(token);
-                return _notificationMessage;
             }
-
-            return null;
+            else
+            {
+                _notificationMessage.LOGS(token);
+            }
         }
 
         [HttpGet("{id}", Name = "GetNotificationById")]
