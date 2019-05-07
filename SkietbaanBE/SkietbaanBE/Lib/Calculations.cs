@@ -40,8 +40,6 @@ namespace SkietbaanBE.Lib
                     listBestScores.Add(listScores.Last());
                     listYearAllScores.AddRange(listScores);
                 }
-
-
             }
 
             YearScores yearScores = new YearScores();
@@ -58,6 +56,14 @@ namespace SkietbaanBE.Lib
             Competition competition = _context.Competitions.Where(c => c.Id == competitionID).FirstOrDefault<Competition>();
 
             YearScores yearScores = GetYearScores(userID, competitionID);
+            var dbRecord = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.CompetitionId == competitionID
+                            && x.UserId == userID);
+            if(yearScores.listYearScores.Count() == 0 && dbRecord != null) {
+                _context.UserCompetitionTotalScores.Remove(dbRecord);
+                _context.SaveChanges();
+                return;
+            }
+
             List<double> bestScores= yearScores.listYearBest.TakeLast(competition.BestScoresNumber).ToList<double>();
             //calculate total
             double total = Math.Round(bestScores.Sum() / competition.BestScoresNumber,2);
