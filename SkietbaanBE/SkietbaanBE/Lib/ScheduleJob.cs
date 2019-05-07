@@ -143,14 +143,14 @@ namespace SkietbaanBE.Lib {
         {
             long ReNewGetMilliSecondsToNextMonth()
             {
-                int daysInMonth = DateTime.DaysInMonth(dbUser.MemberExpiryDate.Value.Year, dbUser.MemberExpiryDate.Value.Month);
-                var target = new DateTime(dbUser.MemberExpiryDate.Value.Year, dbUser.MemberExpiryDate.Value.Month, daysInMonth);
+                int daysInMonth = DateTime.DaysInMonth(dbUser.AdvanceExpiryDate.Value.Year, dbUser.AdvanceExpiryDate.Value.Month);
+                var target = new DateTime(dbUser.AdvanceExpiryDate.Value.Year, dbUser.AdvanceExpiryDate.Value.Month, daysInMonth);
                 var current = DateTime.Today;
                 return (long)target.Subtract(current).TotalMilliseconds;
             }
             void sendDetails(object source)
             {
-                dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1);
+                dbUser.MemberExpiryDate = dbUser.AdvanceExpiryDate.Value.AddYears(+1);
                 dbUser.AdvanceExpiryDate = null;
                 _context.Users.Update(dbUser);
                 _context.SaveChanges();
