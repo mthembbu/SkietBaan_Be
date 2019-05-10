@@ -138,5 +138,17 @@ namespace SkietbaanBE.Controllers
                 return new BadRequestObjectResult("score cannot be null");
             }
         }
+
+        [HttpGet("activeCompetitions/{token}")]
+        public IActionResult GetActiveCompetitions(string token) {
+            try {
+                var activeCompetitions = _context.UserCompetitionTotalScores.Where(x => x.User.Token == token)
+                                        .Select(c => c.Competition);
+                if (activeCompetitions.Count() == 0) return new OkObjectResult("No active competitions");
+                else return new OkObjectResult(activeCompetitions.ToList());
+            } catch (Exception) {
+                return new OkObjectResult("Something went wrong");
+            }
+        }
     }
 }
