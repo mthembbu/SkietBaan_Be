@@ -52,18 +52,16 @@ namespace SkietbaanBE.Lib
         }
         public void performCalculations(int userID,int competitionID)
         {
-
-            Competition competition = _context.Competitions.Where(c => c.Id == competitionID).FirstOrDefault<Competition>();
-
-            YearScores yearScores = GetYearScores(userID, competitionID);
             var dbRecord = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.CompetitionId == competitionID
                             && x.UserId == userID);
-            if(yearScores.listYearScores.Count() == 0 && dbRecord != null) {
+            var scores = _context.UserCompetitionTotalScores.Where(x => x.UserId == userID && x.CompetitionId == competitionID);
+            YearScores yearScores = GetYearScores(userID, competitionID);
+            if (yearScores.listYearScores.Count() == 0 && dbRecord != null || scores.Count() == 0 && dbRecord != null) {
                 _context.UserCompetitionTotalScores.Remove(dbRecord);
                 _context.SaveChanges();
                 return;
             }
-
+            Competition competition = _context.Competitions.Where(c => c.Id == competitionID).FirstOrDefault<Competition>();
             List<double> bestScores= yearScores.listYearBest.TakeLast(competition.BestScoresNumber).ToList<double>();
             //calculate total
             double total = Math.Round(bestScores.Sum() / competition.BestScoresNumber,2);
