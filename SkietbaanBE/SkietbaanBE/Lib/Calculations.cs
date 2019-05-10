@@ -25,7 +25,7 @@ namespace SkietbaanBE.Lib
                             where (Scores.User.Id == userID && Scores.Competition.Id == competitionID && Scores.UploadDate.Value.Month == i)
                             select new
                             {
-                                Scores.UserScore,
+                               Scores.UserScore,
                                Scores.UploadDate.Value.Year
                             };
                 List<double> listScores = new List<double>();
@@ -54,10 +54,14 @@ namespace SkietbaanBE.Lib
         {
             var dbRecord = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.CompetitionId == competitionID
                             && x.UserId == userID);
-            var scores = _context.UserCompetitionTotalScores.Where(x => x.UserId == userID && x.CompetitionId == competitionID);
+            var scores = _context.Scores.Where(x => x.User.Id == userID && 
+                        x.Competition.Id == competitionID && x.UploadDate.Value.Year == DateTime.Today.Year);
             YearScores yearScores = GetYearScores(userID, competitionID);
-            if (yearScores.listYearScores.Count() == 0 && dbRecord != null || scores.Count() == 0 && dbRecord != null) {
+            if (scores.Count() == 0 && dbRecord != null) {
+                var awards = _context.Awards.Where(x => x.Competition.Id == competitionID);
                 _context.UserCompetitionTotalScores.Remove(dbRecord);
+                if(awards.Count() > 0)
+                    _context.Awards.RemoveRange(awards);
                 _context.SaveChanges();
                 return;
             }
