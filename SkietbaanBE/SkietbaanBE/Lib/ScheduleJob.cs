@@ -139,18 +139,19 @@ namespace SkietbaanBE.Lib {
             return strMonth;
         }
 
-        public static void ReNewUserMemberShip(User dbUser)
+        public static void ReNewUserMemberShip(string tokens)
         {
-            long ReNewGetMilliSecondsToNextMonth()
+            long time;
             {
-                int daysInMonth = DateTime.DaysInMonth(dbUser.MemberExpiryDate.Value.Year, dbUser.MemberExpiryDate.Value.Month);
-                var target = new DateTime(dbUser.MemberExpiryDate.Value.Year, dbUser.MemberExpiryDate.Value.Month, daysInMonth);
+                User dbUser = _context.Users.FirstOrDefault(x => x.Token == tokens);
+                var target = new DateTime(dbUser.AdvanceExpiryDate.Value.Year, dbUser.AdvanceExpiryDate.Value.Month, dbUser.AdvanceExpiryDate.Value.Day);
                 var current = DateTime.Today;
-                return (long)target.Subtract(current).TotalMilliseconds;
+                time = (long)target.Subtract(current).TotalMilliseconds;
             }
             void sendDetails(object source)
             {
-                dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1);
+                User dbUser = _context.Users.FirstOrDefault(x => x.Token == tokens);
+                dbUser.MemberExpiryDate = dbUser.AdvanceExpiryDate.Value.AddYears(+1);
                 dbUser.AdvanceExpiryDate = null;
                 _context.Users.Update(dbUser);
                 _context.SaveChanges();
@@ -158,7 +159,7 @@ namespace SkietbaanBE.Lib {
             new Timer(
                callback: new TimerCallback(sendDetails),
                       state: "",
-                      dueTime: ReNewGetMilliSecondsToNextMonth(),
+                      dueTime: time,
                       period: 0
                   );
         }

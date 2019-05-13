@@ -33,8 +33,13 @@ namespace SkietbaanBE.Controllers
                 var nonMemberUsers = (users.Where(u => u.MemberID == null)).Count();
                 var newUsers = (double)((users.Where(x => x.EntryDate.Year == year && x.EntryDate.Month == month).ToList()).ToList()).Count;
                 var newMembers = (double)(users.Where(y => y.MemberStartDate.Value.Year == year && y.MemberStartDate.Value.Month == month)).Count();
-                var new_user_percent = Math.Round(((newUsers / users.Count()) * 100), 1);
-                var new_member_percent = Math.Round(((newMembers / users.Count()) * 100), 1);
+                double new_user_percent=0;
+                double new_member_percent = 0;
+                if (users.Count() != 0)
+                {
+                    new_user_percent = Math.Round(((newUsers / users.Count()) * 100), 1);
+                    new_member_percent = Math.Round(((newMembers / users.Count()) * 100), 1);
+                }
                 statDetails.Add("new user", newUsers);
                 statDetails.Add("new member", newMembers);
                 statDetails.Add("total users", (this.SearchNonMember()).Count());

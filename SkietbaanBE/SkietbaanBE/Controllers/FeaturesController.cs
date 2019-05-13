@@ -468,8 +468,7 @@ namespace SkietbaanBE.Controllers
         [ActionName("Update")]
         public async Task<IActionResult> PutUserMember([FromBody] User user)
         {
-
-            int year = ((user.MemberExpiryDate).Value).Year;
+           
             if (user.Username == null)
             {
                 return new BadRequestObjectResult("No empty fields allowed");
@@ -477,6 +476,7 @@ namespace SkietbaanBE.Controllers
            
             User dbUser = _context.Users.Where(u => u.Username == user.Username)
                     .FirstOrDefault<User>();
+            int year = ((user.MemberExpiryDate).Value).Year;
             if (dbUser == null)
                 {
                     return BadRequest("User is null");
@@ -490,12 +490,32 @@ namespace SkietbaanBE.Controllers
             }
             else
             {
-                dbUser.MemberExpiryDate = user.MemberExpiryDate.Value.AddYears(+1);
+                var monthNum = DiffMonths(user.MemberExpiryDate.Value, DateTime.Now);
+                if (monthNum <= 12)
+                {
+                    dbUser.MemberExpiryDate = user.MemberExpiryDate.Value.AddMonths(+12);
+                }
+                else
+                {
+                    return Ok("the user has alredy expired");
+                }
             }
              _context.Users.Update(dbUser);
              await _context.SaveChangesAsync();
             _notificationMessage.ConfirmationNotification(dbUser);
              return Ok("User update successful");
+        }
+        public int DiffMonths( DateTime start, DateTime end)
+        {
+            int months = 0;
+            DateTime tmp = start;
+
+            while (tmp < end)
+            {
+                months++;
+                tmp = tmp.AddMonths(1);
+            }
+            return months;
         }
 
         //// POST: api/User/RenewMembership
@@ -517,7 +537,7 @@ namespace SkietbaanBE.Controllers
 
             if (user.EntryDate == user.MemberExpiryDate)
             {
-                dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1); ;
+                dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1);
                 _context.Users.Update(dbUser);
             }
             else
@@ -525,7 +545,7 @@ namespace SkietbaanBE.Controllers
                 dbUser.AdvanceExpiryDate = user.MemberExpiryDate;
                 _context.Users.Update(dbUser);
                 _context.SaveChanges();
-                ScheduleJob.ReNewUserMemberShip(dbUser);
+                ScheduleJob.ReNewUserMemberShip(dbUser.Token);
             }
             await _context.SaveChangesAsync();
             _notificationMessage.RenewalNotification(dbUser);
@@ -539,7 +559,6 @@ namespace SkietbaanBE.Controllers
             exelTestData.AddUsersFromExcel();
             exelTestData.AddCompetitionsFromExcel();
             exelTestData.AddScoreFromExcel();
-
             return "success";
         }
     }
