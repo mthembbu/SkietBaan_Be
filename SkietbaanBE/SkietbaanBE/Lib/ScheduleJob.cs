@@ -141,7 +141,6 @@ namespace SkietbaanBE.Lib {
 
         public static void ReNewUserMemberShip(string tokens)
         {
-
             long time;
             {
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == tokens);
