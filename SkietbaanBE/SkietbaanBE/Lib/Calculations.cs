@@ -25,7 +25,7 @@ namespace SkietbaanBE.Lib
                             where (Scores.User.Id == userID && Scores.Competition.Id == competitionID && Scores.UploadDate.Value.Month == i)
                             select new
                             {
-                                Scores.UserScore,
+                               Scores.UserScore,
                                Scores.UploadDate.Value.Year
                             };
                 List<double> listScores = new List<double>();
@@ -52,18 +52,20 @@ namespace SkietbaanBE.Lib
         }
         public void performCalculations(int userID,int competitionID)
         {
-
-            Competition competition = _context.Competitions.Where(c => c.Id == competitionID).FirstOrDefault<Competition>();
-
-            YearScores yearScores = GetYearScores(userID, competitionID);
             var dbRecord = _context.UserCompetitionTotalScores.FirstOrDefault(x => x.CompetitionId == competitionID
                             && x.UserId == userID);
-            if(yearScores.listYearScores.Count() == 0 && dbRecord != null) {
+            var scores = _context.Scores.Where(x => x.User.Id == userID && 
+                        x.Competition.Id == competitionID && x.UploadDate.Value.Year == DateTime.Today.Year);
+            YearScores yearScores = GetYearScores(userID, competitionID);
+            if (scores.Count() == 0 && dbRecord != null) {
+                var awards = _context.Awards.Where(x => x.Competition.Id == competitionID);
                 _context.UserCompetitionTotalScores.Remove(dbRecord);
+                if(awards.Count() > 0)
+                    _context.Awards.RemoveRange(awards);
                 _context.SaveChanges();
                 return;
             }
-
+            Competition competition = _context.Competitions.Where(c => c.Id == competitionID).FirstOrDefault<Competition>();
             List<double> bestScores= yearScores.listYearBest.TakeLast(competition.BestScoresNumber).ToList<double>();
             //calculate total
             double total = Math.Round(bestScores.Sum() / competition.BestScoresNumber,2);
