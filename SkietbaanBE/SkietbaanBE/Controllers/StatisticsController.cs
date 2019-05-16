@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkietbaanBE.Models;
 using SkietbaanBE.RequestModel;
@@ -149,8 +147,8 @@ namespace SkietbaanBE.Controllers
                 if (scores.Count() > 10) {
                     dateOrderedScores = (IOrderedQueryable<Score>)dateOrderedScores.Skip(dateOrderedScores.ToList().Count() - 10);
                 }
-
-                for (int i = 0; i < dateOrderedScores.ToList().Count(); i++) {
+                int scoresCount = dateOrderedScores.ToList().Count();
+                for (int i = 0; i < scoresCount; i++) {
                     foreach (var userInGroup in usersInGroup) {
                         var userInGroupScore = context.Scores.Where(x => x.User.Id == userInGroup.Id &&
                                                 x.Competition.Name == competitionName).OrderBy(x => x.UploadDate);
@@ -205,7 +203,7 @@ namespace SkietbaanBE.Controllers
                 graphData.Average = Math.Round(userAvgList.Sum() / userAvgList.Count(), 2);
                 graphData.Data = dataList;
 
-            } catch (Exception e) {
+            } catch (Exception) {
                 return new BadRequestObjectResult("There was an error fetching your data");
             }
 
@@ -406,22 +404,30 @@ namespace SkietbaanBE.Controllers
             }
         }
 
-        [HttpGet("participants")]
-        public Dictionary<string, int> GetUsersPerGroup() {
-            Dictionary<string, int> mapGroupToNumberOfUsers = new Dictionary<string, int>();
+        [HttpGet("participants/{token}")]
+        public Dictionary<string, ParticipantCount> GetUsersPerGroup(string token) {
+            Dictionary<string, ParticipantCount> mapGroupToNumberOfUsers = new Dictionary<string, ParticipantCount>();
             var GroupList = context.Groups;
 
             try {
-                foreach (var groups in GroupList) {
+                foreach (var _group in GroupList) {
                     int count = (from usergroup in context.UserGroups
-                                 where usergroup.GroupId == groups.Id
+                                 where usergroup.GroupId == _group.Id
                                  select usergroup.User.Id).Distinct().ToList().Count();
+                    bool isParticipant = false;
+                    if (count > 0)
+                        isParticipant = context.UserGroups.FirstOrDefault(x => x.Group.Name == _group.Name
+                                        && x.User.Token == token) != null;
 
-                    mapGroupToNumberOfUsers.Add(groups.Name, count);
+                    ParticipantCount participantCount = new ParticipantCount {
+                        Count = count,
+                        IsParticipant = isParticipant
+                    };
+                    mapGroupToNumberOfUsers.Add(_group.Name, participantCount);
                 }
                 return mapGroupToNumberOfUsers;
             } catch (Exception) {
-                return new Dictionary<string, int>();
+                return new Dictionary<string, ParticipantCount>();
             }
         }
 
