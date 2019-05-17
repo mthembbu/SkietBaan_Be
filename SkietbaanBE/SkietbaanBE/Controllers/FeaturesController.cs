@@ -543,7 +543,7 @@ namespace SkietbaanBE.Controllers
             else
             {*/
             DateTime targetTime = new DateTime(user.MemberExpiryDate.Value.Year, user.MemberExpiryDate.Value.Month,
-                    user.MemberExpiryDate.Value.Day, 09, 39, 00);
+                    user.MemberExpiryDate.Value.Day, 10, 30, 00);
                 dbUser.AdvanceExpiryDate = targetTime;
                 _context.Users.Update(dbUser);
                 _context.SaveChanges();
