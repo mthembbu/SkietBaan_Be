@@ -139,13 +139,11 @@ namespace SkietbaanBE.Lib {
             return strMonth;
         }
 
-        public static void ReNewUserMemberShip(string tokens)
+        public static void ReNewUserMemberShip(string tokens, DateTime target)
         {
             long time;
             {
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == tokens);
-                var target = new DateTime(dbUser.AdvanceExpiryDate.Value.Year, 
-                        dbUser.AdvanceExpiryDate.Value.Month, dbUser.AdvanceExpiryDate.Value.Day, 00, 00, 1);
                 var current = DateTime.Now;
                 time = (long)target.Subtract(current).TotalMilliseconds;  
             }

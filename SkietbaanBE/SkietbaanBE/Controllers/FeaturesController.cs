@@ -535,18 +535,20 @@ namespace SkietbaanBE.Controllers
                 return BadRequest("User is null");
             }
 
-            if (user.EntryDate == user.MemberExpiryDate)
+            /*if (user.EntryDate == user.MemberExpiryDate)
             {
                 dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1);
                 _context.Users.Update(dbUser);
             }
             else
-            {
-                dbUser.AdvanceExpiryDate = user.MemberExpiryDate;
+            {*/
+            DateTime targetTime = new DateTime(user.MemberExpiryDate.Value.Year, user.MemberExpiryDate.Value.Month,
+                    user.MemberExpiryDate.Value.Day, 10, 30, 00);
+                dbUser.AdvanceExpiryDate = targetTime;
                 _context.Users.Update(dbUser);
                 _context.SaveChanges();
-                ScheduleJob.ReNewUserMemberShip(dbUser.Token);
-            }
+                ScheduleJob.ReNewUserMemberShip(dbUser.Token, targetTime);
+            //}
             await _context.SaveChangesAsync();
             _notificationMessage.RenewalNotification(dbUser);
             return Ok("User update successful");
