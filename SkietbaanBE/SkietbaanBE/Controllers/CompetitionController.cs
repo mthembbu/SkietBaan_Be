@@ -152,6 +152,8 @@ namespace SkietbaanBE.Controllers
                     switch (R.Standard) {
                         case "Bronze":
                         case "bronze":
+                            R.NumberOfShoots = rFilter.GetRequirements.ElementAt(i).NumberOfShoots;
+                            R.StatusLetter = rFilter.GetRequirements.ElementAt(i).StatusLetter;
                             if (rFilter.GetRequirements.ElementAt(i).Accuracy == 0) R.Accuracy = 60;
                             else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
                             if (rFilter.GetRequirements.ElementAt(i).Total == 0)
@@ -160,6 +162,8 @@ namespace SkietbaanBE.Controllers
                             break;
                         case "Silver":
                         case "silver":
+                            R.NumberOfShoots = rFilter.GetRequirements.ElementAt(i).NumberOfShoots;
+                            R.StatusLetter = rFilter.GetRequirements.ElementAt(i).StatusLetter;
                             if (rFilter.GetRequirements.ElementAt(i).Accuracy == 0) R.Accuracy = 70;
                             else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
                             if (rFilter.GetRequirements.ElementAt(i).Total == 0)
@@ -168,6 +172,8 @@ namespace SkietbaanBE.Controllers
                             break;
                         case "Gold":
                         case "gold":
+                            R.NumberOfShoots = rFilter.GetRequirements.ElementAt(i).NumberOfShoots;
+                            R.StatusLetter = rFilter.GetRequirements.ElementAt(i).StatusLetter;
                             if (rFilter.GetRequirements.ElementAt(i).Accuracy == 0) R.Accuracy = 90;
                             else R.Accuracy = rFilter.GetRequirements.ElementAt(i).Accuracy;
                             if (rFilter.GetRequirements.ElementAt(i).Total == 0)
@@ -179,7 +185,6 @@ namespace SkietbaanBE.Controllers
                 }
                 _context.SaveChanges();
                 return Ok("Competition " + rFilter.Competition.Name + " Added!");
-                
             }
             catch { return new BadRequestObjectResult("Could not connect to Backend"); ; }
         }
@@ -294,6 +299,8 @@ namespace SkietbaanBE.Controllers
                             R.Standard = requirements[i].Standard;
                             R.Accuracy = requirements[i].Accuracy;
                             R.Total = requirements[i].Total;
+                            R.StatusLetter = requirements[i].StatusLetter;
+                            R.NumberOfShoots = requirements[i].NumberOfShoots;
                             _context.Requirements.Update(R);
                         }
                         await _context.SaveChangesAsync();
