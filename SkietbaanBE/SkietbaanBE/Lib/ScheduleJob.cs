@@ -141,19 +141,24 @@ namespace SkietbaanBE.Lib {
 
         public static void ReNewUserMemberShip(string tokens, DateTime target)
         {
+            SendMail sendMail = new SendMail();
+            sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "job scheduled", "scheduled for " + tokens +" for day " + target.ToString());
             long time;
             {
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == tokens);
                 var current = DateTime.Now;
                 time = (long)target.Subtract(current).TotalMilliseconds;  
             }
+            sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "time", "target in milliseconds: " + time);
             void sendDetails(object source)
             {
                 User dbUser = _context.Users.FirstOrDefault(x => x.Token == tokens);
+                sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "job is running", "user: " + dbUser.Username);
                 dbUser.MemberExpiryDate = dbUser.AdvanceExpiryDate.Value.AddYears(+1);
                 dbUser.AdvanceExpiryDate = null;
                 _context.Users.Update(dbUser);
                 _context.SaveChanges();
+                sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "job is done", "new expiry: " + dbUser.MemberExpiryDate.ToString());
             }
             new Timer(
                callback: new TimerCallback(sendDetails),
