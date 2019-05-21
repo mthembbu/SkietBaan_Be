@@ -226,7 +226,9 @@ namespace SkietbaanBE.Controllers
                 {
                     user.Surname = null;
                 }
+
                 tempUser.Surname = user.Surname;
+                tempUser.ProfilePicture = user.ProfilePicture;
                 _context.Update(tempUser);
                 _context.SaveChanges();
                 return ("updated");
