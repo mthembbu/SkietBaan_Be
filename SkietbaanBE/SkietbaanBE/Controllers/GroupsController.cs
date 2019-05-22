@@ -149,7 +149,7 @@ namespace SkietbaanBE.Controllers
         //creating groups and adding members to the groups for that
         [HttpPost]
         [Route("add")]
-        public void AddListUsers([FromBody] CreateGroup createobj)
+        public IActionResult AddListUsers([FromBody] CreateGroup createobj)
         {
             try
             {
@@ -185,14 +185,15 @@ namespace SkietbaanBE.Controllers
                     }
                     catch (Exception e)
                     {
-                        break;
+                        return BadRequest();
                     }
                 }
                 _context.UserGroups.AddRange(userGroups);
                 _context.SaveChanges();
+                return new OkObjectResult(group);
             }catch(Exception e)
             {
-                e.ToString();
+                return Ok(e);
             }
         }
 
