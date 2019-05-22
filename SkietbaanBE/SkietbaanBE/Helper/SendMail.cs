@@ -54,6 +54,18 @@ namespace SkietbaanBE.Helper
             return true;
         }
 
+        public bool EmailDebugger(string To, string Subject, string body) {
+            try {
+                using (MailMessage mail = new MailMessage()) {
+                    MailAssignment(mail, emailFromAddress, To, Subject, body);
+                    SmtpSend(mail);
+                }
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
+
         public void MailAssignment(MailMessage mailMessage, string From, string To, string Subject, string Body)
         {
             mailMessage.From = new MailAddress(From);
