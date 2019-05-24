@@ -23,7 +23,8 @@ namespace SkietbaanBE.Lib {
                 period: 0
             );
         }
-
+        
+        /*TODO: ADD FEW MILLISECONDS TO MAKE SURE THAT THIS FUNCTION*/
         private long GetMilliSecondsToNextMonth() {
             int daysInMonth = DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month);
             var target = new DateTime(DateTime.Today.Year, DateTime.Today.Month, daysInMonth);
@@ -36,49 +37,60 @@ namespace SkietbaanBE.Lib {
         private void AwardUserJob(Object source) {
             //join all competitions where the user participates, but only the active competitions
             try {
-                var query = (from User in _context.Users
-                             join UserCompetitionTotalScore in _context.UserCompetitionTotalScores on User.Id
-                                 equals UserCompetitionTotalScore.UserId
-                             join Competition in _context.Competitions on UserCompetitionTotalScore.CompetitionId
-                                 equals Competition.Id
-                             where (Competition.Status == true && UserCompetitionTotalScore.Year == DateTime.Today.Year)
-                             orderby Competition.Id, UserCompetitionTotalScore.Total descending
-                             select new {
-                                 User,
-                                 Competition.Id,
-                                 Competition,
-                                 UserCompetitionTotalScore.Total
-                             }).Distinct();
+                var competitions = _context.Competitions.Where(x => x.Status == true);
+                foreach (var competition in competitions) {
+                    var dbTotalScoreRecord = _context.UserCompetitionTotalScores.Where(x => x.Competition.Name == competition.Name)
+                        .OrderByDescending(x => x.Total).FirstOrDefault();
+                    if (dbTotalScoreRecord == null) continue;
+                    double maxTotal = dbTotalScoreRecord.Total;
+                    var usersWithSameMax = _context.UserCompetitionTotalScores.Where(x => x.Total == maxTotal);
+                    if (usersWithSameMax.Count() > 3) {
+                        usersWithSameMax = usersWithSameMax.OrderByDescending(x => x.Total)
+                                .OrderByDescending(x => x.Average).Take(3);
+                        var users = usersWithSameMax.Select(x => x.User).ToList();
+                        int counter = 0;
+                        foreach (var topUser in usersWithSameMax) {
+                            topUser.User = users.ElementAt(counter);
+                            counter++;
+                            Award award = new Award {
+                                Competition = competition,
+                                User = topUser.User,
+                                Month = DateTime.Today.Month,
+                                Year = DateTime.Today.Year,
+                                Description = $"Month:{topUser.Total}"
+                            };
+                            var dbRecord = _context.Awards.Where(x => x.Competition.Name == award.Competition.Name &&
+                                x.User.Id == award.User.Id && x.Month == award.Month && x.Year == award.Year).FirstOrDefault();
+                            if(dbRecord == null)
+                                _context.Awards.Add(award);
+                        }
+                    } else {
+                        var topUsers = _context.UserCompetitionTotalScores.Where(x => x.Competition.Name == competition.Name)
+                            .OrderByDescending(x => x.Total).Take(3);
+                        var users = topUsers.Select(x => x.User).ToList();
+                        int counter = 0;
+                        foreach (var topUser in topUsers) {
+                            topUser.User = users.ElementAt(counter);
+                            counter++;
+                            Award award = new Award {
+                                Competition = competition,
+                                User = topUser.User,
+                                Month = DateTime.Today.Month,
+                                Year = DateTime.Today.Year,
+                                Description = $"Month:{topUser.Total}"
+                            };
 
-                //award the users who ranked first in their respective competitions
-                var allCompIds = query.Select(x => x.Id).Distinct();
-                bool isChanged = false;
-                foreach (var i in allCompIds) {
-                    var top = query.Where(x => x.Id == i).First();
-                    var comp = _context.Competitions.Find(top.Id);
-                    var user = _context.Users.Find(top.User.Id);
-                    Award award = new Award {
-                        Competition = comp,
-                        User = user,
-                        Description = $"Month:Best shooter in {comp.Name} on " + $"{GetMonthNameByMonthNumber(DateTime.Today.Month)}" + " " +
-                                        $"{DateTime.Today.Year}",
-                        Month = DateTime.Today.Month,
-                        Year = DateTime.Today.Year
-                    };
-
-                    var dbRecord = _context.Awards.FirstOrDefault(x => x.Description == award.Description);
-                    if (dbRecord != null) continue;
-
-                    isChanged = true;
-                    _notificationMessage.MonthAwardNotification(user.Token, award.Description);
-                    _context.Awards.Add(award);
+                            var dbRecord = _context.Awards.Where(x => x.Competition.Name == award.Competition.Name &&
+                                x.User.Id == award.User.Id && x.Month == award.Month && x.Year == award.Year).FirstOrDefault();
+                            if (dbRecord == null)
+                                _context.Awards.Add(award);
+                        }
+                    }
                 }
-
-                if(isChanged) _context.SaveChanges();
-
+                _context.SaveChanges();
                 //run the updateAwardTimer once again after 20 days
                 updateAwardTimer.Change((int)TimeSpan.FromDays(20).TotalMilliseconds, 0);
-            } catch (Exception) {
+            } catch (Exception e) {
                 // log to file
             }
         }   
@@ -150,15 +162,20 @@ namespace SkietbaanBE.Lib {
                 time = (long)target.Subtract(current).TotalMilliseconds;  
             }
             sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "time", "target in milliseconds: " + time);
-            void sendDetails(object source)
+            void sendDetails(Object source)
             {
-                User dbUser = _context.Users.FirstOrDefault(x => x.Token == tokens);
-                sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "job is running", "user: " + dbUser.Username);
-                dbUser.MemberExpiryDate = dbUser.AdvanceExpiryDate.Value.AddYears(+1);
-                dbUser.AdvanceExpiryDate = null;
-                _context.Users.Update(dbUser);
-                _context.SaveChanges();
-                sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "job is done", "new expiry: " + dbUser.MemberExpiryDate.ToString());
+                SendMail sendMailTimer = new SendMail();
+                try {
+                    User dbUser = _context.Users.FirstOrDefault(x => x.Token == tokens);
+                    sendMailTimer.EmailDebugger("mandlamasombuka21@gmail.com", "job is running", "user: " + dbUser.Username);
+                    dbUser.MemberExpiryDate = dbUser.AdvanceExpiryDate.Value.AddYears(+1);
+                    dbUser.AdvanceExpiryDate = null;
+                    _context.Users.Update(dbUser);
+                    _context.SaveChanges();
+                    sendMailTimer.EmailDebugger("mandlamasombuka21@gmail.com", "job is done", "new expiry: " + dbUser.MemberExpiryDate.ToString());
+                } catch (Exception e) {
+                    sendMailTimer.EmailDebugger("mandlamasombuka21@gmail.com", "exception", e.Message);
+                }
             }
             new Timer(
                callback: new TimerCallback(sendDetails),
