@@ -540,21 +540,20 @@ namespace SkietbaanBE.Controllers
             {
                 dbUser.MemberExpiryDate = dbUser.MemberExpiryDate.Value.AddYears(1);
                 _context.Users.Update(dbUser);
-            }
-            else
-            
-            try {
-                DateTime targetTime = new DateTime(user.MemberExpiryDate.Value.Year, user.MemberExpiryDate.Value.Month,
-                        user.MemberExpiryDate.Value.Day, 00, 01, 00);
-                dbUser.AdvanceExpiryDate = targetTime;
-                _context.Users.Update(dbUser);
-                _context.SaveChanges();
-                ScheduleJob.ReNewUserMemberShip(dbUser.Token, targetTime);
-                sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "end-point hit", "target: " + targetTime.ToString());
-                await _context.SaveChangesAsync();
-                _notificationMessage.RenewalNotification(dbUser);
-            }catch(Exception e) {
-                sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "exception", "exception: " + e.Message);
+            } else { 
+                try {
+                    DateTime targetTime = new DateTime(user.MemberExpiryDate.Value.Year, user.MemberExpiryDate.Value.Month,
+                            user.MemberExpiryDate.Value.Day, 00, 01, 00);
+                    dbUser.AdvanceExpiryDate = targetTime;
+                    _context.Users.Update(dbUser);
+                    _context.SaveChanges();
+                    ScheduleJob.ReNewUserMemberShip(dbUser.Token, targetTime);
+                    sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "end-point hit", "target: " + targetTime.ToString());
+                    await _context.SaveChangesAsync();
+                    _notificationMessage.RenewalNotification(dbUser);
+                }catch(Exception e) {
+                    sendMail.EmailDebugger("mandlamasombuka21@gmail.com", "exception", "exception: " + e.Message);
+                }
             }
             return Ok("User update successful");
         }
